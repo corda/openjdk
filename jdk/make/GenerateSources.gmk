@@ -47,9 +47,6 @@ GENSRC += $(GENSRC_LOCALEDATAMETAINFO)
 include gensrc/GensrcCharacterData.gmk
 GENSRC += $(GENSRC_CHARACTERDATA)
 
-include gensrc/GensrcJDWP.gmk
-GENSRC += $(GENSRC_JDWP)
-
 include gensrc/GensrcMisc.gmk
 GENSRC += $(GENSRC_MISC)
 
@@ -65,25 +62,8 @@ GENSRC += $(GENSRC_BUFFER)
 include gensrc/GensrcExceptions.gmk
 GENSRC += $(GENSRC_EXCEPTIONS)
 
-ifneq ($(OPENJDK_TARGET_OS), windows)
-  include gensrc/GensrcIcons.gmk
-  GENSRC += $(GENSRC_AWT_ICONS)
-
-  ifeq ($(OPENJDK_TARGET_OS), macosx)
-    GENSRC += $(GENSRC_OSX_ICONS)
-  endif
-
-  ifneq ($(OPENJDK_TARGET_OS), macosx)
-    include gensrc/GensrcX11Wrappers.gmk
-    GENSRC += $(GENSRC_X11WRAPPERS)
-  endif
-endif
-
 include gensrc/GensrcCLDR.gmk
 GENSRC += $(GENSRC_CLDR)
-
-include gensrc/GensrcSwing.gmk
-GENSRC += $(GENSRC_SWING_BEANINFO) $(GENSRC_SWING_NIMBUS)
 
 $(GENSRC): $(BUILD_TOOLS)
 

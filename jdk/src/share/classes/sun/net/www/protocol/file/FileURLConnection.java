@@ -88,13 +88,6 @@ public class FileURLConnection extends URLConnection {
                 } else {
 
                     is = new BufferedInputStream(new FileInputStream(filename));
-
-                    // Check if URL should be metered
-                    boolean meteredInput = ProgressMonitor.getDefault().shouldMeterInput(url, "GET");
-                    if (meteredInput)   {
-                        ProgressSource pi = new ProgressSource(url, "GET", file.length());
-                        is = new MeteredStream(is, pi, file.length());
-                    }
                 }
             } catch (IOException e) {
                 throw e;

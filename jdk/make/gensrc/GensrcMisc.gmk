@@ -48,19 +48,6 @@ GENSRC_MISC += $(JDK_OUTPUTDIR)/gensrc/sun/misc/Version.java \
     $(PROFILE_VERSION_JAVA_TARGETS)
 
 ##########################################################################################
-# Version file for jconsole
-
-$(JDK_OUTPUTDIR)/gensrc/sun/tools/jconsole/Version.java: \
-    $(JDK_TOPDIR)/src/share/classes/sun/tools/jconsole/Version.java.template
-	$(MKDIR) -p $(@D)
-	$(RM) $@ $@.tmp
-	$(ECHO) $(LOG_INFO) Generating sun/tools/jconsole/Version.java
-	$(SED) -e 's/@@jconsole_version@@/$(FULL_VERSION)/g' $< > $@.tmp
-	$(MV) $@.tmp $@
-
-GENSRC_MISC += $(JDK_OUTPUTDIR)/gensrc/sun/tools/jconsole/Version.java
-
-##########################################################################################
 
 GENSRC_MISC += $(JDK_OUTPUTDIR)/gensrc/sun/nio/ch/SocketOptionRegistry.java
 
