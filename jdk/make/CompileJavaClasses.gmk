@@ -110,11 +110,6 @@ else
       UnixSystem.java
 endif
 
-ifeq ($(OPENJDK_TARGET_OS), windows)
-  # Don't build GTK L&F on Windows
-  EXCLUDES += com/sun/java/swing/plaf/gtk
-endif
-
 ifneq ($(OPENJDK_TARGET_OS), linux)
   EXFILES += sun/tools/attach/LinuxAttachProvider.java \
       sun/tools/attach/LinuxVirtualMachine.java \
@@ -174,60 +169,6 @@ ifdef OPENJDK
   EXCLUDES += sun/java2d/cmm/kcms
 endif
 
-# Used on windows and macosx
-ifeq (, $(filter $(OPENJDK_TARGET_OS), windows macosx))
-  EXFILES += sun/awt/AWTCharset.java
-endif
-
-ifeq ($(OPENJDK_TARGET_OS), macosx)
-  # exclude all X11 on Mac, we can't exclude some like below or we'll have compilation errors
-  EXCLUDES += sun/awt/X11
-else
-  # TBD: figure out how to eliminate this long list
-  EXFILES += sun/awt/X11/ScreenFormat.java \
-      sun/awt/X11/XArc.java \
-      sun/awt/X11/XChar2b.java \
-      sun/awt/X11/XCharStruct.java \
-      sun/awt/X11/XClassHint.java \
-      sun/awt/X11/XComposeStatus.java \
-      sun/awt/X11/XExtCodes.java \
-      sun/awt/X11/XFontProp.java \
-      sun/awt/X11/XFontSetExtents.java \
-      sun/awt/X11/XFontStruct.java \
-      sun/awt/X11/XGCValues.java \
-      sun/awt/X11/XHostAddress.java \
-      sun/awt/X11/XIMCallback.java \
-      sun/awt/X11/XIMHotKeyTrigger.java \
-      sun/awt/X11/XIMHotKeyTriggers.java \
-      sun/awt/X11/XIMPreeditCaretCallbackStruct.java \
-      sun/awt/X11/XIMPreeditDrawCallbackStruct.java \
-      sun/awt/X11/XIMPreeditStateNotifyCallbackStruct.java \
-      sun/awt/X11/XIMStatusDrawCallbackStruct.java \
-      sun/awt/X11/XIMStringConversionCallbackStruct.java \
-      sun/awt/X11/XIMStringConversionText.java \
-      sun/awt/X11/XIMStyles.java \
-      sun/awt/X11/XIMText.java \
-      sun/awt/X11/XIMValuesList.java \
-      sun/awt/X11/XImage.java \
-      sun/awt/X11/XKeyboardControl.java \
-      sun/awt/X11/XKeyboardState.java \
-      sun/awt/X11/XOMCharSetList.java \
-      sun/awt/X11/XOMFontInfo.java \
-      sun/awt/X11/XOMOrientation.java \
-      sun/awt/X11/XPoint.java \
-      sun/awt/X11/XRectangle.java \
-      sun/awt/X11/XSegment.java \
-      sun/awt/X11/XStandardColormap.java \
-      sun/awt/X11/XTextItem.java \
-      sun/awt/X11/XTextItem16.java \
-      sun/awt/X11/XTextProperty.java \
-      sun/awt/X11/XTimeCoord.java \
-      sun/awt/X11/XWindowChanges.java \
-      sun/awt/X11/XdbeSwapInfo.java \
-      sun/awt/X11/XmbTextItem.java \
-      sun/awt/X11/XwcTextItem.java
-endif
-
 # Exclude another implicitly not included file.
 EXFILES += sun/util/locale/AsciiUtil.java
 
@@ -243,21 +184,6 @@ ifeq ($(OPENJDK_TARGET_OS), windows)
       sun/nio/ch/PollSelectorProvider.java \
       sun/nio/ch/SimpleAsynchronousFileChannelImpl.java
 endif
-
-# These files do not appear in the build result of the old build. This
-# is because they are generated sources, but the AUTO_JAVA_FILES won't
-# pick them up since they aren't generated when the source dirs are
-# searched and they aren't referenced by any other classes so they won't
-# be picked up by implicit compilation. On a rebuild, they are picked up
-# and compiled. Exclude them here to produce the same rt.jar as the old
-# build does when building just once.
-EXFILES += javax/swing/plaf/nimbus/InternalFrameTitlePanePainter.java \
-    javax/swing/plaf/nimbus/OptionPaneMessageAreaPainter.java \
-    javax/swing/plaf/nimbus/ScrollBarPainter.java \
-    javax/swing/plaf/nimbus/SliderPainter.java \
-    javax/swing/plaf/nimbus/SpinnerPainter.java \
-    javax/swing/plaf/nimbus/SplitPanePainter.java \
-    javax/swing/plaf/nimbus/TabbedPanePainter.java
 
 # Acquire a list of files that should be copied straight over to the classes.
 include CopyIntoClasses.gmk
@@ -308,12 +234,6 @@ ifeq ($(OPENJDK_TARGET_OS),aix)
       $(JDK_TOPDIR)/src/solaris/classes/sun/nio/ch/sctp/SctpServerChannelImpl.java
 endif
 
-# The exception handling of swing beaninfo
-# These resources violates the convention of having code and resources together under
-# $(JDK_TOPDIR)/src/.../classes directories
-$(JDK_OUTPUTDIR)/classes/javax/swing/beaninfo/images/%.gif: $(JDK_TOPDIR)/make/data/swingbeaninfo/images/%.gif
-	$(call install-file)
-
 # The JDK_USER_DEFINED_FILTER is a poor man's incremental build: by specifying
 # JDK_FILTER at the make command line, only a subset of the JDK java files will
 # be recompiled. If multiple paths are separated by comma, convert that into a
@@ -334,7 +254,6 @@ $(eval $(call SetupJavaCompilation,BUILD_JDK,\
         $(MACOSX_SRC_DIRS) \
         $(AIX_SRC_DIRS) \
         $(JDK_OUTPUTDIR)/gensrc \
-        $(JDK_OUTPUTDIR)/gensrc_no_srczip \
         $(CLOSED_SRC_DIRS),\
     INCLUDES:=$(JDK_USER_DEFINED_FILTER),\
     EXCLUDES:=$(EXCLUDES) $(SECURITY_PKGS),\

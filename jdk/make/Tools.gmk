@@ -28,10 +28,6 @@ $(eval $(call FillCacheFind, $(JDK_TOPDIR)/make/src/classes))
 
 TOOLS_SRC := $(JDK_TOPDIR)/make/src/classes
 
-ifeq ($(findstring $(OPENJDK_TARGET_OS),windows macosx),)
-  TOOLS_SRC += $(JDK_TOPDIR)/src/solaris/classes/sun/awt/X11/generator
-endif
-
 # The exception handling of swing beaninfo which have the own tool directory
 ifeq (, $(BUILD_TOOLS))
   $(eval $(call SetupJavaCompilation,BUILD_TOOLS, \
@@ -39,10 +35,6 @@ ifeq (, $(BUILD_TOOLS))
       SRC := $(TOOLS_SRC), \
       BIN := $(JDK_OUTPUTDIR)/btclasses))
 endif
-
-$(JDK_OUTPUTDIR)/btclasses/build/tools/generatenimbus/resources/%.template: \
-    $(JDK_TOPDIR)/src/share/classes/javax/swing/plaf/nimbus/%.template
-	$(call install-file)
 
 BUILD_TOOLS += $(foreach i, $(wildcard $(JDK_TOPDIR)/src/share/classes/javax/swing/plaf/nimbus/*.template), $(JDK_OUTPUTDIR)/btclasses/build/tools/generatenimbus/resources/$(notdir $i))
 

@@ -29,41 +29,11 @@ COPY_PATTERNS = .icu _dict
 
 # Copy config files for com.sun.org.apache.xml.internal.security
 
-XMLSECURITY_RESOURCEDIR = $(JDK_TOPDIR)/src/share/classes/com/sun/org/apache/xml/internal/security/resource
-COPY_FILES += \
-    $(XMLSECURITY_RESOURCEDIR)/config.dtd \
-    $(XMLSECURITY_RESOURCEDIR)/config.xml
-
 # Copy sun/tools related files into the classes directory.
-
-# Extra jstat files
-JSTAT_RESOURCEDIR = $(JDK_TOPDIR)/src/share/classes/sun/tools/jstat/resources
-COPY_FILES += \
-    $(JSTAT_RESOURCEDIR)/jstat_options \
-    $(JSTAT_RESOURCEDIR)/jstat_unsupported_options
-
-# Extra jhat files
-JHAT_RESOURCEDIR = $(JDK_TOPDIR)/src/share/classes/com/sun/tools/hat/resources
-COPY_FILES += \
-    $(JHAT_RESOURCEDIR)/hat.js \
-    $(JHAT_RESOURCEDIR)/oqlhelp.html \
-    $(JHAT_RESOURCEDIR)/platform_names.txt
-
-# Extra jrunscript files
-JRUNSCRIPT_RESOURCEDIR = $(JDK_TOPDIR)/src/share/classes/com/sun/tools/script/shell
-COPY_FILES += \
-    $(JRUNSCRIPT_RESOURCEDIR)/init.js \
-    $(JRUNSCRIPT_RESOURCEDIR)/messages.properties
 
 # Extra jvmstat files
 COPY_FILES += \
     $(JDK_TOPDIR)/src/share/classes/sun/jvmstat/perfdata/resources/aliasmap
-
-# JConsole resources
-JCONSOLE_RESOURCES_DIR = $(JDK_TOPDIR)/src/share/classes/sun/tools/jconsole/resources
-COPY_FILES += \
-    $(wildcard $(JCONSOLE_RESOURCES_DIR)/*.png) \
-    $(wildcard $(JCONSOLE_RESOURCES_DIR)/*.gif)
 
 # Print resources
 PRINT_RESOURCES_DIR = $(JDK_TOPDIR)/src/share/classes/sun/print/resources
@@ -74,86 +44,11 @@ COPY_FILES += \
 COPY_FILES += \
     $(JDK_TOPDIR)/src/share/classes/sun/net/idn/uidna.spp
 
-#
-# Swing plaf resources
-#
-SWING_PLAF_WINDOWS_RESOURCES_DIR = $(JDK_TOPDIR)/src/share/classes/com/sun/java/swing/plaf/windows
-COPY_FILES += \
-    $(wildcard $(SWING_PLAF_WINDOWS_RESOURCES_DIR)/icons/*.gif) \
-    $(wildcard $(SWING_PLAF_WINDOWS_RESOURCES_DIR)/icons/*.png)
-
-ifndef OPENJDK
-  SWING_PLAF_WINDOWS_RESOURCES_DIR_CLOSED = $(JDK_TOPDIR)/src/closed/share/classes/com/sun/java/swing/plaf/windows
-  # Filter out JavaCup32.png from OpenJDK
-  COPY_FILES := $(filter-out $(SWING_PLAF_WINDOWS_RESOURCES_DIR)/icons/JavaCup32.png, $(COPY_FILES))
-  # Alter JavaCup32.png from ClosedJDK
-  COPY_FILES += \
-      $(SWING_PLAF_WINDOWS_RESOURCES_DIR_CLOSED)/icons/JavaCup32.png
-endif
-
 ifeq ($(ENABLE_JFR), true)
   JFR_CONFIGURATION_DIR_CLOSED = $(JDK_TOPDIR)/src/closed/share/classes/oracle/jrockit/jfr/settings
   COPY_FILES += \
       $(JFR_CONFIGURATION_DIR_CLOSED)/jfc.xsd
 endif
-
-SWING_PLAF_BASIC_RESOURCES_DIR = $(JDK_TOPDIR)/src/share/classes/javax/swing/plaf/basic
-COPY_FILES += \
-    $(wildcard $(SWING_PLAF_BASIC_RESOURCES_DIR)/icons/*.png)
-
-ifndef OPENJDK
-  SWING_PLAF_BASIC_RESOURCES_DIR_CLOSED = $(JDK_TOPDIR)/src/closed/share/classes/javax/swing/plaf/basic
-  # Filter out JavaCup16.png from OpenJDK
-  COPY_FILES := $(filter-out $(SWING_PLAF_BASIC_RESOURCES_DIR)/icons/JavaCup16.png, $(COPY_FILES))
-  # Alter JavaCup16.png from ClosedJDK
-  COPY_FILES += \
-      $(SWING_PLAF_BASIC_RESOURCES_DIR_CLOSED)/icons/JavaCup16.png
-endif
-
-ifdef OPENJDK
-  SWING_PLAF_MOTIF_RESOURCES_DIR = $(JDK_TOPDIR)/src/share/classes/com/sun/java/swing/plaf/motif
-  COPY_FILES += \
-      $(wildcard $(SWING_PLAF_MOTIF_RESOURCES_DIR)/icons/*.gif) \
-      $(wildcard $(SWING_PLAF_MOTIF_RESOURCES_DIR)/icons/*.png)
-else
-  SWING_PLAF_MOTIF_RESOURCES_DIR_CLOSED = $(JDK_TOPDIR)/src/closed/share/classes/com/sun/java/swing/plaf/motif
-  COPY_FILES += \
-      $(wildcard $(SWING_PLAF_MOTIF_RESOURCES_DIR_CLOSED)/icons/*.gif) \
-      $(wildcard $(SWING_PLAF_MOTIF_RESOURCES_DIR_CLOSED)/icons/*.png)
-endif
-
-SWING_PLAF_METAL_RESOURCES_DIR = $(JDK_TOPDIR)/src/share/classes/javax/swing/plaf/metal
-COPY_FILES += \
-    $(wildcard $(SWING_PLAF_METAL_RESOURCES_DIR)/icons/*.gif) \
-    $(wildcard $(SWING_PLAF_METAL_RESOURCES_DIR)/icons/*.png) \
-    $(wildcard $(SWING_PLAF_METAL_RESOURCES_DIR)/icons/ocean/*.gif) \
-    $(wildcard $(SWING_PLAF_METAL_RESOURCES_DIR)/icons/ocean/*.png) \
-    $(wildcard $(SWING_PLAF_METAL_RESOURCES_DIR)/sounds/*.wav)
-
-ifneq ($(OPENJDK_TARGET_OS), windows)
-  # Only copy GTK resources on Solaris/Linux
-  SWING_PLAF_GTK_RESOURCES_DIR = $(JDK_TOPDIR)/src/share/classes/com/sun/java/swing/plaf/gtk
-  COPY_FILES += \
-      $(wildcard $(SWING_PLAF_GTK_RESOURCES_DIR)/icons/*.gif) \
-      $(wildcard $(SWING_PLAF_GTK_RESOURCES_DIR)/icons/*.png) \
-      $(wildcard $(SWING_PLAF_GTK_RESOURCES_DIR)/resources/metacity/SwingFallbackTheme/metacity-1/*.xml)
-endif
-# END: Swing plaf resources
-
-SWING_BEANINFO_RESOURCES_SRC_DIR = $(JDK_TOPDIR)/make/data/swingbeaninfo/images
-SWING_BEANINFO_RESOURCES_SRC = $(wildcard $(SWING_BEANINFO_RESOURCES_SRC_DIR)/*.gif)
-OUT_BEANINFO_RESOURCES = $(patsubst $(SWING_BEANINFO_RESOURCES_SRC_DIR)%, \
-    $(JDK_OUTPUTDIR)/classes/javax/swing/beaninfo/images/%, \
-    $(SWING_BEANINFO_RESOURCES_SRC))
-
-COPY_EXTRA += $(OUT_BEANINFO_RESOURCES)
-# END: Swing beaninfo resources
-
-# Swing text resources
-SWING_TEXT_RESOURCEDIR = $(JDK_TOPDIR)/src/share/classes/javax/swing/text
-COPY_FILES += \
-    $(SWING_TEXT_RESOURCEDIR)/html/default.css \
-    $(wildcard $(SWING_TEXT_RESOURCEDIR)/rtf/charsets/*.txt)
 
 ##########################################################################################
 #
@@ -236,19 +131,3 @@ COPY_EXTRA += $(JDK_OUTPUTDIR)/classes/sun/nio/cs/ext/sjis0213.dat
 ###
 
 JAVAX_SOUND_SRC := $(JDK_TOPDIR)/src/share/classes/com/sun/media/sound/services
-
-JAVAX_SOUND_SRC_FILES := \
-    javax.sound.midi.spi.MidiDeviceProvider \
-    javax.sound.midi.spi.MidiFileReader \
-    javax.sound.midi.spi.MidiFileWriter \
-    javax.sound.midi.spi.SoundbankReader \
-    javax.sound.sampled.spi.AudioFileReader \
-    javax.sound.sampled.spi.AudioFileWriter \
-    javax.sound.sampled.spi.FormatConversionProvider \
-    javax.sound.sampled.spi.MixerProvider
-
-COPY_EXTRA += $(addprefix $(JDK_OUTPUTDIR)/classes/META-INF/services/, $(JAVAX_SOUND_SRC_FILES))
-
-JAVAX_SOUND_RULES := $(foreach F, $(JAVAX_SOUND_SRC_FILES), $(JDK_OUTPUTDIR)/classes/META-INF/services/$(notdir $F):$(JAVAX_SOUND_SRC)/$F)
-
-$(foreach R, $(JAVAX_SOUND_RULES), $(eval $(call addto_meta-inf_services, $R)))
