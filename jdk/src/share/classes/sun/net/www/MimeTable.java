@@ -380,18 +380,6 @@ public class MimeTable implements FileNameMap {
         return MimeEntry.UNKNOWN;
     }
 
-    public synchronized boolean save(String filename) {
-        if (filename == null) {
-            filename = System.getProperty("user.home" +
-                                          File.separator +
-                                          "lib" +
-                                          File.separator +
-                                          "content-types.properties");
-        }
-
-        return saveAsProperties(new File(filename));
-    }
-
     public Properties getAsProperties() {
         Properties properties = new Properties();
         Enumeration<MimeEntry> e = elements();
@@ -403,34 +391,6 @@ public class MimeTable implements FileNameMap {
         return properties;
     }
 
-    protected boolean saveAsProperties(File file) {
-        FileOutputStream os = null;
-        try {
-            os = new FileOutputStream(file);
-            Properties properties = getAsProperties();
-            properties.put("temp.file.template", tempFileTemplate);
-            String tag;
-            String user = System.getProperty("user.name");
-            if (user != null) {
-                tag = "; customized for " + user;
-                properties.store(os, filePreamble + tag);
-            }
-            else {
-                properties.store(os, filePreamble);
-            }
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-        finally {
-            if (os != null) {
-                try { os.close(); } catch (IOException e) {}
-            }
-        }
-
-        return true;
-    }
     /*
      * Debugging utilities
      *
