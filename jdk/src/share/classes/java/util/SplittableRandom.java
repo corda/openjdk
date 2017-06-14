@@ -219,26 +219,6 @@ public final class SplittableRandom {
         return seed += gamma;
     }
 
-    /**
-     * The seed generator for default constructors.
-     */
-    private static final AtomicLong defaultGen = new AtomicLong(initialSeed());
-
-    private static long initialSeed() {
-        String pp = java.security.AccessController.doPrivileged(
-                new sun.security.action.GetPropertyAction(
-                        "java.util.secureRandomSeed"));
-        if (pp != null && pp.equalsIgnoreCase("true")) {
-            byte[] seedBytes = java.security.SecureRandom.getSeed(8);
-            long s = (long)(seedBytes[0]) & 0xffL;
-            for (int i = 1; i < 8; ++i)
-                s = (s << 8) | ((long)(seedBytes[i]) & 0xffL);
-            return s;
-        }
-        return (mix64(System.currentTimeMillis()) ^
-                mix64(System.nanoTime()));
-    }
-
     // IllegalArgumentException messages
     static final String BadBound = "bound must be positive";
     static final String BadRange = "bound must be greater than origin";
@@ -364,18 +344,6 @@ public final class SplittableRandom {
      */
     public SplittableRandom(long seed) {
         this(seed, GOLDEN_GAMMA);
-    }
-
-    /**
-     * Creates a new SplittableRandom instance that is likely to
-     * generate sequences of values that are statistically independent
-     * of those of any other instances in the current program; and
-     * may, and typically does, vary across program invocations.
-     */
-    public SplittableRandom() { // emulate defaultGen.split()
-        long s = defaultGen.getAndAdd(2 * GOLDEN_GAMMA);
-        this.seed = mix64(s);
-        this.gamma = mixGamma(s + GOLDEN_GAMMA);
     }
 
     /**
