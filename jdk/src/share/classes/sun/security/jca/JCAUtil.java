@@ -54,19 +54,4 @@ public final class JCAUtil {
         return Math.min(ARRAY_SIZE, totalSize);
     }
 
-    // cached SecureRandom instance
-    private static class CachedSecureRandomHolder {
-        public static SecureRandom instance = new SecureRandom();
-    }
-
-    /**
-     * Get a SecureRandom instance. This method should be used by JDK
-     * internal code in favor of calling "new SecureRandom()". That needs to
-     * iterate through the provider table to find the default SecureRandom
-     * implementation, which is fairly inefficient.
-     */
-    public static SecureRandom getSecureRandom() {
-        return CachedSecureRandomHolder.instance;
-    }
-
 }

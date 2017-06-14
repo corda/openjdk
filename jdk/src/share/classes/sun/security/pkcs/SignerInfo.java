@@ -56,7 +56,6 @@ import sun.security.util.DerEncoder;
 import sun.security.util.DerInputStream;
 import sun.security.util.DerOutputStream;
 import sun.security.util.DerValue;
-import sun.security.util.DisabledAlgorithmConstraints;
 import sun.security.util.KeyUtil;
 import sun.security.util.ObjectIdentifier;
 import sun.security.x509.AlgorithmId;
@@ -76,10 +75,6 @@ public class SignerInfo implements DerEncoder {
 
     private static final Set<CryptoPrimitive> SIG_PRIMITIVE_SET =
             Collections.unmodifiableSet(EnumSet.of(CryptoPrimitive.SIGNATURE));
-
-    private static final DisabledAlgorithmConstraints JAR_DISABLED_CHECK =
-            new DisabledAlgorithmConstraints(
-                    DisabledAlgorithmConstraints.PROPERTY_JAR_DISABLED_ALGS);
 
     BigInteger version;
     X500Name issuerName;
@@ -351,13 +346,6 @@ public class SignerInfo implements DerEncoder {
                 if (messageDigest == null) // fail if there is no message digest
                     return null;
 
-                // check that digest algorithm is not restricted
-                try {
-                    JAR_DISABLED_CHECK.permits(digestAlgname, cparams);
-                } catch (CertPathValidatorException e) {
-                    throw new SignatureException(e.getMessage(), e);
-                }
-
                 MessageDigest md = MessageDigest.getInstance(digestAlgname);
                 byte[] computedMessageDigest = md.digest(data);
 
@@ -389,26 +377,11 @@ public class SignerInfo implements DerEncoder {
             String algname = AlgorithmId.makeSigAlg(
                     digestAlgname, encryptionAlgname);
 
-            // check that jar signature algorithm is not restricted
-            try {
-                JAR_DISABLED_CHECK.permits(algname, cparams);
-            } catch (CertPathValidatorException e) {
-                throw new SignatureException(e.getMessage(), e);
-            }
-
             X509Certificate cert = getCertificate(block);
             if (cert == null) {
                 return null;
             }
             PublicKey key = cert.getPublicKey();
-
-            // check if the public key is restricted
-            if (!JAR_DISABLED_CHECK.permits(SIG_PRIMITIVE_SET, key)) {
-                throw new SignatureException("Public key check failed. " +
-                        "Disabled key used: " +
-                        KeyUtil.getKeySize(key) + " bit " +
-                        key.getAlgorithm());
-            }
 
             if (cert.hasUnsupportedCriticalExtension()) {
                 throw new SignatureException("Certificate has unsupported "
@@ -579,12 +552,6 @@ public class SignerInfo implements DerEncoder {
     private void verifyTimestamp(TimestampToken token)
         throws NoSuchAlgorithmException, SignatureException {
         String digestAlgname = token.getHashAlgorithm().getName();
-        // check that algorithm is not restricted
-        if (!JAR_DISABLED_CHECK.permits(DIGEST_PRIMITIVE_SET, digestAlgname,
-                null)) {
-            throw new SignatureException("Timestamp token digest check failed. " +
-                    "Disabled algorithm used: " + digestAlgname);
-        }
 
         MessageDigest md =
             MessageDigest.getInstance(digestAlgname);
