@@ -88,14 +88,6 @@ public final class UUID implements java.io.Serializable, Comparable<UUID> {
      */
     private final long leastSigBits;
 
-    /*
-     * The random number generator used by this class to create random
-     * based UUIDs. In a holder class to defer initialization until needed.
-     */
-    private static class Holder {
-        static final SecureRandom numberGenerator = new SecureRandom();
-    }
-
     // Constructors and Factories
 
     /*
@@ -128,26 +120,6 @@ public final class UUID implements java.io.Serializable, Comparable<UUID> {
     public UUID(long mostSigBits, long leastSigBits) {
         this.mostSigBits = mostSigBits;
         this.leastSigBits = leastSigBits;
-    }
-
-    /**
-     * Static factory to retrieve a type 4 (pseudo randomly generated) UUID.
-     *
-     * The {@code UUID} is generated using a cryptographically strong pseudo
-     * random number generator.
-     *
-     * @return  A randomly generated {@code UUID}
-     */
-    public static UUID randomUUID() {
-        SecureRandom ng = Holder.numberGenerator;
-
-        byte[] randomBytes = new byte[16];
-        ng.nextBytes(randomBytes);
-        randomBytes[6]  &= 0x0f;  /* clear version        */
-        randomBytes[6]  |= 0x40;  /* set to version 4     */
-        randomBytes[8]  &= 0x3f;  /* clear variant        */
-        randomBytes[8]  |= 0x80;  /* set to IETF variant  */
-        return new UUID(randomBytes);
     }
 
     /**
