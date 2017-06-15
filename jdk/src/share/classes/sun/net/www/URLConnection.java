@@ -38,7 +38,6 @@ abstract public class URLConnection extends java.net.URLConnection {
 
     /** The URL that it is connected to */
 
-    private String contentType;
     private int contentLength = -1;
 
     protected MessageHeader properties;
@@ -134,60 +133,6 @@ abstract public class URLConnection extends java.net.URLConnection {
         }
         MessageHeader props = properties;
         return props == null ? null : props.getValue(n);
-    }
-
-    /** Call this routine to get the content-type associated with this
-     * object.
-     */
-    public String getContentType() {
-        if (contentType == null)
-            contentType = getHeaderField("content-type");
-        if (contentType == null) {
-            String ct = null;
-            try {
-                ct = guessContentTypeFromStream(getInputStream());
-            } catch(java.io.IOException e) {
-            }
-            String ce = properties.findValue("content-encoding");
-            if (ct == null) {
-                ct = properties.findValue("content-type");
-
-                if (ct == null)
-                    if (url.getFile().endsWith("/"))
-                        ct = "text/html";
-                    else
-                        ct = guessContentTypeFromName(url.getFile());
-            }
-
-            /*
-             * If the Mime header had a Content-encoding field and its value
-             * was not one of the values that essentially indicate no
-             * encoding, we force the content type to be unknown. This will
-             * cause a save dialog to be presented to the user.  It is not
-             * ideal but is better than what we were previously doing, namely
-             * bringing up an image tool for compressed tar files.
-             */
-
-            if (ct == null || ce != null &&
-                    !(ce.equalsIgnoreCase("7bit")
-                      || ce.equalsIgnoreCase("8bit")
-                      || ce.equalsIgnoreCase("binary")))
-                ct = "content/unknown";
-            setContentType(ct);
-        }
-        return contentType;
-    }
-
-    /**
-     * Set the content type of this URL to a specific value.
-     * @param   type    The content type to use.  One of the
-     *                  content_* static variables in this
-     *                  class should be used.
-     *                  eg. setType(URL.content_html);
-     */
-    public void setContentType(String type) {
-        contentType = type;
-        properties.set("content-type", type);
     }
 
     /** Call this routine to get the content-length associated with this
