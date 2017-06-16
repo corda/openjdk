@@ -499,17 +499,6 @@ public class SimpleDateFormat extends DateFormat {
      */
     private DateFormatSymbols formatData;
 
-    /**
-     * We map dates with two-digit years into the century starting at
-     * <code>defaultCenturyStart</code>, which may be any date.  May
-     * not be null.
-     * @serial
-     * @since JDK1.1.4
-     */
-    private Date defaultCenturyStart;
-
-    transient private int defaultCenturyStartYear;
-
     private static final int MILLIS_PER_MINUTE = 60 * 1000;
 
     // For time zones that have no names, use strings GMT+minutes and
@@ -641,8 +630,6 @@ public class SimpleDateFormat extends DateFormat {
             cachedNumberFormatData.putIfAbsent(loc, numberFormat);
         }
         numberFormat = (NumberFormat) numberFormat.clone();
-
-        initializeDefaultCentury();
     }
 
     private void initializeCalendar(Locale loc) {
@@ -869,50 +856,6 @@ public class SimpleDateFormat extends DateFormat {
             buffer.append((char)(length >>> 16));
             buffer.append((char)(length & 0xffff));
         }
-    }
-
-    /* Initialize the fields we use to disambiguate ambiguous years. Separate
-     * so we can call it from readObject().
-     */
-    private void initializeDefaultCentury() {
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add( Calendar.YEAR, -80 );
-        parseAmbiguousDatesAsAfter(calendar.getTime());
-    }
-
-    /* Define one-century window into which to disambiguate dates using
-     * two-digit years.
-     */
-    private void parseAmbiguousDatesAsAfter(Date startDate) {
-        defaultCenturyStart = startDate;
-        calendar.setTime(startDate);
-        defaultCenturyStartYear = calendar.get(Calendar.YEAR);
-    }
-
-    /**
-     * Sets the 100-year period 2-digit years will be interpreted as being in
-     * to begin on the date the user specifies.
-     *
-     * @param startDate During parsing, two digit years will be placed in the range
-     * <code>startDate</code> to <code>startDate + 100 years</code>.
-     * @see #get2DigitYearStart
-     * @since 1.2
-     */
-    public void set2DigitYearStart(Date startDate) {
-        parseAmbiguousDatesAsAfter(new Date(startDate.getTime()));
-    }
-
-    /**
-     * Returns the beginning date of the 100-year period 2-digit years are interpreted
-     * as being within.
-     *
-     * @return the start of the 100-year period into which two digit years are
-     * parsed
-     * @see #set2DigitYearStart
-     * @since 1.2
-     */
-    public Date get2DigitYearStart() {
-        return (Date) defaultCenturyStart.clone();
     }
 
     /**
@@ -1527,14 +1470,15 @@ public class SimpleDateFormat extends DateFormat {
 
         Date parsedDate;
         try {
-            parsedDate = calb.establish(calendar).getTime();
             // If the year value is ambiguous,
             // then the two-digit year == the default start year
-            if (ambiguousYear[0]) {
-                if (parsedDate.before(defaultCenturyStart)) {
-                    parsedDate = calb.addYear(100).establish(calendar).getTime();
-                }
+            Calendar parsed = calb.establish(calendar);
+            int yearValue = parsed.get(Calendar.YEAR);
+            if (yearValue < 100) {
+                throw new UnsupportedOperationException(
+                    String.format("2 digit year '%02d' not supported", yearValue));
             }
+            parsedDate = parsed.getTime();
         }
         // An IllegalArgumentException will be thrown by Calendar.getTime()
         // if any fields are out of range, e.g., MONTH == 17.
@@ -1926,18 +1870,8 @@ public class SimpleDateFormat extends DateFormat {
                 if (count <= 2 && (pos.index - actualStart) == 2
                     && Character.isDigit(text.charAt(actualStart))
                     && Character.isDigit(text.charAt(actualStart + 1))) {
-                    // Assume for example that the defaultCenturyStart is 6/18/1903.
-                    // This means that two-digit years will be forced into the range
-                    // 6/18/1903 to 6/17/2003.  As a result, years 00, 01, and 02
-                    // correspond to 2000, 2001, and 2002.  Years 04, 05, etc. correspond
-                    // to 1904, 1905, etc.  If the year is 03, then it is 2003 if the
-                    // other fields specify a date before 6/18, or 1903 if they specify a
-                    // date afterwards.  As a result, 03 is an ambiguous year.  All other
-                    // two-digit years are unambiguous.
-                    int ambiguousTwoDigitYear = defaultCenturyStartYear % 100;
-                    ambiguousYear[0] = value == ambiguousTwoDigitYear;
-                    value += (defaultCenturyStartYear/100)*100 +
-                        (value < ambiguousTwoDigitYear ? 100 : 0);
+                    throw new UnsupportedOperationException(
+                        String.format("2-digit year '%02d' not allowed", value));
                 }
                 calb.set(field, value);
                 return pos.index;
