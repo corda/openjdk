@@ -356,30 +356,6 @@ public class PKCS8Key implements PrivateKey {
         decode(new ByteArrayInputStream(encodedKey));
     }
 
-    protected Object writeReplace() throws java.io.ObjectStreamException {
-        return new KeyRep(KeyRep.Type.PRIVATE,
-                        getAlgorithm(),
-                        getFormat(),
-                        getEncoded());
-    }
-
-    /**
-     * Serialization read ... PKCS#8 keys serialize as
-     * themselves, and they're parsed when they get read back.
-     */
-    private void readObject (ObjectInputStream stream)
-    throws IOException {
-
-        try {
-            decode(stream);
-
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-            throw new IOException("deserialized key is invalid: " +
-                                  e.getMessage());
-        }
-    }
-
     /*
      * Produce PKCS#8 encoding from algorithm id and key material.
      */

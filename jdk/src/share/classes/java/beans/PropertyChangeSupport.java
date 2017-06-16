@@ -25,9 +25,6 @@
 package java.beans;
 
 import java.io.Serializable;
-import java.io.ObjectStreamField;
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Map.Entry;
@@ -416,83 +413,9 @@ public class PropertyChangeSupport implements Serializable {
     }
 
     /**
-     * @serialData Null terminated list of <code>PropertyChangeListeners</code>.
-     * <p>
-     * At serialization time we skip non-serializable listeners and
-     * only serialize the serializable listeners.
-     */
-    private void writeObject(ObjectOutputStream s) throws IOException {
-        Hashtable<String, PropertyChangeSupport> children = null;
-        PropertyChangeListener[] listeners = null;
-        synchronized (this.map) {
-            for (Entry<String, PropertyChangeListener[]> entry : this.map.getEntries()) {
-                String property = entry.getKey();
-                if (property == null) {
-                    listeners = entry.getValue();
-                } else {
-                    if (children == null) {
-                        children = new Hashtable<>();
-                    }
-                    PropertyChangeSupport pcs = new PropertyChangeSupport(this.source);
-                    pcs.map.set(null, entry.getValue());
-                    children.put(property, pcs);
-                }
-            }
-        }
-        ObjectOutputStream.PutField fields = s.putFields();
-        fields.put("children", children);
-        fields.put("source", this.source);
-        fields.put("propertyChangeSupportSerializedDataVersion", 2);
-        s.writeFields();
-
-        if (listeners != null) {
-            for (PropertyChangeListener l : listeners) {
-                if (l instanceof Serializable) {
-                    s.writeObject(l);
-                }
-            }
-        }
-        s.writeObject(null);
-    }
-
-    private void readObject(ObjectInputStream s) throws ClassNotFoundException, IOException {
-        this.map = new PropertyChangeListenerMap();
-
-        ObjectInputStream.GetField fields = s.readFields();
-
-        @SuppressWarnings("unchecked")
-        Hashtable<String, PropertyChangeSupport> children = (Hashtable<String, PropertyChangeSupport>) fields.get("children", null);
-        this.source = fields.get("source", null);
-        fields.get("propertyChangeSupportSerializedDataVersion", 2);
-
-        Object listenerOrNull;
-        while (null != (listenerOrNull = s.readObject())) {
-            this.map.add(null, (PropertyChangeListener)listenerOrNull);
-        }
-        if (children != null) {
-            for (Entry<String, PropertyChangeSupport> entry : children.entrySet()) {
-                for (PropertyChangeListener listener : entry.getValue().getPropertyChangeListeners()) {
-                    this.map.add(entry.getKey(), listener);
-                }
-            }
-        }
-    }
-
-    /**
      * The object to be provided as the "source" for any generated events.
      */
     private Object source;
-
-    /**
-     * @serialField children                                   Hashtable
-     * @serialField source                                     Object
-     * @serialField propertyChangeSupportSerializedDataVersion int
-     */
-    private static final ObjectStreamField[] serialPersistentFields = {
-            new ObjectStreamField("children", Hashtable.class),
-            new ObjectStreamField("source", Object.class),
-            new ObjectStreamField("propertyChangeSupportSerializedDataVersion", Integer.TYPE)
-    };
 
     /**
      * Serialization version ID, so we're compatible with JDK 1.1

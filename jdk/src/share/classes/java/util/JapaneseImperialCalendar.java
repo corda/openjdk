@@ -26,7 +26,6 @@
 package java.util;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import sun.util.locale.provider.CalendarDataUtility;
 import sun.util.calendar.BaseCalendar;
 import sun.util.calendar.CalendarDate;
@@ -2338,17 +2337,5 @@ class JapaneseImperialCalendar extends Calendar {
      */
     private int internalGetEra() {
         return isSet(ERA) ? internalGet(ERA) : eras.length - 1;
-    }
-
-    /**
-     * Updates internal state.
-     */
-    private void readObject(ObjectInputStream stream)
-            throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        if (jdate == null) {
-            jdate = jcal.newCalendarDate(getZone());
-            cachedFixedDate = Long.MIN_VALUE;
-        }
     }
 }

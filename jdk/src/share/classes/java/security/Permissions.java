@@ -34,9 +34,6 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.Collections;
 import java.io.Serializable;
-import java.io.ObjectStreamField;
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
 import java.io.IOException;
 
 
@@ -337,71 +334,6 @@ implements Serializable
     // Need to maintain serialization interoperability with earlier releases,
     // which had the serializable field:
     // private Hashtable perms;
-
-    /**
-     * @serialField perms java.util.Hashtable
-     *     A table of the Permission classes and PermissionCollections.
-     * @serialField allPermission java.security.PermissionCollection
-     */
-    private static final ObjectStreamField[] serialPersistentFields = {
-        new ObjectStreamField("perms", Hashtable.class),
-        new ObjectStreamField("allPermission", PermissionCollection.class),
-    };
-
-    /**
-     * @serialData Default fields.
-     */
-    /*
-     * Writes the contents of the permsMap field out as a Hashtable for
-     * serialization compatibility with earlier releases. allPermission
-     * unchanged.
-     */
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        // Don't call out.defaultWriteObject()
-
-        // Copy perms into a Hashtable
-        Hashtable<Class<?>, PermissionCollection> perms =
-            new Hashtable<>(permsMap.size()*2); // no sync; estimate
-        synchronized (this) {
-            perms.putAll(permsMap);
-        }
-
-        // Write out serializable fields
-        ObjectOutputStream.PutField pfields = out.putFields();
-
-        pfields.put("allPermission", allPermission); // no sync; staleness OK
-        pfields.put("perms", perms);
-        out.writeFields();
-    }
-
-    /*
-     * Reads in a Hashtable of Class/PermissionCollections and saves them in the
-     * permsMap field. Reads in allPermission.
-     */
-    private void readObject(ObjectInputStream in) throws IOException,
-    ClassNotFoundException {
-        // Don't call defaultReadObject()
-
-        // Read in serialized fields
-        ObjectInputStream.GetField gfields = in.readFields();
-
-        // Get allPermission
-        allPermission = (PermissionCollection) gfields.get("allPermission", null);
-
-        // Get permissions
-        // writeObject writes a Hashtable<Class<?>, PermissionCollection> for
-        // the perms key, so this cast is safe, unless the data is corrupt.
-        @SuppressWarnings("unchecked")
-        Hashtable<Class<?>, PermissionCollection> perms =
-            (Hashtable<Class<?>, PermissionCollection>)gfields.get("perms", null);
-        permsMap = new HashMap<Class<?>, PermissionCollection>(perms.size()*2);
-        permsMap.putAll(perms);
-
-        // Set hasUnresolved
-        UnresolvedPermissionCollection uc =
-        (UnresolvedPermissionCollection) permsMap.get(UnresolvedPermission.class);
-        hasUnresolved = (uc != null && uc.elements().hasMoreElements());
-    }
 }
 
 final class PermissionsEnumerator implements Enumeration<Permission> {
@@ -549,55 +481,4 @@ implements Serializable
     // Need to maintain serialization interoperability with earlier releases,
     // which had the serializable field:
     // private Hashtable perms;
-    /**
-     * @serialField perms java.util.Hashtable
-     *     A table of the Permissions (both key and value are same).
-     */
-    private static final ObjectStreamField[] serialPersistentFields = {
-        new ObjectStreamField("perms", Hashtable.class),
-    };
-
-    /**
-     * @serialData Default fields.
-     */
-    /*
-     * Writes the contents of the permsMap field out as a Hashtable for
-     * serialization compatibility with earlier releases.
-     */
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        // Don't call out.defaultWriteObject()
-
-        // Copy perms into a Hashtable
-        Hashtable<Permission, Permission> perms =
-                new Hashtable<>(permsMap.size()*2);
-        synchronized (this) {
-            perms.putAll(permsMap);
-        }
-
-        // Write out serializable fields
-        ObjectOutputStream.PutField pfields = out.putFields();
-        pfields.put("perms", perms);
-        out.writeFields();
-    }
-
-    /*
-     * Reads in a Hashtable of Permission/Permission and saves them in the
-     * permsMap field.
-     */
-    private void readObject(ObjectInputStream in) throws IOException,
-    ClassNotFoundException {
-        // Don't call defaultReadObject()
-
-        // Read in serialized fields
-        ObjectInputStream.GetField gfields = in.readFields();
-
-        // Get permissions
-        // writeObject writes a Hashtable<Class<?>, PermissionCollection> for
-        // the perms key, so this cast is safe, unless the data is corrupt.
-        @SuppressWarnings("unchecked")
-        Hashtable<Permission, Permission> perms =
-                (Hashtable<Permission, Permission>)gfields.get("perms", null);
-        permsMap = new HashMap<Permission, Permission>(perms.size()*2);
-        permsMap.putAll(perms);
-    }
 }

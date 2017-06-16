@@ -25,7 +25,6 @@
 
 package java.net;
 
-import java.io.ObjectInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
@@ -464,17 +463,6 @@ public final class URLPermission extends Permission {
             b.append(s);
         }
         return b.toString();
-    }
-
-    /**
-     * restore the state of this object from stream
-     */
-    private void readObject(ObjectInputStream s)
-        throws IOException, ClassNotFoundException {
-        ObjectInputStream.GetField fields = s.readFields();
-        String actions = (String)fields.get("actions", null);
-
-        init(actions);
     }
 
     static class Authority {

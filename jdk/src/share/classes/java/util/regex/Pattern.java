@@ -1307,29 +1307,6 @@ public final class Pattern
     }
 
     /**
-     * Recompile the Pattern instance from a stream.  The original pattern
-     * string is read in and the object tree is recompiled from it.
-     */
-    private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
-
-        // Read in all fields
-        s.defaultReadObject();
-
-        // Initialize counts
-        capturingGroupCount = 1;
-        localCount = 0;
-
-        // if length > 0, the Pattern is lazily compiled
-        compiled = false;
-        if (pattern.length() == 0) {
-            root = new Start(lastAccept);
-            matchRoot = lastAccept;
-            compiled = true;
-        }
-    }
-
-    /**
      * This private constructor is used to create all Patterns. The pattern
      * string and match flags are all that is needed to completely describe
      * a Pattern. An empty pattern string results in an object tree with

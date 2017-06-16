@@ -277,14 +277,4 @@ public class LongAccumulator extends Striped64 implements Serializable {
     private Object writeReplace() {
         return new SerializationProxy(this);
     }
-
-    /**
-     * @param s the stream
-     * @throws java.io.InvalidObjectException always
-     */
-    private void readObject(java.io.ObjectInputStream s)
-        throws java.io.InvalidObjectException {
-        throw new java.io.InvalidObjectException("Proxy required");
-    }
-
 }

@@ -851,44 +851,6 @@ public class ArrayDeque<E> extends AbstractCollection<E>
     private static final long serialVersionUID = 2340985798034038923L;
 
     /**
-     * Saves this deque to a stream (that is, serializes it).
-     *
-     * @serialData The current size ({@code int}) of the deque,
-     * followed by all of its elements (each an object reference) in
-     * first-to-last order.
-     */
-    private void writeObject(java.io.ObjectOutputStream s)
-            throws java.io.IOException {
-        s.defaultWriteObject();
-
-        // Write out size
-        s.writeInt(size());
-
-        // Write out elements in order.
-        int mask = elements.length - 1;
-        for (int i = head; i != tail; i = (i + 1) & mask)
-            s.writeObject(elements[i]);
-    }
-
-    /**
-     * Reconstitutes this deque from a stream (that is, deserializes it).
-     */
-    private void readObject(java.io.ObjectInputStream s)
-            throws java.io.IOException, ClassNotFoundException {
-        s.defaultReadObject();
-
-        // Read in size and allocate array
-        int size = s.readInt();
-        allocateElements(size);
-        head = 0;
-        tail = size;
-
-        // Read in all elements in the proper order.
-        for (int i = 0; i < size; i++)
-            elements[i] = s.readObject();
-    }
-
-    /**
      * Creates a <em><a href="Spliterator.html#binding">late-binding</a></em>
      * and <em>fail-fast</em> {@link Spliterator} over the elements in this
      * deque.

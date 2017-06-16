@@ -27,8 +27,6 @@ package java.net;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -1621,52 +1619,6 @@ public final class URI
         defineString();
         return encode(string);
     }
-
-
-    // -- Serialization support --
-
-    /**
-     * Saves the content of this URI to the given serial stream.
-     *
-     * <p> The only serializable field of a URI instance is its {@code string}
-     * field.  That field is given a value, if it does not have one already,
-     * and then the {@link java.io.ObjectOutputStream#defaultWriteObject()}
-     * method of the given object-output stream is invoked. </p>
-     *
-     * @param  os  The object-output stream to which this object
-     *             is to be written
-     */
-    private void writeObject(ObjectOutputStream os)
-        throws IOException
-    {
-        defineString();
-        os.defaultWriteObject();        // Writes the string field only
-    }
-
-    /**
-     * Reconstitutes a URI from the given serial stream.
-     *
-     * <p> The {@link java.io.ObjectInputStream#defaultReadObject()} method is
-     * invoked to read the value of the {@code string} field.  The result is
-     * then parsed in the usual way.
-     *
-     * @param  is  The object-input stream from which this object
-     *             is being read
-     */
-    private void readObject(ObjectInputStream is)
-        throws ClassNotFoundException, IOException
-    {
-        port = -1;                      // Argh
-        is.defaultReadObject();
-        try {
-            new Parser(string).parse(false);
-        } catch (URISyntaxException x) {
-            IOException y = new InvalidObjectException("Invalid URI");
-            y.initCause(x);
-            throw y;
-        }
-    }
-
 
     // -- End of public methods --
 

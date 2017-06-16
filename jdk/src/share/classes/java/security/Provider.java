@@ -690,19 +690,6 @@ public abstract class Provider extends Properties {
         super.put("Provider.id className", this.getClass().getName());
     }
 
-    private void readObject(ObjectInputStream in)
-                throws IOException, ClassNotFoundException {
-        Map<Object,Object> copy = new HashMap<>();
-        for (Map.Entry<Object,Object> entry : super.entrySet()) {
-            copy.put(entry.getKey(), entry.getValue());
-        }
-        defaults = null;
-        in.defaultReadObject();
-        implClear();
-        initialized = true;
-        putAll(copy);
-    }
-
     private boolean checkLegacy(Object key) {
         String keyString = (String)key;
         if (keyString.startsWith("Provider.")) {

@@ -35,11 +35,6 @@ import java.io.Serializable;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
-import java.io.ObjectStreamField;
-import java.io.ObjectInputStream;
-import java.io.ObjectInputStream.GetField;
-import java.io.ObjectOutputStream;
-import java.io.ObjectOutputStream.PutField;
 import java.io.IOException;
 
 /**
@@ -66,13 +61,6 @@ final class CryptoPermissions extends PermissionCollection
 implements Serializable {
 
     private static final long serialVersionUID = 4946547168093391015L;
-
-    /**
-     * @serialField perms java.util.Hashtable
-     */
-    private static final ObjectStreamField[] serialPersistentFields = {
-        new ObjectStreamField("perms", Hashtable.class),
-    };
 
     // Switched from Hashtable to ConcurrentHashMap to improve scalability.
     // To maintain serialization compatibility, this field is made transient
@@ -425,28 +413,6 @@ implements Serializable {
             pc = cryptoPerm.newPermissionCollection();
         }
         return pc;
-    }
-
-    private void readObject(ObjectInputStream s)
-        throws IOException, ClassNotFoundException {
-        ObjectInputStream.GetField fields = s.readFields();
-        @SuppressWarnings("unchecked")
-        Hashtable<String,PermissionCollection> permTable =
-                (Hashtable<String,PermissionCollection>)
-                (fields.get("perms", null));
-        if (permTable != null) {
-            perms = new ConcurrentHashMap<>(permTable);
-        } else {
-            perms = new ConcurrentHashMap<>();
-        }
-    }
-
-    private void writeObject(ObjectOutputStream s) throws IOException {
-        Hashtable<String,PermissionCollection> permTable =
-                new Hashtable<>(perms);
-        ObjectOutputStream.PutField fields = s.putFields();
-        fields.put("perms", permTable);
-        s.writeFields();
     }
 }
 

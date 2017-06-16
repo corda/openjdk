@@ -26,8 +26,6 @@
 package javax.print.attribute;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 
@@ -55,41 +53,6 @@ public class HashAttributeSet implements AttributeSet, Serializable {
      * The serialised form doesn't include this instance variable.
      */
     private transient HashMap attrMap = new HashMap();
-
-    /**
-     * Write the instance to a stream (ie serialize the object)
-     *
-     * @serialData
-     * The serialized form of an attribute set explicitly writes the
-     * number of attributes in the set, and each of the attributes.
-     * This does not guarantee equality of serialized forms since
-     * the order in which the attributes are written is not defined.
-     */
-    private void writeObject(ObjectOutputStream s) throws IOException {
-
-        s.defaultWriteObject();
-        Attribute [] attrs = toArray();
-        s.writeInt(attrs.length);
-        for (int i = 0; i < attrs.length; i++) {
-            s.writeObject(attrs[i]);
-        }
-    }
-
-    /**
-     * Reconstitute an instance from a stream that is, deserialize it).
-     */
-    private void readObject(ObjectInputStream s)
-        throws ClassNotFoundException, IOException {
-
-        s.defaultReadObject();
-        attrMap = new HashMap();
-        int count = s.readInt();
-        Attribute attr;
-        for (int i = 0; i < count; i++) {
-            attr = (Attribute)s.readObject();
-            add(attr);
-        }
-    }
 
     /**
      * Construct a new, empty attribute set.

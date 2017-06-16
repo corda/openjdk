@@ -905,49 +905,6 @@ public class PriorityBlockingQueue<E> extends AbstractQueue<E>
         }
     }
 
-    /**
-     * Saves this queue to a stream (that is, serializes it).
-     *
-     * For compatibility with previous version of this class, elements
-     * are first copied to a java.util.PriorityQueue, which is then
-     * serialized.
-     *
-     * @param s the stream
-     * @throws java.io.IOException if an I/O error occurs
-     */
-    private void writeObject(java.io.ObjectOutputStream s)
-        throws java.io.IOException {
-        lock.lock();
-        try {
-            // avoid zero capacity argument
-            q = new PriorityQueue<E>(Math.max(size, 1), comparator);
-            q.addAll(this);
-            s.defaultWriteObject();
-        } finally {
-            q = null;
-            lock.unlock();
-        }
-    }
-
-    /**
-     * Reconstitutes this queue from a stream (that is, deserializes it).
-     * @param s the stream
-     * @throws ClassNotFoundException if the class of a serialized object
-     *         could not be found
-     * @throws java.io.IOException if an I/O error occurs
-     */
-    private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
-        try {
-            s.defaultReadObject();
-            this.queue = new Object[q.size()];
-            comparator = q.comparator();
-            addAll(q);
-        } finally {
-            q = null;
-        }
-    }
-
     // Similar to Collections.ArraySnapshotSpliterator but avoids
     // commitment to toArray until needed
     static final class PBQSpliterator<E> implements Spliterator<E> {

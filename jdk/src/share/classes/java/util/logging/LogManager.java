@@ -496,31 +496,7 @@ public class LogManager {
     // Returns the LoggerContext for the user code (i.e. application or AppContext).
     // Loggers are isolated from each AppContext.
     private LoggerContext getUserContext() {
-        LoggerContext context = null;
-
-        SecurityManager sm = System.getSecurityManager();
-        JavaAWTAccess javaAwtAccess = SharedSecrets.getJavaAWTAccess();
-        if (sm != null && javaAwtAccess != null) {
-            // for each applet, it has its own LoggerContext isolated from others
-            final Object ecx = javaAwtAccess.getAppletContext();
-            if (ecx != null) {
-                synchronized (javaAwtAccess) {
-                    // find the AppContext of the applet code
-                    // will be null if we are in the main app context.
-                    if (contextsMap == null) {
-                        contextsMap = new WeakHashMap<>();
-                    }
-                    context = contextsMap.get(ecx);
-                    if (context == null) {
-                        // Create a new LoggerContext for the applet.
-                        context = new LoggerContext();
-                        contextsMap.put(ecx, context);
-                    }
-                }
-            }
-        }
-        // for standalone app, return userContext
-        return context != null ? context : userContext;
+        return userContext;
     }
 
     // The system context.

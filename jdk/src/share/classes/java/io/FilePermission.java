@@ -642,33 +642,6 @@ public final class FilePermission extends Permission implements Serializable {
     public PermissionCollection newPermissionCollection() {
         return new FilePermissionCollection();
     }
-
-    /**
-     * WriteObject is called to save the state of the FilePermission
-     * to a stream. The actions are serialized, and the superclass
-     * takes care of the name.
-     */
-    private void writeObject(ObjectOutputStream s)
-        throws IOException
-    {
-        // Write out the actions. The superclass takes care of the name
-        // call getActions to make sure actions field is initialized
-        if (actions == null)
-            getActions();
-        s.defaultWriteObject();
-    }
-
-    /**
-     * readObject is called to restore the state of the FilePermission from
-     * a stream.
-     */
-    private void readObject(ObjectInputStream s)
-         throws IOException, ClassNotFoundException
-    {
-        // Read in the actions, then restore everything else by calling init.
-        s.defaultReadObject();
-        init(getMask(actions));
-    }
 }
 
 /**
@@ -801,39 +774,4 @@ final class FilePermissionCollection extends PermissionCollection
     /**
      * @serialData "permissions" field (a Vector containing the FilePermissions).
      */
-    /*
-     * Writes the contents of the perms field out as a Vector for
-     * serialization compatibility with earlier releases.
-     */
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        // Don't call out.defaultWriteObject()
-
-        // Write out Vector
-        Vector<Permission> permissions = new Vector<>(perms.size());
-        synchronized (this) {
-            permissions.addAll(perms);
-        }
-
-        ObjectOutputStream.PutField pfields = out.putFields();
-        pfields.put("permissions", permissions);
-        out.writeFields();
-    }
-
-    /*
-     * Reads in a Vector of FilePermissions and saves them in the perms field.
-     */
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException
-    {
-        // Don't call defaultReadObject()
-
-        // Read in serialized fields
-        ObjectInputStream.GetField gfields = in.readFields();
-
-        // Get the one we want
-        @SuppressWarnings("unchecked")
-        Vector<Permission> permissions = (Vector<Permission>)gfields.get("permissions", null);
-        perms = new ArrayList<>(permissions.size());
-        perms.addAll(permissions);
-    }
 }

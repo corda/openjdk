@@ -25,7 +25,6 @@
 
 package java.util;
 import java.io.Serializable;
-import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.function.BiConsumer;
@@ -2077,9 +2076,6 @@ public class Collections {
         public Stream<E> parallelStream() {
             return c.parallelStream(); // Must be manually synched by user!
         }
-        private void writeObject(ObjectOutputStream s) throws IOException {
-            synchronized (mutex) {s.defaultWriteObject();}
-        }
     }
 
     /**
@@ -2685,10 +2681,6 @@ public class Collections {
         public V merge(K key, V value,
                 BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
             synchronized (mutex) {return m.merge(key, value, remappingFunction);}
-        }
-
-        private void writeObject(ObjectOutputStream s) throws IOException {
-            synchronized (mutex) {s.defaultWriteObject();}
         }
     }
 
@@ -5488,13 +5480,6 @@ public class Collections {
         public Stream<E> parallelStream()   {return s.parallelStream();}
 
         private static final long serialVersionUID = 2454657854757543876L;
-
-        private void readObject(java.io.ObjectInputStream stream)
-            throws IOException, ClassNotFoundException
-        {
-            stream.defaultReadObject();
-            s = m.keySet();
-        }
     }
 
     /**

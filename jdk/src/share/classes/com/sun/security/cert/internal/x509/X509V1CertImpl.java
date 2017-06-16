@@ -29,9 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.OutputStream;
-import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.security.Signature;
 import javax.security.cert.*;
@@ -299,25 +297,6 @@ public class X509V1CertImpl extends X509Certificate implements Serializable {
      */
     public byte[] getSigAlgParams() {
         return wrappedCert.getSigAlgParams();
-    }
-
-    private synchronized void writeObject(ObjectOutputStream stream)
-        throws IOException {
-        try {
-            stream.write(getEncoded());
-        } catch (CertificateEncodingException e) {
-            throw new IOException("getEncoded failed: " + e.getMessage());
-        }
-    }
-
-    private synchronized void readObject(ObjectInputStream stream)
-        throws IOException {
-        try {
-            wrappedCert = (java.security.cert.X509Certificate)
-                getFactory().generateCertificate(stream);
-        } catch (java.security.cert.CertificateException e) {
-            throw new IOException("generateCertificate failed: " + e.getMessage());
-        }
     }
 
     public java.security.cert.X509Certificate getX509Certificate() {

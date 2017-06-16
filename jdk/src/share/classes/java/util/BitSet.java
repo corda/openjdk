@@ -1120,42 +1120,6 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Save the state of the {@code BitSet} instance to a stream (i.e.,
-     * serialize it).
-     */
-    private void writeObject(ObjectOutputStream s)
-        throws IOException {
-
-        checkInvariants();
-
-        if (! sizeIsSticky)
-            trimToSize();
-
-        ObjectOutputStream.PutField fields = s.putFields();
-        fields.put("bits", words);
-        s.writeFields();
-    }
-
-    /**
-     * Reconstitute the {@code BitSet} instance from a stream (i.e.,
-     * deserialize it).
-     */
-    private void readObject(ObjectInputStream s)
-        throws IOException, ClassNotFoundException {
-
-        ObjectInputStream.GetField fields = s.readFields();
-        words = (long[]) fields.get("bits", null);
-
-        // Assume maximum length then find real length
-        // because recalculateWordsInUse assumes maintenance
-        // or reduction in logical size
-        wordsInUse = words.length;
-        recalculateWordsInUse();
-        sizeIsSticky = (words.length > 0 && words[words.length-1] == 0L); // heuristic
-        checkInvariants();
-    }
-
-    /**
      * Returns a string representation of this bit set. For every index
      * for which this {@code BitSet} contains a bit in the set
      * state, the decimal representation of that index is included in

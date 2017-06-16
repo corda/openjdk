@@ -231,36 +231,4 @@ implements java.io.Serializable {
         remainder = output;
         remCount %= DIGEST_SIZE;
     }
-
-    /*
-     * readObject is called to restore the state of the random object from
-     * a stream.  We have to create a new instance of MessageDigest, because
-     * it is not included in the stream (it is marked "transient").
-     *
-     * Note that the engineNextBytes() method invoked on the restored random
-     * object will yield the exact same (random) bytes as the original.
-     * If you do not want this behaviour, you should re-seed the restored
-     * random object, using engineSetSeed().
-     */
-    private void readObject(java.io.ObjectInputStream s)
-        throws IOException, ClassNotFoundException {
-
-        s.defaultReadObject ();
-
-        try {
-            /*
-             * Use the local SUN implementation to avoid native
-             * performance overhead.
-             */
-            digest = MessageDigest.getInstance("SHA", "SUN");
-        } catch (NoSuchProviderException | NoSuchAlgorithmException e) {
-            // Fallback to any available.
-            try {
-                digest = MessageDigest.getInstance("SHA");
-            } catch (NoSuchAlgorithmException exc) {
-                throw new InternalError(
-                    "internal error: SHA-1 not available.", exc);
-            }
-        }
-    }
 }

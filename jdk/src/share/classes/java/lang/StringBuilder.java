@@ -406,34 +406,4 @@ public final class StringBuilder
         // Create a copy, don't share the array
         return new String(value, 0, count);
     }
-
-    /**
-     * Save the state of the {@code StringBuilder} instance to a stream
-     * (that is, serialize it).
-     *
-     * @serialData the number of characters currently stored in the string
-     *             builder ({@code int}), followed by the characters in the
-     *             string builder ({@code char[]}).   The length of the
-     *             {@code char} array may be greater than the number of
-     *             characters currently stored in the string builder, in which
-     *             case extra characters are ignored.
-     */
-    private void writeObject(java.io.ObjectOutputStream s)
-        throws java.io.IOException {
-        s.defaultWriteObject();
-        s.writeInt(count);
-        s.writeObject(value);
-    }
-
-    /**
-     * readObject is called to restore the state of the StringBuffer from
-     * a stream.
-     */
-    private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
-        s.defaultReadObject();
-        count = s.readInt();
-        value = (char[]) s.readObject();
-    }
-
 }
