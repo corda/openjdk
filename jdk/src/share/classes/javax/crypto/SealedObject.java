@@ -408,9 +408,9 @@ public class SealedObject implements Serializable {
 
         try {
             if (params != null)
-                c.init(Cipher.DECRYPT_MODE, key, params);
+                c.init(Cipher.DECRYPT_MODE, key, params, null);
             else
-                c.init(Cipher.DECRYPT_MODE, key);
+                c.init(Cipher.DECRYPT_MODE, key, (java.security.SecureRandom) null);
         } catch (InvalidAlgorithmParameterException iape) {
             // this should never happen, because we use the exact same
             // parameters that were used in the sealing operation

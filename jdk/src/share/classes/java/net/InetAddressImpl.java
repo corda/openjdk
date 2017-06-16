@@ -43,6 +43,4 @@ interface InetAddressImpl {
 
     InetAddress anyLocalAddress();
     InetAddress loopbackAddress();
-    boolean isReachable(InetAddress addr, int timeout, NetworkInterface netif,
-                        int ttl) throws IOException;
 }

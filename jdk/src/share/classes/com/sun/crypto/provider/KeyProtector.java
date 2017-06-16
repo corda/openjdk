@@ -299,7 +299,7 @@ final class KeyProtector {
         cipherSpi = new PBEWithMD5AndTripleDESCipher();
         cipher = new CipherForKeyProtector(cipherSpi, SunJCE.getInstance(),
                                            "PBEWithMD5AndTripleDES");
-        cipher.init(Cipher.ENCRYPT_MODE, sKey, pbeSpec);
+        cipher.init(Cipher.ENCRYPT_MODE, sKey, pbeSpec, null);
         return new SealedObjectForKeyProtector(key, cipher);
     }
 
@@ -331,7 +331,7 @@ final class KeyProtector {
             Cipher cipher = new CipherForKeyProtector(cipherSpi,
                                                       SunJCE.getInstance(),
                                                       "PBEWithMD5AndTripleDES");
-            cipher.init(Cipher.DECRYPT_MODE, skey, params);
+            cipher.init(Cipher.DECRYPT_MODE, skey, params, null);
             return (Key)soForKeyProtector.getObject(cipher);
         } catch (NoSuchAlgorithmException ex) {
             // Note: this catch needed to be here because of the

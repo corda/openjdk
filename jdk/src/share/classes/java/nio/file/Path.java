@@ -99,13 +99,6 @@ public interface Path
     extends Comparable<Path>, Iterable<Path>, Watchable
 {
     /**
-     * Returns the file system that created this object.
-     *
-     * @return  the file system that created this object
-     */
-    FileSystem getFileSystem();
-
-    /**
      * Tells whether or not this path is absolute.
      *
      * <p> An absolute path is complete in that it doesn't need to be combined

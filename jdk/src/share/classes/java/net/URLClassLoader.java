@@ -693,8 +693,7 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
             }
             String host = locUrl.getHost();
             if (host != null && (host.length() > 0))
-                p = new SocketPermission(host,
-                                         SecurityConstants.SOCKET_CONNECT_ACCEPT_ACTION);
+                throw new UnsupportedOperationException("Networking unavailable");
         }
 
         // make sure the person that created this class loader

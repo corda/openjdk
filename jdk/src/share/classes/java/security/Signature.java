@@ -1263,7 +1263,7 @@ public abstract class Signature extends SignatureSpi {
 
         protected void engineInitVerify(PublicKey publicKey)
                 throws InvalidKeyException {
-            cipher.init(Cipher.DECRYPT_MODE, publicKey);
+            cipher.init(Cipher.DECRYPT_MODE, publicKey, null);
             if (data == null) {
                 data = new ByteArrayOutputStream(128);
             } else {
@@ -1273,8 +1273,7 @@ public abstract class Signature extends SignatureSpi {
 
         protected void engineInitSign(PrivateKey privateKey)
                 throws InvalidKeyException {
-            cipher.init(Cipher.ENCRYPT_MODE, privateKey);
-            data = null;
+            throw new UnsupportedOperationException("Randomness not supported");
         }
 
         protected void engineInitSign(PrivateKey privateKey,

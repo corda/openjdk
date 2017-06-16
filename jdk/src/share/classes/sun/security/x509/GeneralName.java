@@ -118,22 +118,17 @@ public class GeneralName {
 
         case GeneralNameInterface.NAME_URI:
             if (encName.isContextSpecific() && !encName.isConstructed()) {
-                encName.resetTag(DerValue.tag_IA5String);
-                name = (nameConstraint ? URIName.nameConstraint(encName) :
-                        new URIName(encName));
+                throw new UnsupportedOperationException("DNS lookup unavailable");
             } else {
                 throw new IOException("Invalid encoding of URI");
             }
-            break;
 
         case GeneralNameInterface.NAME_IP:
             if (encName.isContextSpecific() && !encName.isConstructed()) {
-                encName.resetTag(DerValue.tag_OctetString);
-                name = new IPAddressName(encName);
+                throw new UnsupportedOperationException("DNS lookup unavailable");
             } else {
                 throw new IOException("Invalid encoding of IP address");
             }
-            break;
 
         case GeneralNameInterface.NAME_OID:
             if (encName.isContextSpecific() && !encName.isConstructed()) {

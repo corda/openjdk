@@ -1181,10 +1181,11 @@ public class Cipher {
      * @throws UnsupportedOperationException if (@code opmode} is
      * {@code WRAP_MODE} or {@code UNWRAP_MODE} but the mode is not implemented
      * by the underlying {@code CipherSpi}.
-     */
+     *
     public final void init(int opmode, Key key) throws InvalidKeyException {
         init(opmode, key, JceSecurity.RANDOM);
     }
+     */
 
     /**
      * Initializes this cipher with a key and a source of randomness.
@@ -1320,12 +1321,13 @@ public class Cipher {
      * @throws UnsupportedOperationException if (@code opmode} is
      * {@code WRAP_MODE} or {@code UNWRAP_MODE} but the mode is not implemented
      * by the underlying {@code CipherSpi}.
-     */
+     *
     public final void init(int opmode, Key key, AlgorithmParameterSpec params)
             throws InvalidKeyException, InvalidAlgorithmParameterException
     {
         init(opmode, key, params, JceSecurity.RANDOM);
     }
+     */
 
     /**
      * Initializes this cipher with a key, a set of algorithm
@@ -1463,12 +1465,13 @@ public class Cipher {
      * @throws UnsupportedOperationException if (@code opmode} is
      * {@code WRAP_MODE} or {@code UNWRAP_MODE} but the mode is not implemented
      * by the underlying {@code CipherSpi}.
-     */
+     *
     public final void init(int opmode, Key key, AlgorithmParameters params)
             throws InvalidKeyException, InvalidAlgorithmParameterException
     {
         init(opmode, key, params, JceSecurity.RANDOM);
     }
+     */
 
     /**
      * Initializes this cipher with a key, a set of algorithm
@@ -1611,12 +1614,13 @@ public class Cipher {
      * @throws UnsupportedOperationException if (@code opmode} is
      * {@code WRAP_MODE} or {@code UNWRAP_MODE} but the mode is not implemented
      * by the underlying {@code CipherSpi}.
-     */
+     *
     public final void init(int opmode, Certificate certificate)
             throws InvalidKeyException
     {
         init(opmode, certificate, JceSecurity.RANDOM);
     }
+     */
 
     /**
      * Initializes this cipher with the public key from the given certificate
