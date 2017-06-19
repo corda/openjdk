@@ -957,16 +957,6 @@ public final class Subject implements java.io.Serializable {
 
         private static final long serialVersionUID = 7911754171111800359L;
 
-        /**
-         * @serialField this$0 Subject The outer Subject instance.
-         * @serialField elements LinkedList The elements in this set.
-         */
-        private static final ObjectStreamField[] serialPersistentFields = {
-            new ObjectStreamField("this$0", Subject.class),
-            new ObjectStreamField("elements", LinkedList.class),
-            new ObjectStreamField("which", int.class)
-        };
-
         Subject subject;
         LinkedList<E> elements;
 

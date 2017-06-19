@@ -759,19 +759,4 @@ final class FilePermissionCollection extends PermissionCollection
 
     private static final long serialVersionUID = 2202956749081564585L;
 
-    // Need to maintain serialization interoperability with earlier releases,
-    // which had the serializable field:
-    //    private Vector permissions;
-
-    /**
-     * @serialField permissions java.util.Vector
-     *     A list of FilePermission objects.
-     */
-    private static final ObjectStreamField[] serialPersistentFields = {
-        new ObjectStreamField("permissions", Vector.class),
-    };
-
-    /**
-     * @serialData "permissions" field (a Vector containing the FilePermissions).
-     */
 }

@@ -76,17 +76,6 @@ public class BitSet implements Cloneable, java.io.Serializable {
     private static final long WORD_MASK = 0xffffffffffffffffL;
 
     /**
-     * @serialField bits long[]
-     *
-     * The bits in this BitSet.  The ith bit is stored in bits[i/64] at
-     * bit position i % 64 (where bit position 0 refers to the least
-     * significant bit and 63 refers to the most significant bit).
-     */
-    private static final ObjectStreamField[] serialPersistentFields = {
-        new ObjectStreamField("bits", long[].class),
-    };
-
-    /**
      * The internal field corresponding to the serialField "bits".
      */
     private long[] words;

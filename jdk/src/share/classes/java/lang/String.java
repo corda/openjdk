@@ -25,7 +25,6 @@
 
 package java.lang;
 
-import java.io.ObjectStreamField;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -118,16 +117,6 @@ public final class String
 
     /** use serialVersionUID from JDK 1.0.2 for interoperability */
     private static final long serialVersionUID = -6849794470754667710L;
-
-    /**
-     * Class String is special cased within the Serialization Stream Protocol.
-     *
-     * A String instance is written into an ObjectOutputStream according to
-     * <a href="{@docRoot}/../platform/serialization/spec/output.html">
-     * Object Serialization Specification, Section 6.2, "Stream Elements"</a>
-     */
-    private static final ObjectStreamField[] serialPersistentFields =
-        new ObjectStreamField[0];
 
     /**
      * Initializes a newly created {@code String} object so that it represents
