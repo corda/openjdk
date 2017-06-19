@@ -394,14 +394,6 @@ class TimerThread extends Thread {
                 timerQueue = timerQueue.next;
                 TimerTickThread thr = TimerTickThread.call(
                     timer, timer.sleepUntil);
-                if (debug) {
-                    long delta = (System.currentTimeMillis() - timer.sleepUntil);
-                    System.out.println("tick(" + thr.getName() + ","
-                        + timer.interval + ","+delta+ ")");
-                    if (delta > 250) {
-                        System.out.println("*** BIG DELAY ***");
-                    }
-                }
             }
         }
     }
@@ -442,19 +434,6 @@ class TimerThread extends Thread {
             timer.next = cur;
             prev.next = timer;
         }
-        if (debug) {
-            long now = System.currentTimeMillis();
-
-            System.out.print(Thread.currentThread().getName()
-                + ": enqueue " + timer.interval + ": ");
-            cur = timerQueue;
-            while(cur != null) {
-                long delta = cur.sleepUntil - now;
-                System.out.print(cur.interval + "(" + delta + ") ");
-                cur = cur.next;
-            }
-            System.out.println();
-        }
     }
 
     /*
@@ -471,10 +450,6 @@ class TimerThread extends Thread {
             cur = cur.next;
         }
         if (cur == null) {
-            if (debug) {
-                System.out.println(Thread.currentThread().getName()
-                    + ": dequeue " + timer.interval + ": no-op");
-            }
             return false;
         }       if (prev == null) {
             timerQueue = timer.next;
@@ -484,19 +459,6 @@ class TimerThread extends Thread {
             prev.next = timer.next;
         }
         timer.next = null;
-        if (debug) {
-            long now = System.currentTimeMillis();
-
-            System.out.print(Thread.currentThread().getName()
-                + ": dequeue " + timer.interval + ": ");
-            cur = timerQueue;
-            while(cur != null) {
-                long delta = cur.sleepUntil - now;
-                System.out.print(cur.interval + "(" + delta + ") ");
-                cur = cur.next;
-            }
-            System.out.println();
-        }
         return true;
     }
 
@@ -516,9 +478,6 @@ class TimerThread extends Thread {
                 timer.sleepUntil = now + timer.interval;
             }
             enqueue(timer);
-        } else if (debug) {
-            System.out.println(Thread.currentThread().getName()
-                + ": requeue " + timer.interval + ": no-op");
         }
     }
 }

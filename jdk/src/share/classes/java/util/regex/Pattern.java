@@ -1715,33 +1715,18 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
     private static void printObjectTree(Node node) {
         while(node != null) {
             if (node instanceof Prolog) {
-                System.out.println(node);
                 printObjectTree(((Prolog)node).loop);
-                System.out.println("**** end contents prolog loop");
             } else if (node instanceof Loop) {
-                System.out.println(node);
                 printObjectTree(((Loop)node).body);
-                System.out.println("**** end contents Loop body");
             } else if (node instanceof Curly) {
-                System.out.println(node);
                 printObjectTree(((Curly)node).atom);
-                System.out.println("**** end contents Curly body");
             } else if (node instanceof GroupCurly) {
-                System.out.println(node);
                 printObjectTree(((GroupCurly)node).atom);
-                System.out.println("**** end contents GroupCurly body");
             } else if (node instanceof GroupTail) {
-                System.out.println(node);
-                System.out.println("Tail next is "+node.next);
                 return;
-            } else {
-                System.out.println(node);
             }
             node = node.next;
-            if (node != null)
-                System.out.println("->next:");
             if (node == Pattern.accept) {
-                System.out.println("Accept Node");
                 node = null;
             }
        }

@@ -27,7 +27,6 @@ package sun.security.timestamp;
 
 import java.io.IOException;
 import sun.security.pkcs.PKCS7;
-import sun.security.util.Debug;
 import sun.security.util.DerValue;
 
 /**
@@ -175,8 +174,6 @@ public class TSResponse {
      * The request cannot be handled due to system failure.
      */
     public static final int SYSTEM_FAILURE = 25;
-
-    private static final Debug debug = Debug.getInstance("ts");
 
     private int status;
 
@@ -328,9 +325,6 @@ public class TSResponse {
 
         DerValue statusInfo = derValue.data.getDerValue();
         this.status = statusInfo.data.getInteger();
-        if (debug != null) {
-            debug.println("timestamp response: status=" + this.status);
-        }
         // Parse statusString, if present
         if (statusInfo.data.available() > 0) {
             byte tag = (byte)statusInfo.data.peekByte();
@@ -339,10 +333,6 @@ public class TSResponse {
                 statusString = new String[strings.length];
                 for (int i = 0; i < strings.length; i++) {
                     statusString[i] = strings[i].getUTF8String();
-                    if (debug != null) {
-                        debug.println("timestamp response: statusString=" +
-                                      statusString[i]);
-                    }
                 }
             }
         }

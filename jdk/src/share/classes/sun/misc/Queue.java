@@ -127,24 +127,6 @@ public class Queue<T> {
     public final synchronized Enumeration<T> reverseElements() {
         return new FIFOQueueEnumerator<>(this);
     }
-
-    public synchronized void dump(String msg) {
-        System.err.println(">> "+msg);
-        System.err.println("["+length+" elt(s); head = "+
-                           (head == null ? "null" : (head.obj)+"")+
-                           " tail = "+(tail == null ? "null" : (tail.obj)+""));
-        QueueElement<T> cursor = head;
-        QueueElement<T> last = null;
-        while (cursor != null) {
-            System.err.println("  "+cursor);
-            last = cursor;
-            cursor = cursor.next;
-        }
-        if (last != tail) {
-            System.err.println("  tail != last: "+tail+", "+last);
-        }
-        System.err.println("]");
-    }
 }
 
 final class FIFOQueueEnumerator<T> implements Enumeration<T> {

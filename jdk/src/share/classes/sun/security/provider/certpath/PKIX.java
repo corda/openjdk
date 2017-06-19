@@ -32,15 +32,11 @@ import java.security.interfaces.DSAPublicKey;
 import java.util.*;
 import javax.security.auth.x500.X500Principal;
 
-import sun.security.util.Debug;
-
 /**
  * Common utility methods and classes used by the PKIX CertPathValidator and
  * CertPathBuilder implementation.
  */
 class PKIX {
-
-    private static final Debug debug = Debug.getInstance("certpath");
 
     private PKIX() { }
 

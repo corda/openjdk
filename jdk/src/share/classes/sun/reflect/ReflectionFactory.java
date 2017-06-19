@@ -507,7 +507,7 @@ public class ReflectionFactory {
                     // fully initialized and that the bulk of the startup code
                     // has been run.
 
-                    if (System.out == null) {
+                    if (!System.isBootstrapped) {
                         // java.lang.System not yet fully initialized
                         return null;
                     }

@@ -426,13 +426,6 @@ public class PlatformLogger {
 
 
     private static final class DefaultLoggerProxy extends LoggerProxy {
-        /**
-         * Default platform logging support - output messages to System.err -
-         * equivalent to ConsoleHandler with SimpleFormatter.
-         */
-        private static PrintStream outputStream() {
-            return System.err;
-        }
 
         volatile Level effectiveLevel; // effective level (never null)
         volatile Level level;          // current level set for this node (may be null)
@@ -461,20 +454,17 @@ public class PlatformLogger {
 
         void doLog(Level level, String msg) {
             if (isLoggable(level)) {
-                outputStream().print(format(level, msg, null));
             }
         }
 
         void doLog(Level level, String msg, Throwable thrown) {
             if (isLoggable(level)) {
-                outputStream().print(format(level, msg, thrown));
             }
         }
 
         void doLog(Level level, String msg, Object... params) {
             if (isLoggable(level)) {
                 String newMsg = formatMessage(msg, params);
-                outputStream().print(format(level, newMsg, null));
             }
         }
 

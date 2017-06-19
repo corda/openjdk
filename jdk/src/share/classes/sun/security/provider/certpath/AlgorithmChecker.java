@@ -55,7 +55,6 @@ import java.security.spec.DSAPublicKeySpec;
 
 import sun.security.util.AnchorCertificates;
 import sun.security.util.ConstraintsParameters;
-import sun.security.util.Debug;
 import sun.security.util.DisabledAlgorithmConstraints;
 import sun.security.validator.Validator;
 import sun.security.x509.X509CertImpl;
@@ -74,7 +73,6 @@ import sun.security.x509.AlgorithmId;
  * @see PKIXParameters
  */
 public final class AlgorithmChecker extends PKIXCertPathChecker {
-    private static final Debug debug = Debug.getInstance("certpath");
 
     private final AlgorithmConstraints constraints;
     private final PublicKey trustedPubKey;
@@ -162,17 +160,11 @@ public final class AlgorithmChecker extends PKIXCertPathChecker {
                 this.trustedPubKey = anchor.getTrustedCert().getPublicKey();
                 // Check for anchor certificate restrictions
                 trustedMatch = checkFingerprint(anchor.getTrustedCert());
-                if (trustedMatch && debug != null) {
-                    debug.println("trustedMatch = true");
-                }
             } else {
                 this.trustedPubKey = anchor.getCAPublicKey();
             }
         } else {
             this.trustedPubKey = null;
-            if (debug != null) {
-                debug.println("TrustAnchor is null, trustedMatch is false.");
-            }
         }
 
         this.prevPubKey = this.trustedPubKey;
@@ -208,9 +200,6 @@ public final class AlgorithmChecker extends PKIXCertPathChecker {
             return false;
         }
 
-        if (debug != null) {
-            debug.println("AlgorithmChecker.contains: " + cert.getSigAlgName());
-        }
         return AnchorCertificates.contains(cert);
     }
 
@@ -410,9 +399,6 @@ public final class AlgorithmChecker extends PKIXCertPathChecker {
                 prevPubKey = anchor.getTrustedCert().getPublicKey();
                 // Check for anchor certificate restrictions
                 trustedMatch = checkFingerprint(anchor.getTrustedCert());
-                if (trustedMatch && debug != null) {
-                    debug.println("trustedMatch = true");
-                }
             } else {
                 prevPubKey = anchor.getCAPublicKey();
             }

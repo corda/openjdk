@@ -64,9 +64,6 @@ import sun.security.jca.JCAUtil;
  */
 abstract class DSA extends SignatureSpi {
 
-    /* Are we debugging? */
-    private static final boolean debug = false;
-
     /* The parameter object */
     private DSAParams params;
 
@@ -376,18 +373,6 @@ abstract class DSA extends SignatureSpi {
             printable += "\n\tUNINIIALIZED";
         }
         return printable;
-    }
-
-    private static void debug(Exception e) {
-        if (debug) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void debug(String s) {
-        if (debug) {
-            System.err.println(s);
-        }
     }
 
     /**

@@ -263,8 +263,6 @@ public abstract class AttachProvider {
                             ThreadDeath td = (ThreadDeath)t;
                             throw td;
                         }
-                        // Ignore errors and exceptions
-                        System.err.println(t);
                     }
                 }
             }

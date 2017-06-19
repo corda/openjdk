@@ -33,7 +33,6 @@ import java.security.spec.AlgorithmParameterSpec;
 
 import java.nio.ByteBuffer;
 
-import sun.security.util.Debug;
 import sun.security.jca.*;
 import sun.security.jca.GetInstance.Instance;
 
@@ -73,14 +72,6 @@ import sun.security.jca.GetInstance.Instance;
  */
 
 public class Mac implements Cloneable {
-
-    private static final Debug debug =
-                        Debug.getInstance("jca", "Mac");
-
-    private static final Debug pdebug =
-                        Debug.getInstance("provider", "Provider");
-    private static final boolean skipDebug =
-        Debug.isOn("engine=") && !Debug.isOn("mac");
 
     // The provider
     private Provider provider;
@@ -274,18 +265,6 @@ public class Mac implements Cloneable {
             if (spi != null) {
                 return;
             }
-            if (debug != null) {
-                int w = --warnCount;
-                if (w >= 0) {
-                    debug.println("Mac.init() not first method "
-                        + "called, disabling delayed provider selection");
-                    if (w == 0) {
-                        debug.println("Further warnings of this type will "
-                            + "be suppressed");
-                    }
-                    new Exception("Call trace").printStackTrace();
-                }
-            }
             Exception lastException = null;
             while ((firstService != null) || serviceIterator.hasNext()) {
                 Service s;
@@ -418,11 +397,6 @@ public class Mac implements Cloneable {
             throw new InvalidKeyException("init() failed", e);
         }
         initialized = true;
-
-        if (!skipDebug && pdebug != null) {
-            pdebug.println("Mac." + algorithm + " algorithm from: " +
-                this.provider.getName());
-        }
     }
 
     /**
@@ -445,11 +419,6 @@ public class Mac implements Cloneable {
             chooseProvider(key, params);
         }
         initialized = true;
-
-        if (!skipDebug && pdebug != null) {
-            pdebug.println("Mac." + algorithm + " algorithm from: " +
-                this.provider.getName());
-        }
     }
 
     /**

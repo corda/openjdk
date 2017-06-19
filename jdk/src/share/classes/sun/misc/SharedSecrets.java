@@ -26,7 +26,6 @@
 package sun.misc;
 
 import java.util.jar.JarFile;
-import java.io.Console;
 import java.io.FileDescriptor;
 import java.security.ProtectionDomain;
 
@@ -46,7 +45,6 @@ public class SharedSecrets {
     private static JavaUtilJarAccess javaUtilJarAccess;
     private static JavaLangAccess javaLangAccess;
     private static JavaLangRefAccess javaLangRefAccess;
-    private static JavaIOAccess javaIOAccess;
     private static JavaNetAccess javaNetAccess;
     private static JavaNioAccess javaNioAccess;
     private static JavaIOFileDescriptorAccess javaIOFileDescriptorAccess;
@@ -103,17 +101,6 @@ public class SharedSecrets {
             unsafe.ensureClassInitialized(java.nio.ByteOrder.class);
         }
         return javaNioAccess;
-    }
-
-    public static void setJavaIOAccess(JavaIOAccess jia) {
-        javaIOAccess = jia;
-    }
-
-    public static JavaIOAccess getJavaIOAccess() {
-        if (javaIOAccess == null) {
-            unsafe.ensureClassInitialized(Console.class);
-        }
-        return javaIOAccess;
     }
 
     public static void setJavaIOFileDescriptorAccess(JavaIOFileDescriptorAccess jiofda) {

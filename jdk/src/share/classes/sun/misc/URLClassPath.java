@@ -64,18 +64,12 @@ import sun.security.action.GetPropertyAction;
 public class URLClassPath {
     final static String USER_AGENT_JAVA_VERSION = "UA-Java-Version";
     final static String JAVA_VERSION;
-    private static final boolean DEBUG;
-    private static final boolean DEBUG_LOOKUP_CACHE;
     private static final boolean DISABLE_JAR_CHECKING;
     private static final boolean DISABLE_ACC_CHECKING;
 
     static {
         JAVA_VERSION = java.security.AccessController.doPrivileged(
             new GetPropertyAction("java.version"));
-        DEBUG        = (java.security.AccessController.doPrivileged(
-            new GetPropertyAction("sun.misc.URLClassPath.debug")) != null);
-        DEBUG_LOOKUP_CACHE = (java.security.AccessController.doPrivileged(
-            new GetPropertyAction("sun.misc.URLClassPath.debugLookupCache")) != null);
         String p = java.security.AccessController.doPrivileged(
             new GetPropertyAction("sun.misc.URLClassPath.disableJarChecking"));
         DISABLE_JAR_CHECKING = p != null ? p.equals("true") || p.equals("") : false;
@@ -228,10 +222,6 @@ public class URLClassPath {
      * @return the Resource, or null if not found
      */
     public Resource getResource(String name, boolean check) {
-        if (DEBUG) {
-            System.err.println("URLClassPath.getResource(\"" + name + "\")");
-        }
-
         Loader loader;
         int[] cache = getLookupCache(name);
         for (int i = 0; (loader = getNextLoader(cache, i)) != null; i++) {
@@ -400,10 +390,6 @@ public class URLClassPath {
         if (cache != null && cache.length > 0) {
             int maxindex = cache[cache.length - 1]; // cache[] is strictly ascending.
             if (!ensureLoaderOpened(maxindex)) {
-                if (DEBUG_LOOKUP_CACHE) {
-                    System.out.println("Expanded loaders FAILED " +
-                                       loaders.size() + " for maxindex=" + maxindex);
-                }
                 return null;
             }
         }
@@ -420,10 +406,6 @@ public class URLClassPath {
             if (!lookupCacheEnabled) {
                 // cache was invalidated as the result of the above call.
                 return false;
-            }
-            if (DEBUG_LOOKUP_CACHE) {
-                System.out.println("Expanded loaders " + loaders.size() +
-                                   " to index=" + index);
             }
         }
         return true;
@@ -443,10 +425,6 @@ public class URLClassPath {
                 urlNoFragString.equals(
                     URLUtil.urlNoFragString(lookupCacheURLs[index]))) {
                 return;
-            }
-            if (DEBUG || DEBUG_LOOKUP_CACHE) {
-                System.out.println("WARNING: resource lookup cache invalidated "
-                                   + "for lookupCacheLoader at " + index);
             }
             disableAllLookupCaches();
         }
@@ -471,10 +449,6 @@ public class URLClassPath {
         if (cache != null) {
             if (index < cache.length) {
                 Loader loader = loaders.get(cache[index]);
-                if (DEBUG_LOOKUP_CACHE) {
-                    System.out.println("HASCACHE: Loading from : " + cache[index]
-                                       + " = " + loader.getBaseURL());
-                }
                 return loader;
             } else {
                 return null; // finished iterating over cache[]
@@ -529,18 +503,12 @@ public class URLClassPath {
                 // Always silently ignore. The context, if there is one, that
                 // this URLClassPath was given during construction will never
                 // have permission to access the URL.
-                if (DEBUG) {
-                    System.err.println("Failed to access " + url + ", " + se );
-                }
                 continue;
             }
             // Finally, add the Loader to the search path.
             validateLookupCache(loaders.size(), urlNoFragString);
             loaders.add(loader);
             lmap.put(urlNoFragString, loader);
-        }
-        if (DEBUG_LOOKUP_CACHE) {
-            System.out.println("NOCACHE: Loading from : " + index );
         }
         return loaders.get(index);
     }
@@ -850,11 +818,6 @@ public class URLClassPath {
                     java.security.AccessController.doPrivileged(
                         new java.security.PrivilegedExceptionAction<Void>() {
                             public Void run() throws IOException {
-                                if (DEBUG) {
-                                    System.err.println("Opening " + csu);
-                                    Thread.dumpStack();
-                                }
-
                                 jar = getJarFile(csu);
                                 index = JarIndex.getJarIndex(jar, metaIndex);
                                 if (index != null) {

@@ -30,7 +30,6 @@ import java.util.Enumeration;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import sun.security.jca.GetInstance;
-import sun.security.util.Debug;
 import sun.security.util.SecurityConstants;
 
 
@@ -108,8 +107,6 @@ public abstract class Policy {
     // PolicyInfo is stored in an AtomicReference
     private static AtomicReference<PolicyInfo> policy =
         new AtomicReference<>(new PolicyInfo(null, false));
-
-    private static final Debug debug = Debug.getInstance("policy");
 
     // Cache mapping ProtectionDomain.Key to PermissionCollection
     private WeakHashMap<ProtectionDomain.Key, PermissionCollection> pdMapping;

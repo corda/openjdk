@@ -652,8 +652,6 @@ class LambdaForm {
         assert(vmentry == null || vmentry.getMethodType().basicType().equals(invokerType));
         try {
             vmentry = InvokerBytecodeGenerator.generateCustomizedCode(this, invokerType);
-            if (TRACE_INTERPRETER)
-                traceInterpreter("compileToBytecode", this);
             isCompiled = true;
             return vmentry;
         } catch (Error | Exception ex) {
@@ -794,8 +792,6 @@ class LambdaForm {
     @DontInline
     /** Evaluate a single Name within this form, applying its function to its arguments. */
     Object interpretName(Name name, Object[] values) throws Throwable {
-        if (TRACE_INTERPRETER)
-            traceInterpreter("| interpretName", name.debugString(), (Object[]) null);
         Object[] arguments = Arrays.copyOf(name.arguments, name.arguments.length, Object[].class);
         for (int i = 0; i < arguments.length; i++) {
             Object a = arguments[i];
@@ -820,38 +816,22 @@ class LambdaForm {
         }
     }
     Object interpretWithArgumentsTracing(Object... argumentValues) throws Throwable {
-        traceInterpreter("[ interpretWithArguments", this, argumentValues);
         if (invocationCounter < COMPILE_THRESHOLD) {
             int ctr = invocationCounter++;  // benign race
-            traceInterpreter("| invocationCounter", ctr);
             if (invocationCounter >= COMPILE_THRESHOLD) {
                 compileToBytecode();
             }
         }
         Object rval;
-        try {
-            assert(arityCheck(argumentValues));
-            Object[] values = Arrays.copyOf(argumentValues, names.length);
-            for (int i = argumentValues.length; i < values.length; i++) {
-                values[i] = interpretName(names[i], values);
-            }
-            rval = (result < 0) ? null : values[result];
-        } catch (Throwable ex) {
-            traceInterpreter("] throw =>", ex);
-            throw ex;
+        assert(arityCheck(argumentValues));
+        Object[] values = Arrays.copyOf(argumentValues, names.length);
+        for (int i = argumentValues.length; i < values.length; i++) {
+            values[i] = interpretName(names[i], values);
         }
-        traceInterpreter("] return =>", rval);
+        rval = (result < 0) ? null : values[result];
         return rval;
     }
 
-    static void traceInterpreter(String event, Object obj, Object... args) {
-        if (TRACE_INTERPRETER) {
-            System.out.println("LFI: "+event+" "+(obj != null ? obj : "")+(args != null && args.length != 0 ? Arrays.asList(args) : ""));
-        }
-    }
-    static void traceInterpreter(String event, Object obj) {
-        traceInterpreter(event, obj, (Object[])null);
-    }
     private boolean arityCheck(Object[] argumentValues) {
         assert(argumentValues.length == arity) : arity+"!="+Arrays.asList(argumentValues)+".length";
         // also check that the leading (receiver) argument is somehow bound to this LF:
@@ -1230,22 +1210,17 @@ class LambdaForm {
         Object invokeWithArgumentsTracing(Object[] arguments) throws Throwable {
             Object rval;
             try {
-                traceInterpreter("[ call", this, arguments);
                 if (invoker == null) {
-                    traceInterpreter("| getInvoker", this);
                     invoker();
                 }
                 if (resolvedHandle == null) {
-                    traceInterpreter("| resolve", this);
                     resolvedHandle();
                 }
                 assert(checkArgumentTypes(arguments, methodType()));
                 rval = invoker().invokeBasic(resolvedHandle(), arguments);
             } catch (Throwable ex) {
-                traceInterpreter("] throw =>", ex);
                 throw ex;
             }
-            traceInterpreter("] return =>", rval);
             return rval;
         }
 

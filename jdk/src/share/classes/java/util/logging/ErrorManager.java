@@ -91,7 +91,6 @@ public class ErrorManager {
         if (msg != null) {
             text = text + ": " + msg;
         }
-        System.err.println(text);
         if (ex != null) {
             ex.printStackTrace();
         }

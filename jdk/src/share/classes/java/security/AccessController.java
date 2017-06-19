@@ -25,7 +25,6 @@
 
 package java.security;
 
-import sun.security.util.Debug;
 import sun.reflect.CallerSensitive;
 import sun.reflect.Reflection;
 
@@ -858,25 +857,6 @@ public final class AccessController {
         AccessControlContext stack = getStackAccessControlContext();
         // if context is null, we had privileged system code on the stack.
         if (stack == null) {
-            Debug debug = AccessControlContext.getDebug();
-            boolean dumpDebug = false;
-            if (debug != null) {
-                dumpDebug = !Debug.isOn("codebase=");
-                dumpDebug &= !Debug.isOn("permission=") ||
-                    Debug.isOn("permission=" + perm.getClass().getCanonicalName());
-            }
-
-            if (dumpDebug && Debug.isOn("stack")) {
-                Thread.dumpStack();
-            }
-
-            if (dumpDebug && Debug.isOn("domain")) {
-                debug.println("domain (context is null)");
-            }
-
-            if (dumpDebug) {
-                debug.println("access allowed "+perm);
-            }
             return;
         }
 

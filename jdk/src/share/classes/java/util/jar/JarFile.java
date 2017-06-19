@@ -390,10 +390,6 @@ class JarFile extends ZipFile {
             // treat the jar file as being unsigned
             jv = null;
             verify = false;
-            if (JarVerifier.debug != null) {
-                JarVerifier.debug.println("jarfile parsing error!");
-                ex.printStackTrace();
-            }
         }
 
         // if after initializing the verifier we have nothing
@@ -402,14 +398,8 @@ class JarFile extends ZipFile {
         if (jv != null) {
 
             jv.doneWithMeta();
-            if (JarVerifier.debug != null) {
-                JarVerifier.debug.println("done with meta!");
-            }
 
             if (jv.nothingToVerify()) {
-                if (JarVerifier.debug != null) {
-                    JarVerifier.debug.println("nothing to verify!");
-                }
                 jv = null;
                 verify = false;
             }

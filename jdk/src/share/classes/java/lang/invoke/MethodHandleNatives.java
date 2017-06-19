@@ -261,14 +261,11 @@ class MethodHandleNatives {
                 if (jval == vmval)  continue;
                 String err = (name+": JVM has "+vmval+" while Java has "+jval);
                 if (name.equals("CONV_OP_LIMIT")) {
-                    System.err.println("warning: "+err);
                     continue;
                 }
                 throw new InternalError(err);
             } catch (NoSuchFieldException | IllegalAccessException ex) {
-                String err = (name+": JVM has "+vmval+" which Java does not define");
                 // ignore exotic ops the JVM cares about; we just wont issue them
-                //System.err.println("warning: "+err);
                 continue;
             }
         }
@@ -328,16 +325,11 @@ class MethodHandleNatives {
         Object staticArglist = (staticArguments instanceof Object[] ?
                                 java.util.Arrays.asList((Object[]) staticArguments) :
                                 staticArguments);
-        System.out.println("linkCallSite "+caller.getName()+" "+
-                           bsmReference+" "+
-                           name+type+"/"+staticArglist);
         try {
             MemberName res = linkCallSiteImpl(caller, bootstrapMethod, name, type,
                                               staticArguments, appendixResult);
-            System.out.println("linkCallSite => "+res+" + "+appendixResult[0]);
             return res;
         } catch (Throwable ex) {
-            System.out.println("linkCallSite => throw "+ex);
             throw ex;
         }
     }
@@ -448,14 +440,10 @@ class MethodHandleNatives {
     static MemberName linkMethodTracing(Class<?> callerClass, int refKind,
                                         Class<?> defc, String name, Object type,
                                         Object[] appendixResult) {
-        System.out.println("linkMethod "+defc.getName()+"."+
-                           name+type+"/"+Integer.toHexString(refKind));
         try {
             MemberName res = linkMethodImpl(callerClass, refKind, defc, name, type, appendixResult);
-            System.out.println("linkMethod => "+res+" + "+appendixResult[0]);
             return res;
         } catch (Throwable ex) {
-            System.out.println("linkMethod => throw "+ex);
             throw ex;
         }
     }

@@ -315,7 +315,6 @@ public class ExtensionInfo {
             try {
                 return Integer.parseInt(token) * 100;
             } catch (NumberFormatException e) {
-                System.out.println(versionError);
                 return 0;
             }
         }
@@ -343,14 +342,12 @@ public class ExtensionInfo {
                     } else {
                         // character is not a a-z letter, ignore
                         charVersion = 0;
-                        System.out.println(versionError);
                     }
                 } else {
                     // This is a regular update release. Obtain the patch version id
                     patchVersion = Integer.parseInt(token.substring(patchIndex+1, endIndex));
                 }
             } catch (NumberFormatException e) {
-                System.out.println(versionError);
                 return 0;
             }
             return prversion * 100 + (patchVersion + charVersion);
@@ -364,7 +361,6 @@ public class ExtensionInfo {
             try {
                 mrversion = Integer.parseInt(token.substring(0, prIndex));
             } catch (NumberFormatException e) {
-                System.out.println(versionError);
                 return 0;
             }
 
@@ -407,7 +403,6 @@ public class ExtensionInfo {
                 try {
                     return mrversion * 100 - delta + Integer.parseInt(msVersion);
                 } catch (NumberFormatException e) {
-                    System.out.println(versionError);
                     return 0;
                 }
             }

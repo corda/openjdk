@@ -44,7 +44,6 @@ import sun.security.x509.X509CertImpl;
  */
 public final class UntrustedCertificates {
 
-    private static final Debug debug = Debug.getInstance("certpath");
     private static final String ALGORITHM_KEY = "Algorithm";
 
     private static final Properties props = new Properties();
@@ -63,9 +62,6 @@ public final class UntrustedCertificates {
                         e.setValue(stripColons(e.getValue()));
                     }
                 } catch (IOException fnfe) {
-                    if (debug != null) {
-                        debug.println("Error parsing blacklisted.certs");
-                    }
                 }
                 return null;
             }

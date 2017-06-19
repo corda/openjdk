@@ -84,7 +84,6 @@ public class SignerInfo implements DerEncoder {
     byte[] encryptedDigest;
     Timestamp timestamp;
     private boolean hasTimestamp = true;
-    private static final Debug debug = Debug.getInstance("jar");
 
     PKCS9Attributes authenticatedAttributes;
     PKCS9Attributes unauthenticatedAttributes;
@@ -562,13 +561,6 @@ public class SignerInfo implements DerEncoder {
             throw new SignatureException("Signature timestamp (#" +
                 token.getSerialNumber() + ") generated on " + token.getDate() +
                 " is inapplicable");
-        }
-
-        if (debug != null) {
-            debug.println();
-            debug.println("Detected signature timestamp (#" +
-                token.getSerialNumber() + ") generated on " + token.getDate());
-            debug.println();
         }
     }
 

@@ -30,7 +30,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.io.*;
 import java.net.URL;
-import sun.security.util.Debug;
 import sun.security.util.PropertyExpander;
 
 import sun.security.jca.*;
@@ -47,10 +46,6 @@ import sun.security.jca.*;
  */
 
 public final class Security {
-
-    /* Are we debugging? -- for developers */
-    private static final Debug sdebug =
-                        Debug.getInstance("properties");
 
     /* The java.security properties */
     private static Properties props;
@@ -89,25 +84,12 @@ public final class Security {
                 is = new BufferedInputStream(fis);
                 props.load(is);
                 loadedProps = true;
-
-                if (sdebug != null) {
-                    sdebug.println("reading security properties file: " +
-                                propFile);
-                }
             } catch (IOException e) {
-                if (sdebug != null) {
-                    sdebug.println("unable to load security properties from " +
-                                propFile);
-                    e.printStackTrace();
-                }
             } finally {
                 if (is != null) {
                     try {
                         is.close();
                     } catch (IOException ioe) {
-                        if (sdebug != null) {
-                            sdebug.println("unable to close input stream");
-                        }
                     }
                 }
             }
@@ -125,10 +107,6 @@ public final class Security {
 
             if (overrideAll) {
                 props = new Properties();
-                if (sdebug != null) {
-                    sdebug.println
-                        ("overriding other security properties files!");
-                }
             }
 
             // now load the user-specified file so its values
@@ -149,30 +127,12 @@ public final class Security {
                     bis = new BufferedInputStream(propURL.openStream());
                     props.load(bis);
                     loadedProps = true;
-
-                    if (sdebug != null) {
-                        sdebug.println("reading security properties file: " +
-                                        propURL);
-                        if (overrideAll) {
-                            sdebug.println
-                                ("overriding other security properties files!");
-                        }
-                    }
                 } catch (Exception e) {
-                    if (sdebug != null) {
-                        sdebug.println
-                                ("unable to load security properties from " +
-                                extraPropFile);
-                        e.printStackTrace();
-                    }
                 } finally {
                     if (bis != null) {
                         try {
                             bis.close();
                         } catch (IOException ioe) {
-                            if (sdebug != null) {
-                                sdebug.println("unable to close input stream");
-                            }
                         }
                     }
                 }
@@ -181,10 +141,6 @@ public final class Security {
 
         if (!loadedProps) {
             initializeStatic();
-            if (sdebug != null) {
-                sdebug.println("unable to load security properties " +
-                        "-- using defaults");
-            }
         }
 
     }

@@ -143,16 +143,6 @@ public class UnixLoginModule implements LoginModule {
                         supplementaryGroups.add(ngp);
                 }
             }
-            if (debug) {
-                System.out.println("\t\t[UnixLoginModule]: " +
-                        "succeeded importing info: ");
-                System.out.println("\t\t\tuid = " + ss.getUid());
-                System.out.println("\t\t\tgid = " + ss.getGid());
-                unixGroups = ss.getGroups();
-                for (int i = 0; i < unixGroups.length; i++) {
-                    System.out.println("\t\t\tsupp gid = " + unixGroups[i]);
-                }
-            }
             succeeded = true;
             return true;
         }
@@ -183,11 +173,6 @@ public class UnixLoginModule implements LoginModule {
      */
     public boolean commit() throws LoginException {
         if (succeeded == false) {
-            if (debug) {
-                System.out.println("\t\t[UnixLoginModule]: " +
-                    "did not add any Principals to Subject " +
-                    "because own authentication failed.");
-            }
             return false;
         } else {
             if (subject.isReadOnly()) {
@@ -204,14 +189,6 @@ public class UnixLoginModule implements LoginModule {
                 if (!subject.getPrincipals().contains
                     (supplementaryGroups.get(i)))
                     subject.getPrincipals().add(supplementaryGroups.get(i));
-            }
-
-            if (debug) {
-                System.out.println("\t\t[UnixLoginModule]: " +
-                    "added UnixPrincipal,");
-                System.out.println("\t\t\t\tUnixNumericUserPrincipal,");
-                System.out.println("\t\t\t\tUnixNumericGroupPrincipal(s),");
-                System.out.println("\t\t\t to Subject");
             }
 
             commitSucceeded = true;
@@ -239,11 +216,6 @@ public class UnixLoginModule implements LoginModule {
      *          failed, and true otherwise.
      */
     public boolean abort() throws LoginException {
-        if (debug) {
-            System.out.println("\t\t[UnixLoginModule]: " +
-                "aborted authentication attempt");
-        }
-
         if (succeeded == false) {
             return false;
         } else if (succeeded == true && commitSucceeded == false) {
@@ -299,10 +271,6 @@ public class UnixLoginModule implements LoginModule {
         GIDPrincipal = null;
         supplementaryGroups = new LinkedList<UnixNumericGroupPrincipal>();
 
-        if (debug) {
-            System.out.println("\t\t[UnixLoginModule]: " +
-                "logged out Subject");
-        }
         return true;
     }
 }

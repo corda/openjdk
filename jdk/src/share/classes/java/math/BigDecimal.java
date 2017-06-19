@@ -3843,18 +3843,6 @@ public class BigDecimal extends Number implements Comparable<BigDecimal> {
         return (s == i) ? i : (s < 0 ? Integer.MIN_VALUE : Integer.MAX_VALUE);
     }
 
-    /*
-     * Internal printing routine
-     */
-    private static void print(String name, BigDecimal bd) {
-        System.err.format("%s:\tintCompact %d\tintVal %d\tscale %d\tprecision %d%n",
-                          name,
-                          bd.intCompact,
-                          bd.intVal,
-                          bd.scale,
-                          bd.precision);
-    }
-
     /**
      * Check internal invariants of this BigDecimal.  These invariants
      * include:
@@ -3877,26 +3865,22 @@ public class BigDecimal extends Number implements Comparable<BigDecimal> {
     private BigDecimal audit() {
         if (intCompact == INFLATED) {
             if (intVal == null) {
-                print("audit", this);
                 throw new AssertionError("null intVal");
             }
             // Check precision
             if (precision > 0 && precision != bigDigitLength(intVal)) {
-                print("audit", this);
                 throw new AssertionError("precision mismatch");
             }
         } else {
             if (intVal != null) {
                 long val = intVal.longValue();
                 if (val != intCompact) {
-                    print("audit", this);
                     throw new AssertionError("Inconsistent state, intCompact=" +
                                              intCompact + "\t intVal=" + val);
                 }
             }
             // Check precision
             if (precision > 0 && precision != longDigitLength(intCompact)) {
-                print("audit", this);
                 throw new AssertionError("precision mismatch");
             }
         }

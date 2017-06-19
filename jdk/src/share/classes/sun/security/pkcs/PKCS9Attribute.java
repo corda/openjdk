@@ -32,7 +32,6 @@ import java.util.Locale;
 import java.util.Date;
 import java.util.Hashtable;
 import sun.security.x509.CertificateExtensions;
-import sun.security.util.Debug;
 import sun.security.util.DerEncoder;
 import sun.security.util.DerValue;
 import sun.security.util.DerInputStream;
@@ -178,9 +177,6 @@ import sun.misc.HexDumpEncoder;
  * @author Douglas Hoover
  */
 public class PKCS9Attribute implements DerEncoder {
-
-    /* Are we debugging ? */
-    private static final Debug debug = Debug.getInstance("jar");
 
     /**
      * Array of attribute OIDs defined in PKCS9, by number.
@@ -497,9 +493,6 @@ public class PKCS9Attribute implements DerEncoder {
 
         index = indexOf(oid, PKCS9_OIDS, 1);
         if (index == -1) {
-            if (debug != null) {
-                debug.println("Unsupported signer attribute: " + oid);
-            }
             value = content;
             return;
         }

@@ -117,7 +117,6 @@ public class ExtensionDependency {
             ExtensionDependency extDep = new ExtensionDependency();
             return extDep.checkExtensions(jar);
         } catch (ExtensionInstallationException e) {
-            debug(e.getMessage());
         }
         return false;
     }
@@ -152,26 +151,15 @@ public class ExtensionDependency {
                 // Iterate over all declared dependencies
                 while (st.hasMoreTokens()) {
                     String extensionName = st.nextToken();
-                    debug("The file " + jar.getName() +
-                          " appears to depend on " + extensionName);
                     // Sanity Check
                     String extName = extensionName + "-" +
                         Name.EXTENSION_NAME.toString();
-                    if (attr.getValue(extName) == null) {
-                        debug("The jar file " + jar.getName() +
-                              " appers to depend on "
-                              + extensionName + " but does not define the " +
-                              extName + " attribute in its manifest ");
-
-                    } else {
+                    if (attr.getValue(extName) != null) {
                         if (!checkExtension(extensionName, attr)) {
-                            debug("Failed installing " + extensionName);
                             result = false;
                         }
                     }
                 }
-            } else {
-                debug("No dependencies for " + jar.getName());
             }
         }
         return result;
@@ -191,11 +179,9 @@ public class ExtensionDependency {
                                      final Attributes attr)
         throws ExtensionInstallationException
     {
-        debug("Checking extension " + extensionName);
         if (checkExtensionAgainstInstalled(extensionName, attr))
             return true;
 
-        debug("Extension not currently installed ");
         ExtensionInfo reqInfo = new ExtensionInfo(extensionName, attr);
         return installExtension(reqInfo, null);
     }
@@ -222,9 +208,7 @@ public class ExtensionDependency {
                 if (checkExtensionAgainst(extensionName, attr, fExtension))
                     return true;
             } catch (FileNotFoundException e) {
-                debugException(e);
             } catch (IOException e) {
-                debugException(e);
             }
             return false;
 
@@ -239,7 +223,6 @@ public class ExtensionDependency {
             // compare the installed versus the requested extension
                 installedExts = getInstalledExtensions();
             } catch(IOException e) {
-                debugException(e);
                 return false;
             }
 
@@ -248,9 +231,7 @@ public class ExtensionDependency {
                     if (checkExtensionAgainst(extensionName, attr, installedExts[i]))
                         return true;
                 } catch (FileNotFoundException e) {
-                    debugException(e);
                 } catch (IOException e) {
-                    debugException(e);
                     // let's continue with the next installed extension
                 }
             }
@@ -278,9 +259,6 @@ public class ExtensionDependency {
                ExtensionInstallationException
     {
 
-        debug("Checking extension " + extensionName +
-              " against " + file.getName());
-
         // Load the jar file ...
         Manifest man;
         try {
@@ -302,7 +280,6 @@ public class ExtensionDependency {
 
         // Construct the extension information object
         ExtensionInfo reqInfo = new ExtensionInfo(extensionName, attr);
-        debug("Requested Extension : " + reqInfo);
 
         int isCompatible = ExtensionInfo.INCOMPATIBLE;
         ExtensionInfo instInfo = null;
@@ -311,20 +288,16 @@ public class ExtensionDependency {
             Attributes instAttr = man.getMainAttributes();
             if (instAttr != null) {
                 instInfo = new ExtensionInfo(null, instAttr);
-                debug("Extension Installed " + instInfo);
                 isCompatible = instInfo.isCompatibleWith(reqInfo);
                 switch(isCompatible) {
                 case ExtensionInfo.COMPATIBLE:
-                    debug("Extensions are compatible");
                     return true;
 
                 case ExtensionInfo.INCOMPATIBLE:
-                    debug("Extensions are incompatible");
                     return false;
 
                 default:
                     // everything else
-                    debug("Extensions require an upgrade or vendor switch");
                     return installExtension(reqInfo, instInfo);
 
                 }
@@ -362,7 +335,6 @@ public class ExtensionDependency {
             if (eip!=null) {
                 // delegate the installation to the provider
                 if (eip.installExtension(reqInfo, instInfo)) {
-                    debug(reqInfo.name + " installation successful");
                     Launcher.ExtClassLoader cl = (Launcher.ExtClassLoader)
                         Launcher.getLauncher().getClassLoader().getParent();
                     addNewExtensionsToClassLoader(cl);
@@ -372,7 +344,6 @@ public class ExtensionDependency {
         }
         // We have tried all of our providers, noone could install this
         // extension, we just return failure at this point
-        debug(reqInfo.name + " installation failed");
         return false;
     }
 
@@ -408,7 +379,6 @@ public class ExtensionDependency {
                                 } else {
                                     fExtension = new File(dirs[i], extName+fileExt[j]);
                                 }
-                                debug("checkExtensionExists:fileName " + fExtension.getName());
                                 if (fExtension.exists()) {
                                     return fExtension;
                                 }
@@ -417,7 +387,6 @@ public class ExtensionDependency {
                         return null;
 
                     } catch(Exception e) {
-                         debugException(e);
                          return null;
                     }
                 }
@@ -438,17 +407,13 @@ public class ExtensionDependency {
             StringTokenizer st =
                 new StringTokenizer(s, File.pathSeparator);
             int count = st.countTokens();
-            debug("getExtDirs count " + count);
             dirs = new File[count];
             for (int i = 0; i < count; i++) {
                 dirs[i] = new File(st.nextToken());
-                debug("getExtDirs dirs["+i+"] "+ dirs[i]);
             }
         } else {
             dirs = new File[0];
-            debug("getExtDirs dirs " + dirs);
         }
-        debug("getExtDirs dirs.length " + dirs.length);
         return dirs;
     }
 
@@ -465,17 +430,14 @@ public class ExtensionDependency {
         for (int i = 0; i < dirs.length; i++) {
             String[] files = dirs[i].list(new JarFilter());
             if (files != null) {
-                debug("getExtFiles files.length " + files.length);
                 for (int j = 0; j < files.length; j++) {
                     File f = new File(dirs[i], files[j]);
                     urls.add(f);
-                    debug("getExtFiles f["+j+"] "+ f);
                 }
             }
         }
         File[] ua = new File[urls.size()];
         urls.copyInto(ua);
-        debug("getExtFiles ua.length " + ua.length);
         return ua;
     }
 
@@ -491,9 +453,7 @@ public class ExtensionDependency {
                      try {
                          return getExtFiles(getExtDirs());
                      } catch(IOException e) {
-                         debug("Cannot get list of installed extensions");
-                         debugException(e);
-                        return new File[0];
+                         return new File[0];
                      }
                  }
             });
@@ -519,7 +479,6 @@ public class ExtensionDependency {
                             try {
                                 return ParseUtil.fileToEncodedURL(instFile);
                             } catch (MalformedURLException e) {
-                                debugException(e);
                                 return null;
                             }
                         }
@@ -528,17 +487,12 @@ public class ExtensionDependency {
                     URL[] urls = cl.getURLs();
                     boolean found=false;
                     for (int j = 0; j<urls.length; j++) {
-                        debug("URL["+j+"] is " + urls[j] + " looking for "+
-                                           instURL);
                         if (urls[j].toString().compareToIgnoreCase(
                                     instURL.toString())==0) {
                             found=true;
-                            debug("Found !");
                         }
                     }
                     if (!found) {
-                        debug("Not Found ! adding to the classloader " +
-                              instURL);
                         cl.addExtURL(instURL);
                     }
                 }
@@ -550,21 +504,6 @@ public class ExtensionDependency {
             // let's continue with the next installed extension
         }
         return Boolean.TRUE;
-    }
-
-    // True to display all debug and trace messages
-    static final boolean DEBUG = false;
-
-    private static void debug(String s) {
-        if (DEBUG) {
-            System.err.println(s);
-        }
-    }
-
-    private void debugException(Throwable e) {
-        if (DEBUG) {
-            e.printStackTrace();
-        }
     }
 
 }

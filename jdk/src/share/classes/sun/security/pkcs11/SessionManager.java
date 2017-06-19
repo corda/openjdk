@@ -71,8 +71,6 @@ final class SessionManager {
 
     private final static int DEFAULT_MAX_SESSIONS = 32;
 
-    private final static Debug debug = Debug.getInstance("pkcs11");
-
     // token instance
     private final Token token;
 
@@ -114,9 +112,6 @@ final class SessionManager {
         this.token = token;
         this.objSessions = new Pool(this);
         this.opSessions = new Pool(this);
-        if (debug != null) {
-            maxActiveSessionsLock = new Object();
-        }
     }
 
     // returns whether only a fairly low number of sessions are
@@ -166,11 +161,6 @@ final class SessionManager {
         if ((session == null) || (token.isValid() == false)) {
             return null;
         }
-        if (debug != null) {
-            String location = new Exception().getStackTrace()[2].toString();
-            System.out.println("Killing session (" + location + ") active: "
-                + activeSessions.get());
-        }
         closeSession(session);
         return null;
     }
@@ -192,10 +182,6 @@ final class SessionManager {
         if (token.isValid() == false) {
             return;
         }
-        if (debug != null) {
-            System.out.println("Demoting session, active: " +
-                activeSessions.get());
-        }
         boolean present = objSessions.remove(session);
         if (present == false) {
             // session is currently in use
@@ -215,16 +201,6 @@ final class SessionManager {
                     (token.provider.slotID, openSessionFlags, null, null);
         Session session = new Session(token, id);
         activeSessions.incrementAndGet();
-        if (debug != null) {
-            synchronized(maxActiveSessionsLock) {
-                if (activeSessions.get() > maxActiveSessions) {
-                    maxActiveSessions = activeSessions.get();
-                    if (maxActiveSessions % 10 == 0) {
-                        System.out.println("Open sessions: " + maxActiveSessions);
-                    }
-                }
-            }
-        }
         return session;
     }
 
@@ -278,11 +254,6 @@ final class SessionManager {
                 i++;
                 mgr.closeSession(oldestSession);
             } while ((n - i) > 1);
-
-            if (debug != null) {
-                System.out.println("Closing " + i + " idle sessions, active: "
-                        + mgr.activeSessions);
-            }
         }
 
     }

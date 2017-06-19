@@ -42,7 +42,6 @@ import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.TextOutputCallback;
 
-import sun.security.util.Debug;
 import sun.security.util.ResourcesMgr;
 
 import sun.security.pkcs11.Secmod.*;
@@ -59,8 +58,6 @@ import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
 public final class SunPKCS11 extends AuthProvider {
 
     private static final long serialVersionUID = -1354835039035306505L;
-
-    static final Debug debug = Debug.getInstance("sunpkcs11");
 
     private static int dummyConfigId;
 
@@ -130,10 +127,6 @@ public final class SunPKCS11 extends AuthProvider {
             1.8d, Config.getConfig(configName, configStream).getDescription());
         this.configName = configName;
         this.config = Config.removeConfig(configName);
-
-        if (debug != null) {
-            System.out.println("SunPKCS11 loading " + configName);
-        }
 
         String library = config.getLibrary();
         String functionList = config.getFunctionList();
@@ -212,9 +205,6 @@ public final class SunPKCS11 extends AuthProvider {
                 throw new ProviderException("Could not initialize NSS", e);
             }
             List<Module> modules = secmod.getModules();
-            if (config.getShowInfo()) {
-                System.out.println("NSS modules: " + modules);
-            }
 
             String moduleName = config.getNssModule();
             if (moduleName == null) {
@@ -298,9 +288,6 @@ public final class SunPKCS11 extends AuthProvider {
         }
 
         try {
-            if (debug != null) {
-                debug.println("Initializing PKCS#11 library " + library);
-            }
             CK_C_INITIALIZE_ARGS initArgs = new CK_C_INITIALIZE_ARGS();
             String nssArgs = config.getNssArgs();
             if (nssArgs != null) {
@@ -314,9 +301,6 @@ public final class SunPKCS11 extends AuthProvider {
                     library, functionList, initArgs,
                     config.getOmitInitialize());
             } catch (PKCS11Exception e) {
-                if (debug != null) {
-                    debug.println("Multi-threaded initialization failed: " + e);
-                }
                 if (config.getAllowSingleThreadedModules() == false) {
                     throw e;
                 }
@@ -337,20 +321,9 @@ public final class SunPKCS11 extends AuthProvider {
                 throw new ProviderException("Only PKCS#11 v2.0 and later "
                 + "supported, library version is v" + p11Info.cryptokiVersion);
             }
-            boolean showInfo = config.getShowInfo();
-            if (showInfo) {
-                System.out.println("Information for provider " + getName());
-                System.out.println("Library info:");
-                System.out.println(p11Info);
-            }
 
-            if ((slotID < 0) || showInfo) {
+            if (slotID < 0) {
                 long[] slots = p11.C_GetSlotList(false);
-                if (showInfo) {
-                    System.out.println("All slots: " + toString(slots));
-                    slots = p11.C_GetSlotList(true);
-                    System.out.println("Slots with tokens: " + toString(slots));
-                }
                 if (slotID < 0) {
                     if ((slotListIndex < 0)
                             || (slotListIndex >= slots.length)) {
@@ -850,17 +823,7 @@ public final class SunPKCS11 extends AuthProvider {
             return;
         }
         destroyPoller();
-        boolean showInfo = config.getShowInfo();
-        if (showInfo) {
-            System.out.println("Slot info for slot " + slotID + ":");
-            System.out.println(slotInfo);
-        }
         final Token token = new Token(this);
-        if (showInfo) {
-            System.out.println
-                ("Token info for token in slot " + slotID + ":");
-            System.out.println(token.tokenInfo);
-        }
         long[] supportedMechanisms = p11.C_GetMechanismList(slotID);
 
         // Create a map from the various Descriptors to the "most
@@ -874,16 +837,6 @@ public final class SunPKCS11 extends AuthProvider {
         for (int i = 0; i < supportedMechanisms.length; i++) {
             long longMech = supportedMechanisms[i];
             boolean isEnabled = config.isEnabled(longMech);
-            if (showInfo) {
-                CK_MECHANISM_INFO mechInfo =
-                        p11.C_GetMechanismInfo(slotID, longMech);
-                System.out.println("Mechanism " +
-                        Functions.getMechanismName(longMech) + ":");
-                if (isEnabled == false) {
-                    System.out.println("DISABLED in configuration");
-                }
-                System.out.println(mechInfo);
-            }
             if (isEnabled == false) {
                 continue;
             }
@@ -1136,9 +1089,6 @@ public final class SunPKCS11 extends AuthProvider {
 
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
-            if (debug != null) {
-                debug.println("checking login permission");
-            }
             sm.checkPermission(new SecurityPermission
                         ("authProvider." + this.getName()));
         }
@@ -1150,10 +1100,6 @@ public final class SunPKCS11 extends AuthProvider {
         // see if a login is required
 
         if ((token.tokenInfo.flags & CKF_LOGIN_REQUIRED) == 0) {
-            if (debug != null) {
-                debug.println("login operation not required for token - " +
-                                "ignoring login request");
-            }
             return;
         }
 
@@ -1162,9 +1108,6 @@ public final class SunPKCS11 extends AuthProvider {
         try {
             if (token.isLoggedInNow(null)) {
                 // user already logged in
-                if (debug != null) {
-                    debug.println("user already logged in");
-                }
                 return;
             }
         } catch (PKCS11Exception e) {
@@ -1206,9 +1149,6 @@ public final class SunPKCS11 extends AuthProvider {
             pin = pcall.getPassword();
             pcall.clearPassword();
             if (pin == null) {
-                if (debug != null) {
-                    debug.println("caller passed NULL pin");
-                }
             }
         }
 
@@ -1220,15 +1160,9 @@ public final class SunPKCS11 extends AuthProvider {
 
             // pin is NULL if using CKF_PROTECTED_AUTHENTICATION_PATH
             p11.C_Login(session.id(), CKU_USER, pin);
-            if (debug != null) {
-                debug.println("login succeeded");
-            }
         } catch (PKCS11Exception pe) {
             if (pe.getErrorCode() == CKR_USER_ALREADY_LOGGED_IN) {
                 // let this one go
-                if (debug != null) {
-                    debug.println("user already logged in");
-                }
                 return;
             } else if (pe.getErrorCode() == CKR_PIN_INCORRECT) {
                 FailedLoginException fle = new FailedLoginException();
@@ -1274,18 +1208,11 @@ public final class SunPKCS11 extends AuthProvider {
         }
 
         if ((token.tokenInfo.flags & CKF_LOGIN_REQUIRED) == 0) {
-            if (debug != null) {
-                debug.println("logout operation not required for token - " +
-                                "ignoring logout request");
-            }
             return;
         }
 
         try {
             if (token.isLoggedInNow(null) == false) {
-                if (debug != null) {
-                    debug.println("user not logged in");
-                }
                 return;
             }
         } catch (PKCS11Exception e) {
@@ -1298,15 +1225,9 @@ public final class SunPKCS11 extends AuthProvider {
         try {
             session = token.getOpSession();
             p11.C_Logout(session.id());
-            if (debug != null) {
-                debug.println("logout succeeded");
-            }
         } catch (PKCS11Exception pe) {
             if (pe.getErrorCode() == CKR_USER_NOT_LOGGED_IN) {
                 // let this one go
-                if (debug != null) {
-                    debug.println("user not logged in");
-                }
                 return;
             }
             LoginException le = new LoginException();
@@ -1363,10 +1284,6 @@ public final class SunPKCS11 extends AuthProvider {
             return handler;
         }
 
-        if (debug != null) {
-            debug.println("getting provider callback handler");
-        }
-
         synchronized (LOCK_HANDLER) {
             // see if handler was set via setCallbackHandler
             if (pHandler != null) {
@@ -1374,10 +1291,6 @@ public final class SunPKCS11 extends AuthProvider {
             }
 
             try {
-                if (debug != null) {
-                    debug.println("getting default callback handler");
-                }
-
                 CallbackHandler myHandler = AccessController.doPrivileged
                     (new PrivilegedExceptionAction<CallbackHandler>() {
                     public CallbackHandler run() throws Exception {
@@ -1390,9 +1303,6 @@ public final class SunPKCS11 extends AuthProvider {
                             defaultHandler.length() == 0) {
 
                             // ok
-                            if (debug != null) {
-                                debug.println("no default handler set");
-                            }
                             return null;
                         }
 
@@ -1410,10 +1320,6 @@ public final class SunPKCS11 extends AuthProvider {
 
             } catch (PrivilegedActionException pae) {
                 // ok
-                if (debug != null) {
-                    debug.println("Unable to load default callback handler");
-                    pae.printStackTrace();
-                }
             }
         }
         return null;

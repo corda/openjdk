@@ -61,9 +61,6 @@ public class Statement {
 
     static ExceptionListener defaultExceptionListener = new ExceptionListener() {
         public void exceptionThrown(Exception e) {
-            System.err.println(e);
-            // e.printStackTrace();
-            System.err.println("Continuing ...");
         }
     };
 

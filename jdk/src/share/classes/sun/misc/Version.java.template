@@ -74,7 +74,7 @@ public class Version {
      * stdout.
      */
     public static void print() {
-        print(System.err);
+        //print(System.err);
     }
 
     /**
@@ -82,8 +82,8 @@ public class Version {
      * at the end, typically used by the -showversion in the launcher
      */
     public static void println() {
-        print(System.err);
-        System.err.println();
+        //print(System.err);
+        //System.err.println();
     }
 
     /**

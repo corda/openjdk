@@ -171,7 +171,6 @@ public final class IntHashtable {
         if (primeIndex < 0) {
             primeIndex = 0;
         } else if (primeIndex >= PRIMES.length) {
-            System.out.println("TOO BIG");
             primeIndex = PRIMES.length - 1;
             // throw new java.util.IllegalArgumentError();
         }

@@ -631,7 +631,7 @@ public class Throwable implements Serializable {
      * </pre>
      */
     public void printStackTrace() {
-        printStackTrace(System.err);
+        throw new UnsupportedOperationException("No STDERR stream");
     }
 
     /**

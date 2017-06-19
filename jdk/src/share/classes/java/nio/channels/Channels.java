@@ -26,7 +26,6 @@
 package java.nio.channels;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;

@@ -43,7 +43,6 @@ import javax.crypto.spec.*;
 import java.nio.ByteBuffer;
 import java.nio.ReadOnlyBufferException;
 
-import sun.security.util.Debug;
 import sun.security.jca.*;
 
 /**
@@ -163,14 +162,6 @@ import sun.security.jca.*;
  */
 
 public class Cipher {
-
-    private static final Debug debug =
-                        Debug.getInstance("jca", "Cipher");
-
-    private static final Debug pdebug =
-                        Debug.getInstance("provider", "Provider");
-    private static final boolean skipDebug =
-        Debug.isOn("engine=") && !Debug.isOn("cipher");
 
     /**
      * Constant used to initialize cipher to encryption mode.
@@ -721,18 +712,6 @@ public class Cipher {
             if (spi != null) {
                 return;
             }
-            if (debug != null) {
-                int w = --warnCount;
-                if (w >= 0) {
-                    debug.println("Cipher.init() not first method "
-                        + "called, disabling delayed provider selection");
-                    if (w == 0) {
-                        debug.println("Further warnings of this type will "
-                            + "be suppressed");
-                    }
-                    new Exception("Call trace").printStackTrace();
-                }
-            }
             Exception lastException = null;
             while ((firstService != null) || serviceIterator.hasNext()) {
                 Service s;
@@ -1079,11 +1058,6 @@ public class Cipher {
             new CryptoPermission(algComponent, keySize, params, em);
 
         if (!cryptoPerm.implies(checkPerm)) {
-            if (debug != null) {
-                debug.println("Crypto Permission check failed");
-                debug.println("granted: " + cryptoPerm);
-                debug.println("requesting: " + checkPerm);
-            }
             return false;
         }
         if (exmech == null) {
@@ -1091,17 +1065,9 @@ public class Cipher {
         }
         try {
             if (!exmech.isCryptoAllowed(key)) {
-                if (debug != null) {
-                    debug.println(exmech.getName() + " isn't enforced");
-                }
                 return false;
             }
         } catch (ExemptionMechanismException eme) {
-            if (debug != null) {
-                debug.println("Cannot determine whether "+
-                              exmech.getName() + " has been enforced");
-                eme.printStackTrace();
-            }
             return false;
         }
         return true;
@@ -1256,12 +1222,6 @@ public class Cipher {
 
         initialized = true;
         this.opmode = opmode;
-
-        if (!skipDebug && pdebug != null) {
-            pdebug.println("Cipher." + transformation + " " +
-                getOpmodeString(opmode) + " algorithm from: " +
-                this.provider.getName());
-        }
     }
 
     /**
@@ -1400,12 +1360,6 @@ public class Cipher {
 
         initialized = true;
         this.opmode = opmode;
-
-        if (!skipDebug && pdebug != null) {
-            pdebug.println("Cipher." + transformation + " " +
-                getOpmodeString(opmode) + " algorithm from: " +
-                this.provider.getName());
-        }
     }
 
     /**
@@ -1544,12 +1498,6 @@ public class Cipher {
 
         initialized = true;
         this.opmode = opmode;
-
-        if (!skipDebug && pdebug != null) {
-            pdebug.println("Cipher." + transformation + " " +
-                getOpmodeString(opmode) + " algorithm from: " +
-                this.provider.getName());
-        }
     }
 
     /**
@@ -1735,12 +1683,6 @@ public class Cipher {
 
         initialized = true;
         this.opmode = opmode;
-
-        if (!skipDebug && pdebug != null) {
-            pdebug.println("Cipher." + transformation + " " +
-                getOpmodeString(opmode) + " algorithm from: " +
-                this.provider.getName());
-        }
     }
 
     /**

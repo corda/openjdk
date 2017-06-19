@@ -42,7 +42,6 @@ import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.ConfigurationSpi;
-import sun.security.util.Debug;
 import sun.security.util.PropertyExpander;
 import sun.security.util.ResourcesMgr;
 
@@ -120,9 +119,6 @@ public final class ConfigFile extends Configuration {
         private int linenum;
         private StreamTokenizer st;
         private int lookahead;
-
-        private static Debug debugConfig = Debug.getInstance("configfile");
-        private static Debug debugParser = Debug.getInstance("configparser");
 
         /**
          * Creates a new {@code ConfigurationSpi} object.
@@ -221,9 +217,6 @@ public final class ConfigFile extends Configuration {
                  * If the caller specified a URI via Configuration.getInstance,
                  * we only read from that URI
                  */
-                if (debugConfig != null) {
-                    debugConfig.println("reading " + url);
-                }
                 init(url, newConfig);
                 configuration = newConfig;
                 return;
@@ -265,15 +258,9 @@ public final class ConfigFile extends Configuration {
                         }
                     }
 
-                    if (debugConfig != null) {
-                        debugConfig.println("reading "+configURL);
-                    }
                     init(configURL, newConfig);
                     initialized = true;
                     if (overrideAll) {
-                        if (debugConfig != null) {
-                            debugConfig.println("overriding other policies!");
-                        }
                         configuration = newConfig;
                         return;
                     }
@@ -287,9 +274,6 @@ public final class ConfigFile extends Configuration {
                 try {
                     config_url = PropertyExpander.expand
                         (config_url).replace(File.separatorChar, '/');
-                    if (debugConfig != null) {
-                        debugConfig.println("\tReading config: " + config_url);
-                    }
                     init(new URL(config_url), newConfig);
                     initialized = true;
                 } catch (PropertyExpander.ExpandException peee) {
@@ -302,10 +286,6 @@ public final class ConfigFile extends Configuration {
             if (initialized == false && n == 1 && config_url == null) {
 
                 // get the config from the user's home directory
-                if (debugConfig != null) {
-                    debugConfig.println("\tReading Policy " +
-                                "from ~/.java.login.config");
-                }
                 config_url = System.getProperty("user.home");
                 String userConfigFile = config_url + File.separatorChar +
                                         ".java.login.config";
@@ -328,9 +308,6 @@ public final class ConfigFile extends Configuration {
                     = new InputStreamReader(getInputStream(config), "UTF-8")) {
                 readConfig(isr, newConfig);
             } catch (FileNotFoundException fnfe) {
-                if (debugConfig != null) {
-                    debugConfig.println(fnfe.toString());
-                }
                 throw new IOException(ResourcesMgr.getString
                     ("Configuration.Error.No.such.file.or.directory",
                     "sun.security.util.AuthResources"));
@@ -438,10 +415,6 @@ public final class ConfigFile extends Configuration {
             String appName = st.sval;
             lookahead = nextToken();
 
-            if (debugParser != null) {
-                debugParser.println("\tReading next config entry: " + appName);
-            }
-
             match("{");
 
             // get the modules
@@ -486,13 +459,6 @@ public final class ConfigFile extends Configuration {
                 lookahead = nextToken();
 
                 // create the new element
-                if (debugParser != null) {
-                    debugParser.println("\t\t" + moduleClass + ", " + sflag);
-                    for (String key : options.keySet()) {
-                        debugParser.println("\t\t\t" + key +
-                                            "=" + options.get(key));
-                    }
-                }
                 configEntries.add(new AppConfigurationEntry(moduleClass,
                                                             controlFlag,
                                                             options));
@@ -629,10 +595,6 @@ public final class ConfigFile extends Configuration {
                     String file = url.getPath();
                     if (url.getHost().length() > 0) {  // For Windows UNC
                         file = "//" + url.getHost() + file;
-                    }
-                    if (debugConfig != null) {
-                        debugConfig.println("cannot read " + url +
-                                            ", try " + file);
                     }
                     return new FileInputStream(file);
                 }

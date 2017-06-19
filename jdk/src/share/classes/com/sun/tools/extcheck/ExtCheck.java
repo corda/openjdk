@@ -297,13 +297,9 @@ public class ExtCheck {
      * Prints out message if the verboseFlag is set
      */
     void verboseMessage(String message){
-        if (verboseFlag) {
-            System.err.println(message);
-        }
     }
 
     void generalMessage(String message){
-        System.err.println(message);
     }
 
     /**

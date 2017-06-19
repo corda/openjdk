@@ -197,8 +197,6 @@ public class LogManager {
                         }
                     }
                 } catch (Exception ex) {
-                    System.err.println("Could not load Logmanager \"" + cname + "\"");
-                    ex.printStackTrace();
                 }
                 if (mgr == null) {
                     mgr = new LogManager();
@@ -387,7 +385,7 @@ public class LogManager {
                     // If System.in/out/err are null, it's a good
                     // indication that we're still in the
                     // bootstrapping phase
-                    if (System.out == null) {
+                    if (!System.isBootstrapped) {
                         return;
                     }
                     readPrimordialConfiguration = true;
@@ -949,15 +947,11 @@ public class LogManager {
                                 hdl.setLevel(l);
                             } else {
                                 // Probably a bad level. Drop through.
-                                System.err.println("Can't set level for " + word);
                             }
                         }
                         // Add this Handler to the logger
                         logger.addHandler(hdl);
                     } catch (Exception ex) {
-                        System.err.println("Can't load log handler \"" + word + "\"");
-                        System.err.println("" + ex);
-                        ex.printStackTrace();
                     }
                 }
                 return null;
@@ -1258,8 +1252,6 @@ public class LogManager {
                     return;
                 }
             } catch (Exception ex) {
-                System.err.println("Logging configuration class \"" + cname + "\" failed");
-                System.err.println("" + ex);
                 // keep going and useful config file.
             }
         }
@@ -1392,9 +1384,6 @@ public class LogManager {
                 Class<?> clz = ClassLoader.getSystemClassLoader().loadClass(word);
                 clz.newInstance();
             } catch (Exception ex) {
-                System.err.println("Can't load config class \"" + word + "\"");
-                System.err.println("" + ex);
-                // ex.printStackTrace();
             }
         }
 
@@ -1660,7 +1649,6 @@ public class LogManager {
             String name = key.substring(0, ix);
             Level level = getLevelProperty(key, null);
             if (level == null) {
-                System.err.println("Bad level value for property: " + key);
                 continue;
             }
             for (LoggerContext cx : contexts()) {

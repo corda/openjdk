@@ -380,7 +380,6 @@ class Crypt {
     public static void main(String arg[]) {
 
         if (arg.length!=2) {
-            System.err.println("usage: Crypt password salt");
             System.exit(1);
         }
 
@@ -388,9 +387,6 @@ class Crypt {
         try {
             byte result[] = c.crypt
                 (arg[0].getBytes("ISO-8859-1"), arg[1].getBytes("ISO-8859-1"));
-            for (int i=0; i<result.length; i++) {
-                System.out.println(" "+i+" "+(char)result[i]);
-            }
         } catch (java.io.UnsupportedEncodingException uee) {
             // cannot happen
         }

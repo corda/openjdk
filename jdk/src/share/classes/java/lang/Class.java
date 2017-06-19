@@ -3243,7 +3243,7 @@ public final class Class<T> implements java.io.Serializable,
                     // fully initialized and that the bulk of the startup code
                     // has been run.
 
-                    if (System.out == null) {
+                    if (!System.isBootstrapped) {
                         // java.lang.System not yet fully initialized
                         return null;
                     }

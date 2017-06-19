@@ -154,7 +154,6 @@ class InvokerBytecodeGenerator {
                     dumpDir.mkdirs();
                 }
                 DUMP_CLASS_FILES_DIR = dumpDir;
-                System.out.println("Dumping class files to "+DUMP_CLASS_FILES_DIR+"/...");
             } catch (Exception e) {
                 throw newInternalError(e);
             }
@@ -162,30 +161,6 @@ class InvokerBytecodeGenerator {
             DUMP_CLASS_FILES_COUNTERS = null;
             DUMP_CLASS_FILES_DIR = null;
         }
-    }
-
-    static void maybeDump(final String className, final byte[] classFile) {
-        if (DUMP_CLASS_FILES) {
-            java.security.AccessController.doPrivileged(
-            new java.security.PrivilegedAction<Void>() {
-                public Void run() {
-                    try {
-                        String dumpName = className;
-                        //dumpName = dumpName.replace('/', '-');
-                        File dumpFile = new File(DUMP_CLASS_FILES_DIR, dumpName+".class");
-                        System.out.println("dump: " + dumpFile);
-                        dumpFile.getParentFile().mkdirs();
-                        FileOutputStream file = new FileOutputStream(dumpFile);
-                        file.write(classFile);
-                        file.close();
-                        return null;
-                    } catch (IOException ex) {
-                        throw newInternalError(ex);
-                    }
-                }
-            });
-        }
-
     }
 
     private static String makeDumpableClassName(String className) {
@@ -288,14 +263,11 @@ class InvokerBytecodeGenerator {
 
     private static MemberName resolveInvokerMember(Class<?> invokerClass, String name, MethodType type) {
         MemberName member = new MemberName(invokerClass, name, type, REF_invokeStatic);
-        //System.out.println("resolveInvokerMember => "+member);
-        //for (Method m : invokerClass.getDeclaredMethods())  System.out.println("  "+m);
         try {
             member = MEMBERNAME_FACTORY.resolveOrFail(REF_invokeStatic, member, HOST_CLASS, ReflectiveOperationException.class);
         } catch (ReflectiveOperationException e) {
             throw newInternalError(e);
         }
-        //System.out.println("resolveInvokerMember => "+member);
         return member;
     }
 
@@ -725,7 +697,7 @@ class InvokerBytecodeGenerator {
         bogusMethod(lambdaForm);
 
         final byte[] classFile = cw.toByteArray();
-        maybeDump(className, classFile);
+        //maybeDump(className, classFile);
         return classFile;
     }
 
@@ -1357,7 +1329,7 @@ class InvokerBytecodeGenerator {
         bogusMethod(invokerType);
 
         final byte[] classFile = cw.toByteArray();
-        maybeDump(className, classFile);
+        //maybeDump(className, classFile);
         return classFile;
     }
 
@@ -1425,7 +1397,7 @@ class InvokerBytecodeGenerator {
         bogusMethod(dstType);
 
         final byte[] classFile = cw.toByteArray();
-        maybeDump(className, classFile);
+        //maybeDump(className, classFile);
         return classFile;
     }
 

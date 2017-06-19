@@ -60,7 +60,6 @@ import sun.security.pkcs.PKCS9Attribute;
  */
 public class AVA implements DerEncoder {
 
-    private static final Debug debug = Debug.getInstance("x509", "\t[AVA]");
     // See CR 6391482: if enabled this flag preserves the old but incorrect
     // PrintableString encoding for DomainComponent. It may need to be set to
     // avoid breaking preexisting certificates generated with sun.security APIs.
@@ -801,26 +800,6 @@ public class AVA implements DerEncoder {
                     // escape null character
                     sbuffer.append("\\00");
 
-                } else if (debug != null && Debug.isOn("ava")) {
-
-                    // embed non-printable/non-escaped char
-                    // as escaped hex pairs for debugging
-                    byte[] valueBytes = null;
-                    try {
-                        valueBytes = Character.toString(c).getBytes("UTF8");
-                    } catch (IOException ie) {
-                        throw new IllegalArgumentException
-                                        ("DER Value conversion");
-                    }
-                    for (int j = 0; j < valueBytes.length; j++) {
-                        sbuffer.append('\\');
-                        char hexChar = Character.forDigit
-                                (0xF & (valueBytes[j] >>> 4), 16);
-                        sbuffer.append(Character.toUpperCase(hexChar));
-                        hexChar = Character.forDigit
-                                (0xF & (valueBytes[j]), 16);
-                        sbuffer.append(Character.toUpperCase(hexChar));
-                    }
                 } else {
 
                     // append non-printable/non-escaped char
@@ -960,27 +939,6 @@ public class AVA implements DerEncoder {
                         }
                     }
 
-                } else if (debug != null && Debug.isOn("ava")) {
-
-                    // embed non-printable/non-escaped char
-                    // as escaped hex pairs for debugging
-
-                    previousWhite = false;
-
-                    byte valueBytes[] = null;
-                    try {
-                        valueBytes = Character.toString(c).getBytes("UTF8");
-                    } catch (IOException ie) {
-                        throw new IllegalArgumentException
-                                        ("DER Value conversion");
-                    }
-                    for (int j = 0; j < valueBytes.length; j++) {
-                        sbuffer.append('\\');
-                        sbuffer.append(Character.forDigit
-                                        (0xF & (valueBytes[j] >>> 4), 16));
-                        sbuffer.append(Character.forDigit
-                                        (0xF & (valueBytes[j]), 16));
-                    }
                 } else {
 
                     // append non-printable/non-escaped char
@@ -1108,25 +1066,6 @@ public class AVA implements DerEncoder {
 
                         sbuffer.append(c);
 
-                    } else if (debug != null && Debug.isOn("ava")) {
-
-                        // embed non-printable/non-escaped char
-                        // as escaped hex pairs for debugging
-
-                        previousWhite = false;
-
-                        // embed escaped hex pairs
-                        byte[] valueBytes =
-                                Character.toString(c).getBytes("UTF8");
-                        for (int j = 0; j < valueBytes.length; j++) {
-                            sbuffer.append('\\');
-                            char hexChar = Character.forDigit
-                                        (0xF & (valueBytes[j] >>> 4), 16);
-                            sbuffer.append(Character.toUpperCase(hexChar));
-                            hexChar = Character.forDigit
-                                        (0xF & (valueBytes[j]), 16);
-                            sbuffer.append(Character.toUpperCase(hexChar));
-                        }
                     } else {
 
                         // append non-printable/non-escaped char

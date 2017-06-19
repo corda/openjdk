@@ -31,7 +31,6 @@ import java.security.Provider.Service;
 import java.security.spec.KeySpec;
 import java.security.spec.InvalidKeySpecException;
 
-import sun.security.util.Debug;
 import sun.security.jca.*;
 import sun.security.jca.GetInstance.Instance;
 
@@ -94,9 +93,6 @@ import sun.security.jca.GetInstance.Instance;
  */
 
 public class KeyFactory {
-
-    private static final Debug debug =
-                        Debug.getInstance("jca", "KeyFactory");
 
     // The algorithm associated with this key factory
     private final String algorithm;

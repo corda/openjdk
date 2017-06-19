@@ -73,149 +73,11 @@ public final class System {
     private System() {
     }
 
-    /**
-     * The "standard" input stream. This stream is already
-     * open and ready to supply input data. Typically this stream
-     * corresponds to keyboard input or another input source specified by
-     * the host environment or user.
-     */
-    public final static InputStream in = null;
-
-    /**
-     * The "standard" output stream. This stream is already
-     * open and ready to accept output data. Typically this stream
-     * corresponds to display output or another output destination
-     * specified by the host environment or user.
-     * <p>
-     * For simple stand-alone Java applications, a typical way to write
-     * a line of output data is:
-     * <blockquote><pre>
-     *     System.out.println(data)
-     * </pre></blockquote>
-     * <p>
-     * See the <code>println</code> methods in class <code>PrintStream</code>.
-     *
-     * @see     java.io.PrintStream#println()
-     * @see     java.io.PrintStream#println(boolean)
-     * @see     java.io.PrintStream#println(char)
-     * @see     java.io.PrintStream#println(char[])
-     * @see     java.io.PrintStream#println(double)
-     * @see     java.io.PrintStream#println(float)
-     * @see     java.io.PrintStream#println(int)
-     * @see     java.io.PrintStream#println(long)
-     * @see     java.io.PrintStream#println(java.lang.Object)
-     * @see     java.io.PrintStream#println(java.lang.String)
-     */
-    public final static PrintStream out = null;
-
-    /**
-     * The "standard" error output stream. This stream is already
-     * open and ready to accept output data.
-     * <p>
-     * Typically this stream corresponds to display output or another
-     * output destination specified by the host environment or user. By
-     * convention, this output stream is used to display error messages
-     * or other information that should come to the immediate attention
-     * of a user even if the principal output stream, the value of the
-     * variable <code>out</code>, has been redirected to a file or other
-     * destination that is typically not continuously monitored.
-     */
-    public final static PrintStream err = null;
+    public final static boolean isBootstrapped = false;
 
     /* The security manager for the system.
      */
     private static volatile SecurityManager security = null;
-
-    /**
-     * Reassigns the "standard" input stream.
-     *
-     * <p>First, if there is a security manager, its <code>checkPermission</code>
-     * method is called with a <code>RuntimePermission("setIO")</code> permission
-     *  to see if it's ok to reassign the "standard" input stream.
-     * <p>
-     *
-     * @param in the new standard input stream.
-     *
-     * @throws SecurityException
-     *        if a security manager exists and its
-     *        <code>checkPermission</code> method doesn't allow
-     *        reassigning of the standard input stream.
-     *
-     * @see SecurityManager#checkPermission
-     * @see java.lang.RuntimePermission
-     *
-     * @since   JDK1.1
-     */
-    public static void setIn(InputStream in) {
-        checkIO();
-        setIn0(in);
-    }
-
-    /**
-     * Reassigns the "standard" output stream.
-     *
-     * <p>First, if there is a security manager, its <code>checkPermission</code>
-     * method is called with a <code>RuntimePermission("setIO")</code> permission
-     *  to see if it's ok to reassign the "standard" output stream.
-     *
-     * @param out the new standard output stream
-     *
-     * @throws SecurityException
-     *        if a security manager exists and its
-     *        <code>checkPermission</code> method doesn't allow
-     *        reassigning of the standard output stream.
-     *
-     * @see SecurityManager#checkPermission
-     * @see java.lang.RuntimePermission
-     *
-     * @since   JDK1.1
-     */
-    public static void setOut(PrintStream out) {
-        checkIO();
-        setOut0(out);
-    }
-
-    /**
-     * Reassigns the "standard" error output stream.
-     *
-     * <p>First, if there is a security manager, its <code>checkPermission</code>
-     * method is called with a <code>RuntimePermission("setIO")</code> permission
-     *  to see if it's ok to reassign the "standard" error output stream.
-     *
-     * @param err the new standard error output stream.
-     *
-     * @throws SecurityException
-     *        if a security manager exists and its
-     *        <code>checkPermission</code> method doesn't allow
-     *        reassigning of the standard error output stream.
-     *
-     * @see SecurityManager#checkPermission
-     * @see java.lang.RuntimePermission
-     *
-     * @since   JDK1.1
-     */
-    public static void setErr(PrintStream err) {
-        checkIO();
-        setErr0(err);
-    }
-
-    private static volatile Console cons = null;
-    /**
-     * Returns the unique {@link java.io.Console Console} object associated
-     * with the current Java virtual machine, if any.
-     *
-     * @return  The system console, if any, otherwise <tt>null</tt>.
-     *
-     * @since   1.6
-     */
-     public static Console console() {
-         if (cons == null) {
-             synchronized (System.class) {
-                 cons = sun.misc.SharedSecrets.getJavaIOAccess().console();
-             }
-         }
-         return cons;
-     }
 
     /**
      * Returns the channel inherited from the entity that created this
@@ -246,16 +108,7 @@ public final class System {
         throw new UnsupportedOperationException("No inherited channel support");
     }
 
-    private static void checkIO() {
-        SecurityManager sm = getSecurityManager();
-        if (sm != null) {
-            sm.checkPermission(new RuntimePermission("setIO"));
-        }
-    }
-
-    private static native void setIn0(InputStream in);
-    private static native void setOut0(PrintStream out);
-    private static native void setErr0(PrintStream err);
+    private static native void setBootstrapComplete();
 
     /**
      * Sets the System security.
@@ -977,19 +830,6 @@ public final class System {
     public static native String mapLibraryName(String libname);
 
     /**
-     * Create PrintStream for stdout/err based on encoding.
-     */
-    private static PrintStream newPrintStream(FileOutputStream fos, String enc) {
-       if (enc != null) {
-            try {
-                return new PrintStream(new BufferedOutputStream(fos, 128), true, enc);
-            } catch (UnsupportedEncodingException uee) {}
-        }
-        return new PrintStream(new BufferedOutputStream(fos, 128), true);
-    }
-
-
-    /**
      * Initialize the system class.  Called after thread initialization.
      */
     private static void initializeSystemClass() {
@@ -1025,12 +865,8 @@ public final class System {
         lineSeparator = props.getProperty("line.separator");
         sun.misc.Version.init();
 
-        FileInputStream fdIn = new FileInputStream(FileDescriptor.in);
-        FileOutputStream fdOut = new FileOutputStream(FileDescriptor.out);
-        FileOutputStream fdErr = new FileOutputStream(FileDescriptor.err);
-        setIn0(new BufferedInputStream(fdIn));
-        setOut0(newPrintStream(fdOut, props.getProperty("sun.stdout.encoding")));
-        setErr0(newPrintStream(fdErr, props.getProperty("sun.stderr.encoding")));
+        // Boolean flag to replace checking whether System.out is null.
+        setBootstrapComplete();
 
         // Load the zip library now in order to keep java.util.zip.ZipFile
         // from trying to use itself to load this library later.

@@ -66,8 +66,6 @@ public final class Compiler  {
                             initialize();
                             loaded = true;
                         } catch (UnsatisfiedLinkError e) {
-                            System.err.println("Warning: JIT compiler \"" +
-                              jit + "\" not found. Will use interpreter.");
                         }
                     }
                     String info = System.getProperty("java.vm.info");

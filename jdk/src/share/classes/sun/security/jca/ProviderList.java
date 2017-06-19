@@ -55,9 +55,6 @@ import java.security.Provider.Service;
  */
 public final class ProviderList {
 
-    final static sun.security.util.Debug debug =
-        sun.security.util.Debug.getInstance("jca", "ProviderList");
-
     private final static ProviderConfig[] PC0 = new ProviderConfig[0];
 
     private final static Provider[] P0 = new Provider[0];
@@ -169,8 +166,6 @@ public final class ProviderList {
             }
             entry = entry.trim();
             if (entry.length() == 0) {
-                System.err.println("invalid entry for " +
-                                   "security.provider." + i);
                 break;
             }
             int k = entry.indexOf(' ');
@@ -189,9 +184,6 @@ public final class ProviderList {
             }
         }
         configs = configList.toArray(PC0);
-        if (debug != null) {
-            debug.println("provider configuration: " + configList);
-        }
     }
 
     /**
@@ -272,10 +264,6 @@ public final class ProviderList {
     private int loadAll() {
         if (allLoaded) {
             return configs.length;
-        }
-        if (debug != null) {
-            debug.println("Loading all providers");
-            new Exception("Call trace").printStackTrace();
         }
         int n = 0;
         for (int i = 0; i < configs.length; i++) {

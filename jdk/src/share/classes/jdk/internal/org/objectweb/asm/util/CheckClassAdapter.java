@@ -193,34 +193,6 @@ public class CheckClassAdapter extends ClassVisitor {
 
     /**
      * Checks a given class.
-     * <p>
-     * Usage: CheckClassAdapter &lt;binary class name or class file name&gt;
-     *
-     * @param args
-     *            the command line arguments.
-     *
-     * @throws Exception
-     *             if the class cannot be found, or if an IO exception occurs.
-     */
-    public static void main(final String[] args) throws Exception {
-        if (args.length != 1) {
-            System.err.println("Verifies the given class.");
-            System.err.println("Usage: CheckClassAdapter "
-                    + "<fully qualified class name or class file name>");
-            return;
-        }
-        ClassReader cr;
-        if (args[0].endsWith(".class")) {
-            cr = new ClassReader(new FileInputStream(args[0]));
-        } else {
-            cr = new ClassReader(args[0]);
-        }
-
-        verify(cr, false, new PrintWriter(System.err));
-    }
-
-    /**
-     * Checks a given class.
      *
      * @param cr
      *            a <code>ClassReader</code> that contains bytecode for the

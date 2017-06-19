@@ -36,7 +36,6 @@ import java.security.Provider.Service;
 
 import sun.security.jca.*;
 import sun.security.jca.GetInstance.Instance;
-import sun.security.util.Debug;
 
 /**
  * This class instantiates implementations of JCE engine classes from
@@ -65,9 +64,6 @@ final class JceSecurity {
     // Map<Provider,?> of the providers currently being verified
     private final static Map<Provider, Object> verifyingProviders =
             new IdentityHashMap<>();
-
-    private static final Debug debug =
-                        Debug.getInstance("jca", "Cipher");
 
     private static final boolean isRestricted = true;
 
@@ -269,10 +265,6 @@ final class JceSecurity {
             // populate with java.home
             cpPath = Paths.get(javaHomeProperty, "lib", "security",
                     "policy", cryptoPolicyProperty);
-        }
-
-        if (debug != null) {
-            debug.println("crypto policy directory: " + cpPath);
         }
 
         File exportJar = new File(cpPath.toFile(),"US_export_policy.jar");

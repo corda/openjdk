@@ -492,8 +492,6 @@ public enum Wrapper {
                type.isPrimitive() && forPrimitiveType(type) == findWrapperType(exampleType) ||
                exampleType.isPrimitive() && forPrimitiveType(exampleType) == findWrapperType(type) ||
                type == Object.class && !exampleType.isPrimitive());
-        if (!z)
-            System.out.println(type+" <= "+exampleType);
         assert(type == exampleType ||
                type.isPrimitive() && forPrimitiveType(type) == findWrapperType(exampleType) ||
                exampleType.isPrimitive() && forPrimitiveType(exampleType) == findWrapperType(type) ||
