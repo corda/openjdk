@@ -588,6 +588,6 @@ public class BufferedReader extends Reader {
             }
         };
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(
-                iter, Spliterator.ORDERED | Spliterator.NONNULL), false);
+                iter, Spliterator.ORDERED | Spliterator.NONNULL));
     }
 }

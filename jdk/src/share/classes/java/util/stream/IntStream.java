@@ -674,9 +674,6 @@ public interface IntStream extends BaseStream<Integer, IntStream> {
     IntStream sequential();
 
     @Override
-    IntStream parallel();
-
-    @Override
     PrimitiveIterator.OfInt iterator();
 
     @Override
@@ -699,7 +696,7 @@ public interface IntStream extends BaseStream<Integer, IntStream> {
      * @return an empty sequential stream
      */
     public static IntStream empty() {
-        return StreamSupport.intStream(Spliterators.emptyIntSpliterator(), false);
+        return StreamSupport.intStream(Spliterators.emptyIntSpliterator());
     }
 
     /**
@@ -709,7 +706,7 @@ public interface IntStream extends BaseStream<Integer, IntStream> {
      * @return a singleton sequential stream
      */
     public static IntStream of(int t) {
-        return StreamSupport.intStream(new Streams.IntStreamBuilderImpl(t), false);
+        return StreamSupport.intStream(new Streams.IntStreamBuilderImpl(t));
     }
 
     /**
@@ -757,7 +754,7 @@ public interface IntStream extends BaseStream<Integer, IntStream> {
         };
         return StreamSupport.intStream(Spliterators.spliteratorUnknownSize(
                 iterator,
-                Spliterator.ORDERED | Spliterator.IMMUTABLE | Spliterator.NONNULL), false);
+                Spliterator.ORDERED | Spliterator.IMMUTABLE | Spliterator.NONNULL));
     }
 
     /**
@@ -771,7 +768,7 @@ public interface IntStream extends BaseStream<Integer, IntStream> {
     public static IntStream generate(IntSupplier s) {
         Objects.requireNonNull(s);
         return StreamSupport.intStream(
-                new StreamSpliterators.InfiniteSupplyingSpliterator.OfInt(Long.MAX_VALUE, s), false);
+                new StreamSpliterators.InfiniteSupplyingSpliterator.OfInt(Long.MAX_VALUE, s));
     }
 
     /**
@@ -796,7 +793,7 @@ public interface IntStream extends BaseStream<Integer, IntStream> {
             return empty();
         } else {
             return StreamSupport.intStream(
-                    new Streams.RangeIntSpliterator(startInclusive, endExclusive, false), false);
+                    new Streams.RangeIntSpliterator(startInclusive, endExclusive, false));
         }
     }
 
@@ -822,7 +819,7 @@ public interface IntStream extends BaseStream<Integer, IntStream> {
             return empty();
         } else {
             return StreamSupport.intStream(
-                    new Streams.RangeIntSpliterator(startInclusive, endInclusive, true), false);
+                    new Streams.RangeIntSpliterator(startInclusive, endInclusive, true));
         }
     }
 
@@ -849,7 +846,7 @@ public interface IntStream extends BaseStream<Integer, IntStream> {
 
         Spliterator.OfInt split = new Streams.ConcatSpliterator.OfInt(
                 a.spliterator(), b.spliterator());
-        IntStream stream = StreamSupport.intStream(split, a.isParallel() || b.isParallel());
+        IntStream stream = StreamSupport.intStream(split);
         return stream.onClose(Streams.composedClose(a, b));
     }
 

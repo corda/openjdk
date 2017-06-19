@@ -279,7 +279,7 @@ class JarFile extends ZipFile {
         return StreamSupport.stream(Spliterators.spliterator(
                 new JarEntryIterator(), size(),
                 Spliterator.ORDERED | Spliterator.DISTINCT |
-                        Spliterator.IMMUTABLE | Spliterator.NONNULL), false);
+                        Spliterator.IMMUTABLE | Spliterator.NONNULL));
     }
 
     private class JarFileEntry extends JarEntry {

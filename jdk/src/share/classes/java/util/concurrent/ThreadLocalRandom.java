@@ -532,8 +532,7 @@ public class ThreadLocalRandom extends Random {
             throw new IllegalArgumentException(BadSize);
         return StreamSupport.intStream
             (new RandomIntsSpliterator
-             (0L, streamSize, Integer.MAX_VALUE, 0),
-             false);
+             (0L, streamSize, Integer.MAX_VALUE, 0));
     }
 
     /**
@@ -549,8 +548,7 @@ public class ThreadLocalRandom extends Random {
     public IntStream ints() {
         return StreamSupport.intStream
             (new RandomIntsSpliterator
-             (0L, Long.MAX_VALUE, Integer.MAX_VALUE, 0),
-             false);
+             (0L, Long.MAX_VALUE, Integer.MAX_VALUE, 0));
     }
 
     /**
@@ -576,8 +574,7 @@ public class ThreadLocalRandom extends Random {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.intStream
             (new RandomIntsSpliterator
-             (0L, streamSize, randomNumberOrigin, randomNumberBound),
-             false);
+             (0L, streamSize, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -601,8 +598,7 @@ public class ThreadLocalRandom extends Random {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.intStream
             (new RandomIntsSpliterator
-             (0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound),
-             false);
+             (0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -620,8 +616,7 @@ public class ThreadLocalRandom extends Random {
             throw new IllegalArgumentException(BadSize);
         return StreamSupport.longStream
             (new RandomLongsSpliterator
-             (0L, streamSize, Long.MAX_VALUE, 0L),
-             false);
+             (0L, streamSize, Long.MAX_VALUE, 0L));
     }
 
     /**
@@ -637,8 +632,7 @@ public class ThreadLocalRandom extends Random {
     public LongStream longs() {
         return StreamSupport.longStream
             (new RandomLongsSpliterator
-             (0L, Long.MAX_VALUE, Long.MAX_VALUE, 0L),
-             false);
+             (0L, Long.MAX_VALUE, Long.MAX_VALUE, 0L));
     }
 
     /**
@@ -664,8 +658,7 @@ public class ThreadLocalRandom extends Random {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.longStream
             (new RandomLongsSpliterator
-             (0L, streamSize, randomNumberOrigin, randomNumberBound),
-             false);
+             (0L, streamSize, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -689,8 +682,7 @@ public class ThreadLocalRandom extends Random {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.longStream
             (new RandomLongsSpliterator
-             (0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound),
-             false);
+             (0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -709,8 +701,7 @@ public class ThreadLocalRandom extends Random {
             throw new IllegalArgumentException(BadSize);
         return StreamSupport.doubleStream
             (new RandomDoublesSpliterator
-             (0L, streamSize, Double.MAX_VALUE, 0.0),
-             false);
+             (0L, streamSize, Double.MAX_VALUE, 0.0));
     }
 
     /**
@@ -727,8 +718,7 @@ public class ThreadLocalRandom extends Random {
     public DoubleStream doubles() {
         return StreamSupport.doubleStream
             (new RandomDoublesSpliterator
-             (0L, Long.MAX_VALUE, Double.MAX_VALUE, 0.0),
-             false);
+             (0L, Long.MAX_VALUE, Double.MAX_VALUE, 0.0));
     }
 
     /**
@@ -755,8 +745,7 @@ public class ThreadLocalRandom extends Random {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.doubleStream
             (new RandomDoublesSpliterator
-             (0L, streamSize, randomNumberOrigin, randomNumberBound),
-             false);
+             (0L, streamSize, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -780,8 +769,7 @@ public class ThreadLocalRandom extends Random {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.doubleStream
             (new RandomDoublesSpliterator
-             (0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound),
-             false);
+             (0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound));
     }
 
     /**

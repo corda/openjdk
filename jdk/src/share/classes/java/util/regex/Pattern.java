@@ -5830,6 +5830,6 @@ NEXT:       while (i <= last) {
             }
         }
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(
-                new MatcherIterator(), Spliterator.ORDERED | Spliterator.NONNULL), false);
+                new MatcherIterator(), Spliterator.ORDERED | Spliterator.NONNULL));
     }
 }

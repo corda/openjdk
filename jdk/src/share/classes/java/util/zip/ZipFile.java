@@ -550,7 +550,7 @@ class ZipFile implements ZipConstants, Closeable {
         return StreamSupport.stream(Spliterators.spliterator(
                 new ZipEntryIterator(), size(),
                 Spliterator.ORDERED | Spliterator.DISTINCT |
-                        Spliterator.IMMUTABLE | Spliterator.NONNULL), false);
+                        Spliterator.IMMUTABLE | Spliterator.NONNULL));
     }
 
     private ZipEntry getZipEntry(String name, long jzentry) {

@@ -1206,7 +1206,6 @@ public class BitSet implements Cloneable, java.io.Serializable {
                         new BitSetIterator(), cardinality(),
                         Spliterator.ORDERED | Spliterator.DISTINCT | Spliterator.SORTED),
                 Spliterator.SIZED | Spliterator.SUBSIZED |
-                        Spliterator.ORDERED | Spliterator.DISTINCT | Spliterator.SORTED,
-                false);
+                        Spliterator.ORDERED | Spliterator.DISTINCT | Spliterator.SORTED);
     }
 }

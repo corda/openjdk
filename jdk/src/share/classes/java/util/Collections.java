@@ -1092,11 +1092,6 @@ public class Collections {
         public Stream<E> stream() {
             return (Stream<E>)c.stream();
         }
-        @SuppressWarnings("unchecked")
-        @Override
-        public Stream<E> parallelStream() {
-            return (Stream<E>)c.parallelStream();
-        }
     }
 
     /**
@@ -1641,12 +1636,7 @@ public class Collections {
 
             @Override
             public Stream<Entry<K,V>> stream() {
-                return StreamSupport.stream(spliterator(), false);
-            }
-
-            @Override
-            public Stream<Entry<K,V>> parallelStream() {
-                return StreamSupport.stream(spliterator(), true);
+                return StreamSupport.stream(spliterator());
             }
 
             public Iterator<Map.Entry<K,V>> iterator() {
@@ -2071,10 +2061,6 @@ public class Collections {
         @Override
         public Stream<E> stream() {
             return c.stream(); // Must be manually synched by user!
-        }
-        @Override
-        public Stream<E> parallelStream() {
-            return c.parallelStream(); // Must be manually synched by user!
         }
     }
 
@@ -3120,8 +3106,6 @@ public class Collections {
         public Spliterator<E> spliterator() {return c.spliterator();}
         @Override
         public Stream<E> stream()           {return c.stream();}
-        @Override
-        public Stream<E> parallelStream()   {return c.parallelStream();}
     }
 
     /**
@@ -5059,11 +5043,6 @@ public class Collections {
         }
 
         @Override
-        public Stream<E> parallelStream() {
-            return IntStream.range(0, n).parallel().mapToObj(i -> element);
-        }
-
-        @Override
         public Spliterator<E> spliterator() {
             return stream().spliterator();
         }
@@ -5476,8 +5455,6 @@ public class Collections {
         public Spliterator<E> spliterator() {return s.spliterator();}
         @Override
         public Stream<E> stream()           {return s.stream();}
-        @Override
-        public Stream<E> parallelStream()   {return s.parallelStream();}
 
         private static final long serialVersionUID = 2454657854757543876L;
     }
@@ -5543,7 +5520,5 @@ public class Collections {
         public Spliterator<E> spliterator() {return q.spliterator();}
         @Override
         public Stream<E> stream()           {return q.stream();}
-        @Override
-        public Stream<E> parallelStream()   {return q.parallelStream();}
     }
 }

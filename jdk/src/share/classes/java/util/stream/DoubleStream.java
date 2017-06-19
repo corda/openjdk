@@ -34,7 +34,6 @@ import java.util.OptionalDouble;
 import java.util.PrimitiveIterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleConsumer;
@@ -706,9 +705,6 @@ public interface DoubleStream extends BaseStream<Double, DoubleStream> {
     DoubleStream sequential();
 
     @Override
-    DoubleStream parallel();
-
-    @Override
     PrimitiveIterator.OfDouble iterator();
 
     @Override
@@ -732,7 +728,7 @@ public interface DoubleStream extends BaseStream<Double, DoubleStream> {
      * @return an empty sequential stream
      */
     public static DoubleStream empty() {
-        return StreamSupport.doubleStream(Spliterators.emptyDoubleSpliterator(), false);
+        return StreamSupport.doubleStream(Spliterators.emptyDoubleSpliterator());
     }
 
     /**
@@ -742,7 +738,7 @@ public interface DoubleStream extends BaseStream<Double, DoubleStream> {
      * @return a singleton sequential stream
      */
     public static DoubleStream of(double t) {
-        return StreamSupport.doubleStream(new Streams.DoubleStreamBuilderImpl(t), false);
+        return StreamSupport.doubleStream(new Streams.DoubleStreamBuilderImpl(t));
     }
 
     /**
@@ -790,7 +786,7 @@ public interface DoubleStream extends BaseStream<Double, DoubleStream> {
         };
         return StreamSupport.doubleStream(Spliterators.spliteratorUnknownSize(
                 iterator,
-                Spliterator.ORDERED | Spliterator.IMMUTABLE | Spliterator.NONNULL), false);
+                Spliterator.ORDERED | Spliterator.IMMUTABLE | Spliterator.NONNULL));
     }
 
     /**
@@ -804,7 +800,7 @@ public interface DoubleStream extends BaseStream<Double, DoubleStream> {
     public static DoubleStream generate(DoubleSupplier s) {
         Objects.requireNonNull(s);
         return StreamSupport.doubleStream(
-                new StreamSpliterators.InfiniteSupplyingSpliterator.OfDouble(Long.MAX_VALUE, s), false);
+                new StreamSpliterators.InfiniteSupplyingSpliterator.OfDouble(Long.MAX_VALUE, s));
     }
 
     /**
@@ -830,7 +826,7 @@ public interface DoubleStream extends BaseStream<Double, DoubleStream> {
 
         Spliterator.OfDouble split = new Streams.ConcatSpliterator.OfDouble(
                 a.spliterator(), b.spliterator());
-        DoubleStream stream = StreamSupport.doubleStream(split, a.isParallel() || b.isParallel());
+        DoubleStream stream = StreamSupport.doubleStream(split);
         return stream.onClose(Streams.composedClose(a, b));
     }
 

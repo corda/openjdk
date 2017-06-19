@@ -540,8 +540,7 @@ public final class SplittableRandom {
             throw new IllegalArgumentException(BadSize);
         return StreamSupport.intStream
             (new RandomIntsSpliterator
-             (this, 0L, streamSize, Integer.MAX_VALUE, 0),
-             false);
+             (this, 0L, streamSize, Integer.MAX_VALUE, 0));
     }
 
     /**
@@ -556,8 +555,7 @@ public final class SplittableRandom {
     public IntStream ints() {
         return StreamSupport.intStream
             (new RandomIntsSpliterator
-             (this, 0L, Long.MAX_VALUE, Integer.MAX_VALUE, 0),
-             false);
+             (this, 0L, Long.MAX_VALUE, Integer.MAX_VALUE, 0));
     }
 
     /**
@@ -583,8 +581,7 @@ public final class SplittableRandom {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.intStream
             (new RandomIntsSpliterator
-             (this, 0L, streamSize, randomNumberOrigin, randomNumberBound),
-             false);
+             (this, 0L, streamSize, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -607,8 +604,7 @@ public final class SplittableRandom {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.intStream
             (new RandomIntsSpliterator
-             (this, 0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound),
-             false);
+             (this, 0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -626,8 +622,7 @@ public final class SplittableRandom {
             throw new IllegalArgumentException(BadSize);
         return StreamSupport.longStream
             (new RandomLongsSpliterator
-             (this, 0L, streamSize, Long.MAX_VALUE, 0L),
-             false);
+             (this, 0L, streamSize, Long.MAX_VALUE, 0L));
     }
 
     /**
@@ -642,8 +637,7 @@ public final class SplittableRandom {
     public LongStream longs() {
         return StreamSupport.longStream
             (new RandomLongsSpliterator
-             (this, 0L, Long.MAX_VALUE, Long.MAX_VALUE, 0L),
-             false);
+             (this, 0L, Long.MAX_VALUE, Long.MAX_VALUE, 0L));
     }
 
     /**
@@ -669,8 +663,7 @@ public final class SplittableRandom {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.longStream
             (new RandomLongsSpliterator
-             (this, 0L, streamSize, randomNumberOrigin, randomNumberBound),
-             false);
+             (this, 0L, streamSize, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -693,8 +686,7 @@ public final class SplittableRandom {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.longStream
             (new RandomLongsSpliterator
-             (this, 0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound),
-             false);
+             (this, 0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -712,8 +704,7 @@ public final class SplittableRandom {
             throw new IllegalArgumentException(BadSize);
         return StreamSupport.doubleStream
             (new RandomDoublesSpliterator
-             (this, 0L, streamSize, Double.MAX_VALUE, 0.0),
-             false);
+             (this, 0L, streamSize, Double.MAX_VALUE, 0.0));
     }
 
     /**
@@ -729,8 +720,7 @@ public final class SplittableRandom {
     public DoubleStream doubles() {
         return StreamSupport.doubleStream
             (new RandomDoublesSpliterator
-             (this, 0L, Long.MAX_VALUE, Double.MAX_VALUE, 0.0),
-             false);
+             (this, 0L, Long.MAX_VALUE, Double.MAX_VALUE, 0.0));
     }
 
     /**
@@ -757,8 +747,7 @@ public final class SplittableRandom {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.doubleStream
             (new RandomDoublesSpliterator
-             (this, 0L, streamSize, randomNumberOrigin, randomNumberBound),
-             false);
+             (this, 0L, streamSize, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -781,8 +770,7 @@ public final class SplittableRandom {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.doubleStream
             (new RandomDoublesSpliterator
-             (this, 0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound),
-             false);
+             (this, 0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound));
     }
 
     /**
