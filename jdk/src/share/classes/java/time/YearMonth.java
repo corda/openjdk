@@ -154,53 +154,6 @@ public final class YearMonth
 
     //-----------------------------------------------------------------------
     /**
-     * Obtains the current year-month from the system clock in the default time-zone.
-     * <p>
-     * This will query the {@link Clock#systemDefaultZone() system clock} in the default
-     * time-zone to obtain the current year-month.
-     * <p>
-     * Using this method will prevent the ability to use an alternate clock for testing
-     * because the clock is hard-coded.
-     *
-     * @return the current year-month using the system clock and default time-zone, not null
-     */
-    public static YearMonth now() {
-        return now(Clock.systemDefaultZone());
-    }
-
-    /**
-     * Obtains the current year-month from the system clock in the specified time-zone.
-     * <p>
-     * This will query the {@link Clock#system(ZoneId) system clock} to obtain the current year-month.
-     * Specifying the time-zone avoids dependence on the default time-zone.
-     * <p>
-     * Using this method will prevent the ability to use an alternate clock for testing
-     * because the clock is hard-coded.
-     *
-     * @param zone  the zone ID to use, not null
-     * @return the current year-month using the system clock, not null
-     */
-    public static YearMonth now(ZoneId zone) {
-        return now(Clock.system(zone));
-    }
-
-    /**
-     * Obtains the current year-month from the specified clock.
-     * <p>
-     * This will query the specified clock to obtain the current year-month.
-     * Using this method allows the use of an alternate clock for testing.
-     * The alternate clock may be introduced using {@link Clock dependency injection}.
-     *
-     * @param clock  the clock to use, not null
-     * @return the current year-month, not null
-     */
-    public static YearMonth now(Clock clock) {
-        final LocalDate now = LocalDate.now(clock);  // called once
-        return YearMonth.of(now.getYear(), now.getMonth());
-    }
-
-    //-----------------------------------------------------------------------
-    /**
      * Obtains an instance of {@code YearMonth} from a year and month.
      *
      * @param year  the year to represent, from MIN_YEAR to MAX_YEAR

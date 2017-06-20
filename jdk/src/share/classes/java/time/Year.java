@@ -161,53 +161,6 @@ public final class Year
 
     //-----------------------------------------------------------------------
     /**
-     * Obtains the current year from the system clock in the default time-zone.
-     * <p>
-     * This will query the {@link Clock#systemDefaultZone() system clock} in the default
-     * time-zone to obtain the current year.
-     * <p>
-     * Using this method will prevent the ability to use an alternate clock for testing
-     * because the clock is hard-coded.
-     *
-     * @return the current year using the system clock and default time-zone, not null
-     */
-    public static Year now() {
-        return now(Clock.systemDefaultZone());
-    }
-
-    /**
-     * Obtains the current year from the system clock in the specified time-zone.
-     * <p>
-     * This will query the {@link Clock#system(ZoneId) system clock} to obtain the current year.
-     * Specifying the time-zone avoids dependence on the default time-zone.
-     * <p>
-     * Using this method will prevent the ability to use an alternate clock for testing
-     * because the clock is hard-coded.
-     *
-     * @param zone  the zone ID to use, not null
-     * @return the current year using the system clock, not null
-     */
-    public static Year now(ZoneId zone) {
-        return now(Clock.system(zone));
-    }
-
-    /**
-     * Obtains the current year from the specified clock.
-     * <p>
-     * This will query the specified clock to obtain the current year.
-     * Using this method allows the use of an alternate clock for testing.
-     * The alternate clock may be introduced using {@link Clock dependency injection}.
-     *
-     * @param clock  the clock to use, not null
-     * @return the current year, not null
-     */
-    public static Year now(Clock clock) {
-        final LocalDate now = LocalDate.now(clock);  // called once
-        return Year.of(now.getYear());
-    }
-
-    //-----------------------------------------------------------------------
-    /**
      * Obtains an instance of {@code Year}.
      * <p>
      * This method accepts a year value from the proleptic ISO calendar system.
