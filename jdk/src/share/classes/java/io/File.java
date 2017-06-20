@@ -1227,48 +1227,6 @@ public class File
     }
 
     /**
-     * Renames the file denoted by this abstract pathname.
-     *
-     * <p> Many aspects of the behavior of this method are inherently
-     * platform-dependent: The rename operation might not be able to move a
-     * file from one filesystem to another, it might not be atomic, and it
-     * might not succeed if a file with the destination abstract pathname
-     * already exists.  The return value should always be checked to make sure
-     * that the rename operation was successful.
-     *
-     * <p> Note that the {@link java.nio.file.Files} class defines the {@link
-     * java.nio.file.Files#move move} method to move or rename a file in a
-     * platform independent manner.
-     *
-     * @param  dest  The new abstract pathname for the named file
-     *
-     * @return  <code>true</code> if and only if the renaming succeeded;
-     *          <code>false</code> otherwise
-     *
-     * @throws  SecurityException
-     *          If a security manager exists and its <code>{@link
-     *          java.lang.SecurityManager#checkWrite(java.lang.String)}</code>
-     *          method denies write access to either the old or new pathnames
-     *
-     * @throws  NullPointerException
-     *          If parameter <code>dest</code> is <code>null</code>
-     */
-    public boolean renameTo(File dest) {
-        SecurityManager security = System.getSecurityManager();
-        if (security != null) {
-            security.checkWrite(path);
-            security.checkWrite(dest.path);
-        }
-        if (dest == null) {
-            throw new NullPointerException();
-        }
-        if (this.isInvalid() || dest.isInvalid()) {
-            return false;
-        }
-        return fs.rename(this, dest);
-    }
-
-    /**
      * Sets the last-modified time of the file or directory named by this
      * abstract pathname.
      *
