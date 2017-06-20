@@ -283,17 +283,17 @@ public final class JapaneseChronology extends AbstractChronology implements Seri
 
     @Override
     public JapaneseDate dateNow() {
-        return dateNow(Clock.systemDefaultZone());
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     @Override
     public JapaneseDate dateNow(ZoneId zone) {
-        return dateNow(Clock.system(zone));
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     @Override
     public JapaneseDate dateNow(Clock clock) {
-        return date(LocalDate.now(clock));
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     @Override

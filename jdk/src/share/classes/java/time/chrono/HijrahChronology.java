@@ -500,17 +500,17 @@ public final class HijrahChronology extends AbstractChronology implements Serial
 
     @Override
     public HijrahDate dateNow() {
-        return dateNow(Clock.systemDefaultZone());
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     @Override
     public HijrahDate dateNow(ZoneId zone) {
-        return dateNow(Clock.system(zone));
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     @Override
     public HijrahDate dateNow(Clock clock) {
-        return date(LocalDate.now(clock));
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     @Override

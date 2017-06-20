@@ -257,38 +257,6 @@ public final class Instant
 
     //-----------------------------------------------------------------------
     /**
-     * Obtains the current instant from the system clock.
-     * <p>
-     * This will query the {@link Clock#systemUTC() system UTC clock} to
-     * obtain the current instant.
-     * <p>
-     * Using this method will prevent the ability to use an alternate time-source for
-     * testing because the clock is effectively hard-coded.
-     *
-     * @return the current instant using the system clock, not null
-     */
-    public static Instant now() {
-        return Clock.systemUTC().instant();
-    }
-
-    /**
-     * Obtains the current instant from the specified clock.
-     * <p>
-     * This will query the specified clock to obtain the current time.
-     * <p>
-     * Using this method allows the use of an alternate clock for testing.
-     * The alternate clock may be introduced using {@link Clock dependency injection}.
-     *
-     * @param clock  the clock to use, not null
-     * @return the current instant, not null
-     */
-    public static Instant now(Clock clock) {
-        Objects.requireNonNull(clock, "clock");
-        return clock.instant();
-    }
-
-    //-----------------------------------------------------------------------
-    /**
      * Obtains an instance of {@code Instant} using seconds from the
      * epoch of 1970-01-01T00:00:00Z.
      * <p>

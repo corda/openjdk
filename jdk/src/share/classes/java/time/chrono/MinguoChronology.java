@@ -234,17 +234,17 @@ public final class MinguoChronology extends AbstractChronology implements Serial
 
     @Override
     public MinguoDate dateNow() {
-        return dateNow(Clock.systemDefaultZone());
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     @Override
     public MinguoDate dateNow(ZoneId zone) {
-        return dateNow(Clock.system(zone));
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     @Override
     public MinguoDate dateNow(Clock clock) {
-        return date(LocalDate.now(clock));
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     @Override

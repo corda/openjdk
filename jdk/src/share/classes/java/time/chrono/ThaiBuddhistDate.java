@@ -115,53 +115,6 @@ public final class ThaiBuddhistDate
      */
     private final transient LocalDate isoDate;
 
-    //-----------------------------------------------------------------------
-    /**
-     * Obtains the current {@code ThaiBuddhistDate} from the system clock in the default time-zone.
-     * <p>
-     * This will query the {@link Clock#systemDefaultZone() system clock} in the default
-     * time-zone to obtain the current date.
-     * <p>
-     * Using this method will prevent the ability to use an alternate clock for testing
-     * because the clock is hard-coded.
-     *
-     * @return the current date using the system clock and default time-zone, not null
-     */
-    public static ThaiBuddhistDate now() {
-        return now(Clock.systemDefaultZone());
-    }
-
-    /**
-     * Obtains the current {@code ThaiBuddhistDate} from the system clock in the specified time-zone.
-     * <p>
-     * This will query the {@link Clock#system(ZoneId) system clock} to obtain the current date.
-     * Specifying the time-zone avoids dependence on the default time-zone.
-     * <p>
-     * Using this method will prevent the ability to use an alternate clock for testing
-     * because the clock is hard-coded.
-     *
-     * @param zone  the zone ID to use, not null
-     * @return the current date using the system clock, not null
-     */
-    public static ThaiBuddhistDate now(ZoneId zone) {
-        return now(Clock.system(zone));
-    }
-
-    /**
-     * Obtains the current {@code ThaiBuddhistDate} from the specified clock.
-     * <p>
-     * This will query the specified clock to obtain the current date - today.
-     * Using this method allows the use of an alternate clock for testing.
-     * The alternate clock may be introduced using {@linkplain Clock dependency injection}.
-     *
-     * @param clock  the clock to use, not null
-     * @return the current date, not null
-     * @throws DateTimeException if the current date cannot be obtained
-     */
-    public static ThaiBuddhistDate now(Clock clock) {
-        return new ThaiBuddhistDate(LocalDate.now(clock));
-    }
-
     /**
      * Obtains a {@code ThaiBuddhistDate} representing a date in the Thai Buddhist calendar
      * system from the proleptic-year, month-of-year and day-of-month fields.

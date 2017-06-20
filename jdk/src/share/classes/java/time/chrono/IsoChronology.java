@@ -319,7 +319,7 @@ public final class IsoChronology extends AbstractChronology implements Serializa
      */
     @Override  // override with covariant return type
     public LocalDate dateNow() {
-        return dateNow(Clock.systemDefaultZone());
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     /**
@@ -336,7 +336,7 @@ public final class IsoChronology extends AbstractChronology implements Serializa
      */
     @Override  // override with covariant return type
     public LocalDate dateNow(ZoneId zone) {
-        return dateNow(Clock.system(zone));
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     /**
@@ -352,8 +352,7 @@ public final class IsoChronology extends AbstractChronology implements Serializa
      */
     @Override  // override with covariant return type
     public LocalDate dateNow(Clock clock) {
-        Objects.requireNonNull(clock, "clock");
-        return date(LocalDate.now(clock));
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     //-----------------------------------------------------------------------
