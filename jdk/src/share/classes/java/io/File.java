@@ -1227,67 +1227,6 @@ public class File
     }
 
     /**
-     * Creates the directory named by this abstract pathname.
-     *
-     * @return  <code>true</code> if and only if the directory was
-     *          created; <code>false</code> otherwise
-     *
-     * @throws  SecurityException
-     *          If a security manager exists and its <code>{@link
-     *          java.lang.SecurityManager#checkWrite(java.lang.String)}</code>
-     *          method does not permit the named directory to be created
-     */
-    public boolean mkdir() {
-        SecurityManager security = System.getSecurityManager();
-        if (security != null) {
-            security.checkWrite(path);
-        }
-        if (isInvalid()) {
-            return false;
-        }
-        return fs.createDirectory(this);
-    }
-
-    /**
-     * Creates the directory named by this abstract pathname, including any
-     * necessary but nonexistent parent directories.  Note that if this
-     * operation fails it may have succeeded in creating some of the necessary
-     * parent directories.
-     *
-     * @return  <code>true</code> if and only if the directory was created,
-     *          along with all necessary parent directories; <code>false</code>
-     *          otherwise
-     *
-     * @throws  SecurityException
-     *          If a security manager exists and its <code>{@link
-     *          java.lang.SecurityManager#checkRead(java.lang.String)}</code>
-     *          method does not permit verification of the existence of the
-     *          named directory and all necessary parent directories; or if
-     *          the <code>{@link
-     *          java.lang.SecurityManager#checkWrite(java.lang.String)}</code>
-     *          method does not permit the named directory and all necessary
-     *          parent directories to be created
-     */
-    public boolean mkdirs() {
-        if (exists()) {
-            return false;
-        }
-        if (mkdir()) {
-            return true;
-        }
-        File canonFile = null;
-        try {
-            canonFile = getCanonicalFile();
-        } catch (IOException e) {
-            return false;
-        }
-
-        File parent = canonFile.getParentFile();
-        return (parent != null && (parent.mkdirs() || parent.exists()) &&
-                canonFile.mkdir());
-    }
-
-    /**
      * Renames the file denoted by this abstract pathname.
      *
      * <p> Many aspects of the behavior of this method are inherently
