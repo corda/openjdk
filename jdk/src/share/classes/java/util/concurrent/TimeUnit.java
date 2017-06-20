@@ -317,39 +317,6 @@ public enum TimeUnit {
     abstract int excessNanos(long d, long m);
 
     /**
-     * Performs a timed {@link Object#wait(long, int) Object.wait}
-     * using this time unit.
-     * This is a convenience method that converts timeout arguments
-     * into the form required by the {@code Object.wait} method.
-     *
-     * <p>For example, you could implement a blocking {@code poll}
-     * method (see {@link BlockingQueue#poll BlockingQueue.poll})
-     * using:
-     *
-     *  <pre> {@code
-     * public synchronized Object poll(long timeout, TimeUnit unit)
-     *     throws InterruptedException {
-     *   while (empty) {
-     *     unit.timedWait(this, timeout);
-     *     ...
-     *   }
-     * }}</pre>
-     *
-     * @param obj the object to wait on
-     * @param timeout the maximum time to wait. If less than
-     * or equal to zero, do not wait at all.
-     * @throws InterruptedException if interrupted while waiting
-     */
-    public void timedWait(Object obj, long timeout)
-            throws InterruptedException {
-        if (timeout > 0) {
-            long ms = toMillis(timeout);
-            int ns = excessNanos(timeout, ms);
-            obj.wait(ms, ns);
-        }
-    }
-
-    /**
      * Performs a {@link Thread#sleep(long, int) Thread.sleep} using
      * this time unit.
      * This is a convenience method that converts time arguments into the
