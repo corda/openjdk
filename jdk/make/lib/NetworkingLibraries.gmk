@@ -88,17 +88,3 @@ $(eval $(call SetupNativeCompilation,BUILD_LIBNET, \
 $(BUILD_LIBNET): $(BUILD_LIBJAVA)
 
 BUILD_LIBRARIES += $(BUILD_LIBNET)
-
-$(JDK_OUTPUTDIR)/lib/net.properties: $(JDK_TOPDIR)/src/share/lib/net.properties
-	$(ECHO) $(LOG_INFO) Copying $(@F)
-	$(call install-file)
-
-COPY_FILES += $(JDK_OUTPUTDIR)/lib/net.properties
-
-ifeq ($(OPENJDK_TARGET_OS), solaris)
-  $(JDK_OUTPUTDIR)/lib/sdp/sdp.conf.template: $(JDK_TOPDIR)/src/${OPENJDK_TARGET_OS_API_DIR}/lib/sdp/sdp.conf.template
-	$(ECHO) $(LOG_INFO) Copying $(@F)
-	$(call install-file)
-
-  COPY_FILES += $(JDK_OUTPUTDIR)/lib/sdp/sdp.conf.template
-endif
