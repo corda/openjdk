@@ -1126,7 +1126,6 @@ public class URLClassPath {
             }
 
             ensureOpen();
-            parseExtensionsDependencies();
 
             if (SharedSecrets.javaUtilJarAccess().jarFileHasClassPathAttribute(jar)) { // Only get manifest when necessary
                 Manifest man = jar.getManifest();
@@ -1141,13 +1140,6 @@ public class URLClassPath {
                 }
             }
             return null;
-        }
-
-        /*
-         * parse the standard extension dependencies
-         */
-        private void  parseExtensionsDependencies() throws IOException {
-            ExtensionDependency.checkExtensionsDependencies(jar);
         }
 
         /*
