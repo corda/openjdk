@@ -73,7 +73,7 @@ public final class System {
     private System() {
     }
 
-    public final static boolean isBootstrapped = false;
+    public static final boolean isBootstrapped = false;
 
     /* The security manager for the system.
      */

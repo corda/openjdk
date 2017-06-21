@@ -446,7 +446,7 @@ JNIEXPORT void JNICALL
 Java_java_lang_System_setBootstrapComplete(JNIEnv *env, jclass cla)
 {
     jfieldID fid =
-        (*env)->GetStaticFieldID(env,cla,"isBootstrapped","Z;");
+        (*env)->GetStaticFieldID(env,cla,"isBootstrapped","Z");
     if (fid == 0)
         return;
     (*env)->SetStaticBooleanField(env,cla,fid,JNI_TRUE);
