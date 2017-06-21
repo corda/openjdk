@@ -35,9 +35,7 @@ $(eval $(call FillCacheFind, \
     $(wildcard $(JDK_OUTPUTDIR)/bin \
         $(JDK_OUTPUTDIR)/lib \
         $(IMAGES_OUTPUTDIR)/lib \
-        $(JDK_OUTPUTDIR)/include \
-        $(JDK_OUTPUTDIR)/sample \
-        $(JDK_OUTPUTDIR)/demo)))
+        $(JDK_OUTPUTDIR)/include)))
 
 include Tools.gmk
 
@@ -45,7 +43,7 @@ include Profiles.gmk
 
 # Note: This double-colon rule is intentional, to support
 # custom make file integration.
-images:: jre-image jdk-image
+images:: jre-image
 
 overlay-images: jre-overlay-image jdk-overlay-image
 
@@ -116,7 +114,6 @@ ifeq ($(PROFILE), )
       rmic$(EXE_SUFFIX) \
       serialver$(EXE_SUFFIX) \
       unregbean$(EXE_SUFFIX) \
-      jconsole$(EXE_SUFFIX) \
       jinfo$(EXE_SUFFIX) \
       jmap$(EXE_SUFFIX) \
       native2ascii$(EXE_SUFFIX) \
@@ -223,7 +220,6 @@ endif
 ifeq ($(PROFILE), )
   NOT_JRE_LIB_FILES := \
       tools.jar \
-      jconsole.jar \
       sa-jdi.jar \
       dt.jar \
       orb.idl \
@@ -665,10 +661,6 @@ $(JRE_OVERLAY_INFO_FILE): $(OUTPUT_ROOT)/spec.gmk $(OUTPUT_ROOT)/source_tips
 $(JDK_OVERLAY_INFO_FILE): $(OUTPUT_ROOT)/spec.gmk $(OUTPUT_ROOT)/source_tips
 	$(ECHO) $(LOG_INFO) Generating $(patsubst $(OUTPUT_ROOT)/%,%,$@)
 	$(call create-info-file)
-
-$(JDK_IMAGE_DIR)/src.zip: $(IMAGES_OUTPUTDIR)/src.zip
-	$(ECHO) $(LOG_INFO) Copying $(patsubst $(OUTPUT_ROOT)/%,%,$@)
-	$(install-file)
 
 ################################################################################
 # Post processing (strip etc)

@@ -52,27 +52,6 @@ $(eval $(call MakeDir, $(IMAGES_OUTPUTDIR)/lib))
 
 ##########################################################################################
 
-$(eval $(call SetupArchive,BUILD_JCONSOLE_JAR, , \
-    SRCS := $(JDK_OUTPUTDIR)/classes, \
-    SUFFIXES := .class .gif .png .properties, \
-    INCLUDES := sun/tools/jconsole com/sun/tools/jconsole, \
-    JARMAIN := sun.tools.jconsole.JConsole, \
-    JAR := $(IMAGES_OUTPUTDIR)/lib/jconsole.jar, \
-    SKIP_METAINF := true))
-
-
-##########################################################################################
-
-$(eval $(call SetupArchive,BUILD_DNS_JAR, , \
-    SRCS := $(JDK_OUTPUTDIR)/classes, \
-    INCLUDES := sun/net/spi/nameservice/dns, \
-    EXTRA_FILES := META-INF/services/sun.net.spi.nameservice.NameServiceDescriptor, \
-    JAR := $(IMAGES_OUTPUTDIR)/lib/ext/dnsns.jar, \
-    SKIP_METAINF := true))
-
-
-##########################################################################################
-
 LOCALEDATA_INCLUDE_LOCALES := ar be bg ca cs da de el es et fi fr ga hi hr hu in is it \
     iw ja ko lt lv mk ms mt nl no pl pt ro ru sk sl sq sr sv \
     th tr uk vi zh
@@ -116,70 +95,12 @@ RT_JAR_EXCLUDES += \
     com/sun/xml/internal/rngom \
     com/sun/xml/internal/xsom \
     javax/crypto \
-    javax/swing/AbstractButtonBeanInfo.class \
-    javax/swing/beaninfo \
-    javax/swing/BoxBeanInfo.class \
-    javax/swing/JAppletBeanInfo.class \
-    javax/swing/JButtonBeanInfo.class \
-    javax/swing/JCheckBoxBeanInfo.class \
-    javax/swing/JCheckBoxMenuItemBeanInfo.class \
-    javax/swing/JColorChooserBeanInfo.class \
-    javax/swing/JComboBoxBeanInfo.class \
-    javax/swing/JComponentBeanInfo.class \
-    javax/swing/JDesktopPaneBeanInfo.class \
-    javax/swing/JDialogBeanInfo.class \
-    javax/swing/JEditorPaneBeanInfo.class \
-    javax/swing/JFileChooserBeanInfo.class \
-    javax/swing/JFormattedTextFieldBeanInfo.class \
-    javax/swing/JFrameBeanInfo.class \
-    javax/swing/JInternalFrameBeanInfo.class \
-    javax/swing/JLabelBeanInfo.class \
-    javax/swing/JLayeredPaneBeanInfo.class \
-    javax/swing/JListBeanInfo.class \
-    javax/swing/JMenuBarBeanInfo.class \
-    javax/swing/JMenuBeanInfo.class \
-    javax/swing/JMenuItemBeanInfo.class \
-    javax/swing/JOptionPaneBeanInfo.class \
-    javax/swing/JPanelBeanInfo.class \
-    javax/swing/JPasswordFieldBeanInfo.class \
-    javax/swing/JPopupMenuBeanInfo.class \
-    javax/swing/JProgressBarBeanInfo.class \
-    javax/swing/JRadioButtonBeanInfo.class \
-    javax/swing/JRadioButtonMenuItemBeanInfo.class \
-    javax/swing/JScrollBarBeanInfo.class \
-    javax/swing/JScrollPaneBeanInfo.class \
-    javax/swing/JSeparatorBeanInfo.class \
-    javax/swing/JSliderBeanInfo.class \
-    javax/swing/JSpinnerBeanInfo.class \
-    javax/swing/JSplitPaneBeanInfo.class \
-    javax/swing/JTabbedPaneBeanInfo.class \
-    javax/swing/JTableBeanInfo.class \
-    javax/swing/JTextAreaBeanInfo.class \
-    javax/swing/JTextFieldBeanInfo.class \
-    javax/swing/JTextPaneBeanInfo.class \
-    javax/swing/JToggleButtonBeanInfo.class \
-    javax/swing/JToolBarBeanInfo.class \
-    javax/swing/JTreeBeanInfo.class \
-    javax/swing/JWindowBeanInfo.class \
-    javax/swing/SwingBeanInfoBase.class \
-    javax/swing/text/JTextComponentBeanInfo.class \
     META-INF/services/com.sun.jdi.connect.Connector \
     META-INF/services/com.sun.jdi.connect.spi.TransportService \
     META-INF/services/com.sun.tools.attach.spi.AttachProvider \
     META-INF/services/com.sun.tools.xjc.Plugin \
-    META-INF/services/sun.net.spi.nameservice.NameServiceDescriptor \
     org/relaxng/datatype \
-    sun/awt/HKSCS.class \
-    sun/awt/motif/X11GB2312.class \
-    sun/awt/motif/X11GB2312\$$$$Decoder.class \
-    sun/awt/motif/X11GB2312\$$$$Encoder.class \
-    sun/awt/motif/X11GBK.class \
-    sun/awt/motif/X11GBK\$$$$Encoder.class \
-    sun/awt/motif/X11KSC5601.class \
-    sun/awt/motif/X11KSC5601\$$$$Decoder.class \
-    sun/awt/motif/X11KSC5601\$$$$Encoder.class \
     sun/jvmstat \
-    sun/net/spi/nameservice/dns \
     sun/nio/cs/ext \
     sun/rmi/rmic \
     sun/security/ec \
@@ -197,7 +118,6 @@ RT_JAR_EXCLUDES += \
     sun/tools/java \
     sun/tools/javac \
     sun/tools/jcmd \
-    sun/tools/jconsole \
     sun/tools/jinfo \
     sun/tools/jmap \
     sun/tools/jps \
@@ -372,68 +292,13 @@ $(IMAGES_OUTPUTDIR)/lib$(PROFILE)/resources.jar: $(IMAGES_OUTPUTDIR)/lib$(PROFIL
 
 ##########################################################################################
 
-ifneq ($(OPENJDK_TARGET_OS), windows)
-  CHARSETS_EXTRA_FILES := sun/awt/motif/X11GBK.class \
-      sun/awt/motif/X11GB2312\$$$$Decoder.class \
-      sun/awt/motif/X11GB2312.class \
-      sun/awt/motif/X11KSC5601\$$$$Decoder.class \
-      sun/awt/motif/X11KSC5601\$$$$Encoder.class \
-      sun/awt/motif/X11GB2312\$$$$Encoder.class \
-      sun/awt/motif/X11GBK\$$$$Encoder.class \
-      sun/awt/motif/X11KSC5601.class
-endif
-
 $(eval $(call SetupArchive,BUILD_CHARSETS_JAR, , \
     SRCS := $(JDK_OUTPUTDIR)/classes, \
     SUFFIXES := .class .dat, \
     INCLUDES := sun/nio/cs/ext, \
-    EXTRA_FILES := sun/awt/HKSCS.class \
-        $(CHARSETS_EXTRA_FILES), \
     JAR := $(IMAGES_OUTPUTDIR)/lib/charsets.jar, \
     SKIP_METAINF := true, \
     CHECK_COMPRESS_JAR := true))
-
-##########################################################################################
-
-ifndef OPENJDK
-  ifeq ($(ENABLE_JFR), true)
-    $(eval $(call SetupArchive,BUILD_JFR_JAR, , \
-        SRCS := $(JDK_OUTPUTDIR)/classes, \
-        SUFFIXES := .class .jfc .xsd, \
-        INCLUDES := com/oracle/jrockit/jfr \
-            oracle/jrockit/jfr \
-            jdk/jfr, \
-        JAR := $(IMAGES_OUTPUTDIR)/lib/jfr.jar, \
-        SKIP_METAINF := true, \
-        MANIFEST := $(MAINMANIFEST), \
-        CHECK_COMPRESS_JAR := true))
-
-  endif
-endif
-
-##########################################################################################
-
-$(eval $(call SetupArchive,BUILD_JSSE_JAR, , \
-    SRCS := $(JDK_OUTPUTDIR)/classes, \
-    INCLUDES := sun/security/provider/Sun.class \
-        sun/security/rsa/SunRsaSign.class \
-        sun/security/ssl \
-        com/sun/net/ssl/internal/ssl, \
-    JAR := $(IMAGES_OUTPUTDIR)/lib/jsse.jar, \
-    SKIP_METAINF := true, \
-    MANIFEST := $(MAINMANIFEST), \
-    CHECK_COMPRESS_JAR := true))
-
-##########################################################################################
-
-$(eval $(call SetupArchive,BUILD_SWINGBEANS_JAR, , \
-    SRCS := $(JDK_OUTPUTDIR)/classes, \
-    SUFFIXES := BeanInfo.class .gif, \
-    INCLUDES := javax/swing sun/swing, \
-    EXCLUDES := javax/swing/plaf, \
-    EXTRA_FILES := javax/swing/SwingBeanInfoBase.class sun/swing/BeanInfoUtils.class, \
-    JAR := $(IMAGES_OUTPUTDIR)/lib/dt.jar, \
-    SKIP_METAINF := true))
 
 ##########################################################################################
 
@@ -575,115 +440,6 @@ $(eval $(call SetupArchive,BUILD_CT_SYM, $(IMAGES_OUTPUTDIR)/symbols/_the.symbol
     INCLUDES := META-INF/sym, \
     JAR := $(IMAGES_OUTPUTDIR)/lib/ct.sym, \
     CHECK_COMPRESS_JAR := true))
-
-
-##########################################################################################
-
-SRC_ZIP_INCLUDES = \
-    com/sun/corba \
-    com/sun/image/codec/jpeg \
-    com/sun/imageio \
-    com/sun/java_cup \
-    com/sun/javadoc \
-    com/sun/java/swing \
-    com/sun/jmx \
-    com/sun/naming \
-    com/sun/org/apache \
-    com/sun/security/auth \
-    com/sun/security/jgss \
-    com/sun/source \
-    java \
-    javax/accessibility \
-    javax/annotation \
-    javax/imageio \
-    javax/lang \
-    javax/management \
-    javax/naming \
-    javax/print \
-    javax/rmi \
-    javax/script \
-    javax/security \
-    javax/sound \
-    javax/sql \
-    javax/swing \
-    javax/tools \
-    javax/xml \
-    org/ietf \
-    org/omg \
-    org/w3c/dom \
-    org/xml/sax \
-    #
-
-SRC_ZIP_SRCS = $(JDK_TOPDIR)/src/share/classes $(JDK_TOPDIR)/src/$(OPENJDK_TARGET_OS_API_DIR)/classes
-SRC_ZIP_SRCS += $(JDK_OUTPUTDIR)/gensrc
-SRC_ZIP_SRCS += $(JDK_OUTPUTDIR)/impsrc
-SRC_ZIP_SRCS += $(JDK_OUTPUTDIR)/gendocsrc_rmic
-ifndef OPENJDK
-  SRC_ZIP_SRCS += $(JDK_TOPDIR)/src/closed/share/classes
-endif
-
-# Need to copy launcher src files into desired directory structure
-# before zipping the sources.
-LAUNCHER_SRC_FILES := $(wildcard $(JDK_TOPDIR)/src/share/bin/*) \
-    $(wildcard $(JDK_TOPDIR)/src/$(OPENJDK_TARGET_OS_API_DIR)/bin/java_md*)
-LAUNCHER_ZIP_SRC := $(patsubst $(JDK_TOPDIR)/src/share/bin/%, $(IMAGES_OUTPUTDIR)/src/launcher/%, \
-    $(patsubst $(JDK_TOPDIR)/src/$(OPENJDK_TARGET_OS_API_DIR)/bin/%, $(IMAGES_OUTPUTDIR)/src/launcher/%, \
-    $(LAUNCHER_SRC_FILES)))
-
-$(IMAGES_OUTPUTDIR)/src/launcher/%: $(JDK_TOPDIR)/src/share/bin/%
-	$(install-file)
-
-$(IMAGES_OUTPUTDIR)/src/launcher/%: $(JDK_TOPDIR)/src/$(OPENJDK_TARGET_OS_API_DIR)/bin/%
-	$(install-file)
-
-$(IMAGES_OUTPUTDIR)/src.zip: $(LAUNCHER_ZIP_SRC)
-
-# This dir needs to exist before macro is evaluated to avoid warning from find.
-$(eval $(call MakeDir, $(IMAGES_OUTPUTDIR)/src))
-$(eval $(call SetupZipArchive,BUILD_SRC_ZIP, \
-    SRC := $(SRC_ZIP_SRCS) $(IMAGES_OUTPUTDIR)/src, \
-    INCLUDES := $(SRC_ZIP_INCLUDES) launcher, \
-    EXCLUDES := javax/swing/beaninfo, \
-    SUFFIXES := .java .c .h, \
-    ZIP := $(IMAGES_OUTPUTDIR)/src.zip, \
-    EXTRA_DEPS := $(LAUNCHER_ZIP_SRC)))
-
-##########################################################################################
-
-ifeq ($(OPENJDK_TARGET_OS), windows)
-  ifeq ($(OPENJDK_TARGET_CPU_BITS), 32)
-      $(eval $(call SetupArchive,BUILD_ACCESSBRIDGE_32_JAR, , \
-          SRCS := $(JDK_OUTPUTDIR)/classes_ab/32bit, \
-          INCLUDES := com/sun/java/accessibility, \
-          JAR := $(IMAGES_OUTPUTDIR)/lib/ext/access-bridge-32.jar, \
-          SKIP_METAINF := true))
-
-      $(eval $(call SetupArchive,BUILD_ACCESSBRIDGE_LEGACY_JAR, , \
-          SRCS := $(JDK_OUTPUTDIR)/classes_ab/legacy, \
-          INCLUDES := com/sun/java/accessibility, \
-          JAR := $(IMAGES_OUTPUTDIR)/lib/ext/access-bridge.jar, \
-          SKIP_METAINF := true))
-
-      JARS += $(IMAGES_OUTPUTDIR)/lib/ext/access-bridge-32.jar \
-          $(IMAGES_OUTPUTDIR)/lib/ext/access-bridge.jar
-  else
-      $(eval $(call SetupArchive,BUILD_ACCESSBRIDGE_64_JAR, , \
-          SRCS := $(JDK_OUTPUTDIR)/classes_ab/64bit, \
-          INCLUDES := com/sun/java/accessibility, \
-          JAR := $(IMAGES_OUTPUTDIR)/lib/ext/access-bridge-64.jar, \
-          SKIP_METAINF := true))
-
-      JARS += $(IMAGES_OUTPUTDIR)/lib/ext/access-bridge-64.jar
-  endif
-endif
-
-$(eval $(call SetupArchive,BUILD_JACCESS_JAR, , \
-    SRCS := $(JDK_OUTPUTDIR)/classes, \
-    INCLUDES := com/sun/java/accessibility/util, \
-    JAR := $(IMAGES_OUTPUTDIR)/lib/ext/jaccess.jar, \
-    SKIP_METAINF := true))
-
-JARS += $(IMAGES_OUTPUTDIR)/lib/ext/jaccess.jar
 
 ##########################################################################################
 
