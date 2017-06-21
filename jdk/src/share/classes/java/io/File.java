@@ -826,35 +826,6 @@ public class File
     }
 
     /**
-     * Tests whether the file named by this abstract pathname is a hidden
-     * file.  The exact definition of <em>hidden</em> is system-dependent.  On
-     * UNIX systems, a file is considered to be hidden if its name begins with
-     * a period character (<code>'.'</code>).  On Microsoft Windows systems, a file is
-     * considered to be hidden if it has been marked as such in the filesystem.
-     *
-     * @return  <code>true</code> if and only if the file denoted by this
-     *          abstract pathname is hidden according to the conventions of the
-     *          underlying platform
-     *
-     * @throws  SecurityException
-     *          If a security manager exists and its <code>{@link
-     *          java.lang.SecurityManager#checkRead(java.lang.String)}</code>
-     *          method denies read access to the file
-     *
-     * @since 1.2
-     */
-    public boolean isHidden() {
-        SecurityManager security = System.getSecurityManager();
-        if (security != null) {
-            security.checkRead(path);
-        }
-        if (isInvalid()) {
-            return false;
-        }
-        return ((fs.getBooleanAttributes(this) & FileSystem.BA_HIDDEN) != 0);
-    }
-
-    /**
      * Returns the time that the file denoted by this abstract pathname was
      * last modified.
      *
@@ -1168,44 +1139,6 @@ public class File
                 files.add(f);
         }
         return files.toArray(new File[files.size()]);
-    }
-
-    /**
-     * Sets the last-modified time of the file or directory named by this
-     * abstract pathname.
-     *
-     * <p> All platforms support file-modification times to the nearest second,
-     * but some provide more precision.  The argument will be truncated to fit
-     * the supported precision.  If the operation succeeds and no intervening
-     * operations on the file take place, then the next invocation of the
-     * <code>{@link #lastModified}</code> method will return the (possibly
-     * truncated) <code>time</code> argument that was passed to this method.
-     *
-     * @param  time  The new last-modified time, measured in milliseconds since
-     *               the epoch (00:00:00 GMT, January 1, 1970)
-     *
-     * @return <code>true</code> if and only if the operation succeeded;
-     *          <code>false</code> otherwise
-     *
-     * @throws  IllegalArgumentException  If the argument is negative
-     *
-     * @throws  SecurityException
-     *          If a security manager exists and its <code>{@link
-     *          java.lang.SecurityManager#checkWrite(java.lang.String)}</code>
-     *          method denies write access to the named file
-     *
-     * @since 1.2
-     */
-    public boolean setLastModified(long time) {
-        if (time < 0) throw new IllegalArgumentException("Negative time");
-        SecurityManager security = System.getSecurityManager();
-        if (security != null) {
-            security.checkWrite(path);
-        }
-        if (isInvalid()) {
-            return false;
-        }
-        return fs.setLastModifiedTime(this, time);
     }
 
     /* -- Filesystem interface -- */
