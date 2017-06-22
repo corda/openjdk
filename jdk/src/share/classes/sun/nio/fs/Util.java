@@ -113,21 +113,4 @@ class Util {
         }
         return set;
     }
-
-    /**
-     * Returns {@code true} if symbolic links should be followed
-     */
-    static boolean followLinks(LinkOption... options) {
-        boolean followLinks = true;
-        for (LinkOption option: options) {
-            if (option == LinkOption.NOFOLLOW_LINKS) {
-                followLinks = false;
-            } else if (option == null) {
-                throw new NullPointerException();
-            } else {
-                throw new AssertionError("Should not get here");
-            }
-        }
-        return followLinks;
-    }
 }
