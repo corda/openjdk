@@ -474,8 +474,6 @@ class InetAddress implements java.io.Serializable {
 
     static InetAddress[]    unknown_array; // put THIS in cache
 
-    static InetAddressImpl  impl;
-
     private static final HashMap<String, Void> lookupTable = new HashMap<>();
 
     /**
@@ -591,73 +589,6 @@ class InetAddress implements java.io.Serializable {
         }
     }
 
-    static {
-        // create the impl
-        impl = InetAddressImplFactory.create();
-    }
-
-    /**
-     * Creates an InetAddress based on the provided host name and IP address.
-     * No name service is checked for the validity of the address.
-     *
-     * <p> The host name can either be a machine name, such as
-     * "{@code java.sun.com}", or a textual representation of its IP
-     * address.
-     * <p> No validity checking is done on the host name either.
-     *
-     * <p> If addr specifies an IPv4 address an instance of Inet4Address
-     * will be returned; otherwise, an instance of Inet6Address
-     * will be returned.
-     *
-     * <p> IPv4 address byte array must be 4 bytes long and IPv6 byte array
-     * must be 16 bytes long
-     *
-     * @param host the specified host
-     * @param addr the raw IP address in network byte order
-     * @return  an InetAddress object created from the raw IP address.
-     * @exception  UnknownHostException  if IP address is of illegal length
-     * @since 1.4
-     *
-    public static InetAddress getByAddress(String host, byte[] addr)
-        throws UnknownHostException {
-        if (host != null && host.length() > 0 && host.charAt(0) == '[') {
-            if (host.charAt(host.length()-1) == ']') {
-                host = host.substring(1, host.length() -1);
-            }
-        }
-        if (addr != null) {
-            if (addr.length == Inet4Address.INADDRSZ) {
-                return new Inet4Address(host, addr);
-            } else if (addr.length == Inet6Address.INADDRSZ) {
-                byte[] newAddr
-                    = IPAddressUtil.convertFromIPv4MappedAddress(addr);
-                if (newAddr != null) {
-                    return new Inet4Address(host, newAddr);
-                } else {
-                    return new Inet6Address(host, addr);
-                }
-            }
-        }
-        throw new UnknownHostException("addr is of illegal length");
-    }
-     */
-
-    /**
-     * Returns the loopback address.
-     * <p>
-     * The InetAddress returned will represent the IPv4
-     * loopback address, 127.0.0.1, or the IPv6 loopback
-     * address, ::1. The IPv4 loopback address returned
-     * is only one of many in the form 127.*.*.*
-     *
-     * @return  the InetAddress loopback instance.
-     * @since 1.7
-     */
-    public static InetAddress getLoopbackAddress() {
-        return impl.loopbackAddress();
-    }
-
-
     /**
      * check if the literal address string has %nn appended
      * returns -1 if not, or the numeric value otherwise.
@@ -720,59 +651,4 @@ class InetAddress implements java.io.Serializable {
      * Perform class load-time initializations.
      */
     private static native void init();
-
-
-    /*
-     * Returns the InetAddress representing anyLocalAddress
-     * (typically 0.0.0.0 or ::0)
-     */
-    static InetAddress anyLocalAddress() {
-        return impl.anyLocalAddress();
-    }
-
-    /*
-     * Load and instantiate an underlying impl class
-     */
-    static InetAddressImpl loadImpl(String implName) {
-        Object impl = null;
-
-        /*
-         * Property "impl.prefix" will be prepended to the classname
-         * of the implementation object we instantiate, to which we
-         * delegate the real work (like native methods).  This
-         * property can vary across implementations of the java.
-         * classes.  The default is an empty String "".
-         */
-        String prefix = AccessController.doPrivileged(
-                      new GetPropertyAction("impl.prefix", ""));
-        try {
-            impl = Class.forName("java.net." + prefix + implName).newInstance();
-        } catch (ClassNotFoundException e) {
-        } catch (InstantiationException e) {
-        } catch (IllegalAccessException e) {
-        }
-
-        if (impl == null) {
-            try {
-                impl = Class.forName(implName).newInstance();
-            } catch (Exception e) {
-                throw new Error("System property impl.prefix incorrect");
-            }
-        }
-
-        return (InetAddressImpl) impl;
-    }
-}
-
-/*
- * Simple factory to create the impl
- */
-class InetAddressImplFactory {
-
-    static InetAddressImpl create() {
-        return InetAddress.loadImpl(isIPv6Supported() ?
-                                    "Inet6AddressImpl" : "Inet4AddressImpl");
-    }
-
-    static native boolean isIPv6Supported();
 }

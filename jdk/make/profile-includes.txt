@@ -258,8 +258,7 @@ PROFILE_3_LIBRARIES := \
     jaas_nt \
     java_crw_demo \
     jsdt \
-    npt \
-    sctp
+    npt
 
 ifeq ($(OPENJDK_TARGET_OS), windows)
     PROFILE_3_LIBRARIES += w2k_lsa_auth
@@ -300,23 +299,11 @@ FULL_JRE_BIN_FILES := \
     unpack200$(EXE_SUFFIX)
 
 JRE_LIBRARIES := \
-    awt \
-    awt_headless \
-    awt_xawt \
     dcpr \
-    dt_socket \
-    fontmanager \
-    jawt \
     jdwp \
     jfr \
-    jpeg \
-    jsound \
-    jsoundalsa \
     kcms \
-    mlib_image \
-    splashscreen \
-    t2k \
-    unpack
+    t2k
 
 JRE_LIBRARIES := $(addprefix $(LIBRARY_PREFIX), $(JRE_LIBRARIES))
 JRE_DEBUG_FILES := $(foreach i, $(DEBUG_SUFFIX), $(addsuffix $i, $(JRE_LIBRARIES)))
@@ -341,45 +328,8 @@ FULL_JRE_LIB_FILES += \
     cmm/sRGB.pf \
     ext/cldrdata.jar \
     flavormap.properties \
-    fontconfig.RedHat.5.bfc \
-    fontconfig.RedHat.5.properties.src \
-    fontconfig.RedHat.6.bfc \
-    fontconfig.RedHat.6.properties.src \
-    fontconfig.SuSE.10.bfc \
-    fontconfig.SuSE.10.properties.src \
-    fontconfig.SuSE.11.bfc \
-    fontconfig.SuSE.11.properties.src \
-    fontconfig.Turbo.bfc \
-    fontconfig.Turbo.properties.src \
-    fontconfig.bfc \
-    fontconfig.properties.src \
-    fonts/LucidaBrightDemiBold.ttf \
-    fonts/LucidaBrightDemiItalic.ttf \
-    fonts/LucidaBrightItalic.ttf \
-    fonts/LucidaBrightRegular.ttf \
-    fonts/LucidaSansDemiBold.ttf \
-    fonts/LucidaSansRegular.ttf \
-    fonts/LucidaTypewriterBold.ttf \
-    fonts/LucidaTypewriterRegular.ttf \
-    fonts/fonts.dir \
-    images/cursors/cursors.properties \
-    images/cursors/invalid32x32.gif \
-    images/cursors/motif_CopyDrop32x32.gif \
-    images/cursors/motif_CopyNoDrop32x32.gif \
-    images/cursors/motif_LinkDrop32x32.gif \
-    images/cursors/motif_LinkNoDrop32x32.gif \
-    images/cursors/motif_MoveDrop32x32.gif \
-    images/cursors/motif_MoveNoDrop32x32.gif \
     jexec \
-    jfr.jar \
-    oblique-fonts/LucidaSansDemiOblique.ttf \
-    oblique-fonts/LucidaSansOblique.ttf \
-    oblique-fonts/LucidaTypewriterBoldOblique.ttf \
-    oblique-fonts/LucidaTypewriterOblique.ttf \
-    oblique-fonts/fonts.dir \
-    psfont.properties.ja \
-    psfontj2d.properties \
-    sound.properties
+    jfr.jar
 
 FULL_JRE_OTHER_FILES := \
     man/ja_JP.UTF-8/man1/java.1 \
@@ -397,13 +347,9 @@ FULL_JRE_OTHER_FILES := \
     man/man1/javaws.1 \
     man/man1/keytool.1 \
     man/man1/orbd.1 \
-    man/man1/pack200.1 \
     man/man1/policytool.1 \
-    man/man1/rmid.1 \
-    man/man1/rmiregistry.1 \
     man/man1/servertool.1 \
     man/man1/tnameserv.1 \
-    man/man1/unpack200.1
 
 FULL_JRE_JAR_FILES := \
     charsets.jar \
