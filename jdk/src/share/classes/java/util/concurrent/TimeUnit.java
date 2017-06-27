@@ -316,22 +316,4 @@ public enum TimeUnit {
      */
     abstract int excessNanos(long d, long m);
 
-    /**
-     * Performs a {@link Thread#sleep(long, int) Thread.sleep} using
-     * this time unit.
-     * This is a convenience method that converts time arguments into the
-     * form required by the {@code Thread.sleep} method.
-     *
-     * @param timeout the minimum time to sleep. If less than
-     * or equal to zero, do not sleep at all.
-     * @throws InterruptedException if interrupted while sleeping
-     */
-    public void sleep(long timeout) throws InterruptedException {
-        if (timeout > 0) {
-            long ms = toMillis(timeout);
-            int ns = excessNanos(timeout, ms);
-            Thread.sleep(ms, ns);
-        }
-    }
-
 }

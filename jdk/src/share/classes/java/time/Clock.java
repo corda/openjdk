@@ -331,54 +331,6 @@ public abstract class Clock {
 
     //-----------------------------------------------------------------------
     /**
-     * Implementation of a clock that always returns the latest time from
-     * {@link System#currentTimeMillis()}.
-     */
-    static final class SystemClock extends Clock implements Serializable {
-        private static final long serialVersionUID = 6740630888130243051L;
-        private final ZoneId zone;
-
-        SystemClock(ZoneId zone) {
-            this.zone = zone;
-        }
-        @Override
-        public ZoneId getZone() {
-            return zone;
-        }
-        @Override
-        public Clock withZone(ZoneId zone) {
-            if (zone.equals(this.zone)) {  // intentional NPE
-                return this;
-            }
-            return new SystemClock(zone);
-        }
-        @Override
-        public long millis() {
-            return System.currentTimeMillis();
-        }
-        @Override
-        public Instant instant() {
-            return Instant.ofEpochMilli(millis());
-        }
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof SystemClock) {
-                return zone.equals(((SystemClock) obj).zone);
-            }
-            return false;
-        }
-        @Override
-        public int hashCode() {
-            return zone.hashCode() + 1;
-        }
-        @Override
-        public String toString() {
-            return "SystemClock[" + zone + "]";
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    /**
      * Implementation of a clock that always returns the same instant.
      * This is typically used for testing.
      */

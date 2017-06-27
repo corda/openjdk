@@ -88,10 +88,10 @@ class ExpiringCache {
         }
         Entry entry = entryFor(key);
         if (entry != null) {
-            entry.setTimestamp(System.currentTimeMillis());
+            entry.setTimestamp(0);
             entry.setVal(val);
         } else {
-            map.put(key, new Entry(System.currentTimeMillis(), val));
+            map.put(key, new Entry(0, val));
         }
     }
 
@@ -100,15 +100,7 @@ class ExpiringCache {
     }
 
     private Entry entryFor(String key) {
-        Entry entry = map.get(key);
-        if (entry != null) {
-            long delta = System.currentTimeMillis() - entry.timestamp();
-            if (delta < 0 || delta >= millisUntilExpiration) {
-                map.remove(key);
-                entry = null;
-            }
-        }
-        return entry;
+        return map.get(key);
     }
 
     private void cleanup() {
