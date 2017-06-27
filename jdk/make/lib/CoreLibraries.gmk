@@ -306,7 +306,6 @@ LIBJLI_CFLAGS := $(CFLAGS_JDKLIB) $(foreach dir, $(BUILD_LIBJLI_SRC_DIRS), -I$(d
 
 BUILD_LIBJLI_FILES := \
     java.c \
-    splashscreen_stubs.c \
     parse_manifest.c \
     version_comp.c \
     wildcard.c \
