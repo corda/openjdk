@@ -125,6 +125,15 @@ ifeq ($(OPENJDK_TARGET_OS), macosx)
       ListResourceBundle))
 endif
 
+#sun/launcher/resources
+$(eval $(call add_properties_to_compile,SUN_LAUNCHER, \
+    $(filter %.properties, \
+    $(call CacheFind, $(JDK_TOPDIR)/src/share/classes/sun/launcher/resources)), \
+    ListResourceBundle))
+$(eval $(call add_properties_to_compile,SUN_LAUNCHER_HK, \
+    $(filter %.properties, \
+    $(call CacheFind, $(JDK_TOPDIR)/src/share/classes/sun/launcher/resources)), \
+    ListResourceBundle, %zh_TW, %zh_HK))
 #sun/util/logging/resources
 $(eval $(call add_properties_to_compile,SUN_UTIL_LOGGING, \
     $(filter %.properties, \
