@@ -439,17 +439,14 @@ Java_java_lang_System_initProperties(JNIEnv *env, jclass cla, jobject props)
     return ret;
 }
 
-/*
- * Replaces the in/out/err streams.
- */
 JNIEXPORT void JNICALL
-Java_java_lang_System_setBootstrapComplete(JNIEnv *env, jclass cla)
+Java_java_lang_System_setOut0(JNIEnv *env, jclass cla, jobject stream)
 {
     jfieldID fid =
-        (*env)->GetStaticFieldID(env,cla,"isBootstrapped","Z");
+        (*env)->GetStaticFieldID(env,cla,"out","Ljava/io/PrintStream;");
     if (fid == 0)
         return;
-    (*env)->SetStaticBooleanField(env,cla,fid,JNI_TRUE);
+    (*env)->SetStaticObjectField(env,cla,fid,stream);
 }
 
 static void cpchars(jchar *dst, char *src, int n)

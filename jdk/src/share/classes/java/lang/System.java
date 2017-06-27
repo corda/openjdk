@@ -73,8 +73,6 @@ public final class System {
     private System() {
     }
 
-    public static final boolean isBootstrapped = false;
-
     /* The security manager for the system.
      */
     private static volatile SecurityManager security = null;
@@ -108,7 +106,9 @@ public final class System {
         throw new UnsupportedOperationException("No inherited channel support");
     }
 
-    private static native void setBootstrapComplete();
+    public final static PrintStream out = null;
+
+    private static native void setOut0(PrintStream out);
 
     /**
      * Sets the System security.
@@ -830,6 +830,18 @@ public final class System {
     public static native String mapLibraryName(String libname);
 
     /**
+     * Create PrintStream for stdout/err based on encoding.
+     */
+    private static PrintStream newPrintStream(FileOutputStream fos, String enc) {
+       if (enc != null) {
+            try {
+                return new PrintStream(new BufferedOutputStream(fos, 128), true, enc);
+            } catch (UnsupportedEncodingException uee) {}
+        }
+        return new PrintStream(new BufferedOutputStream(fos, 128), true);
+    }
+
+    /**
      * Initialize the system class.  Called after thread initialization.
      */
     private static void initializeSystemClass() {
@@ -865,8 +877,8 @@ public final class System {
         lineSeparator = props.getProperty("line.separator");
         sun.misc.Version.init();
 
-        // Boolean flag to replace checking whether System.out is null.
-        setBootstrapComplete();
+        FileOutputStream fdOut = new FileOutputStream(FileDescriptor.out);
+        setOut0(newPrintStream(fdOut, props.getProperty("sun.stdout.encoding")));
 
         // Load the zip library now in order to keep java.util.zip.ZipFile
         // from trying to use itself to load this library later.

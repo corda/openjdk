@@ -385,7 +385,7 @@ public class LogManager {
                     // If System.in/out/err are null, it's a good
                     // indication that we're still in the
                     // bootstrapping phase
-                    if (!System.isBootstrapped) {
+                    if (System.out == null) {
                         return;
                     }
                     readPrimordialConfiguration = true;

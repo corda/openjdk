@@ -48,8 +48,6 @@ import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.Normalizer;
 import java.util.ResourceBundle;
@@ -80,7 +78,6 @@ public enum LauncherHelper {
 
     // sync with java.c and sun.misc.VM
     private static final String diagprop = "sun.java.launcher.diag";
-    final static boolean trace = sun.misc.VM.getSavedProperty(diagprop) != null;
 
     private static final String defaultBundleName =
             "sun.launcher.resources.launcher";
@@ -393,7 +390,7 @@ public enum LauncherHelper {
     }
 
     static void initOutput(boolean printToStderr) {
-        ostream =  (printToStderr) ? System.err : System.out;
+        ostream = System.out;
     }
 
     static String getMainClassFromJar(String jarname) {
@@ -439,13 +436,6 @@ public enum LauncherHelper {
     static void abort(Throwable t, String msgKey, Object... args) {
         if (msgKey != null) {
             ostream.println(getLocalizedMessage(msgKey, args));
-        }
-        if (trace) {
-            if (t != null) {
-                t.printStackTrace();
-            } else {
-                Thread.dumpStack();
-            }
         }
         System.exit(1);
     }
@@ -599,51 +589,12 @@ public enum LauncherHelper {
     }
 
     static String[] expandArgs(List<StdArg> argList) {
-        ArrayList<String> out = new ArrayList<>();
-        if (trace) {
-            System.err.println("Incoming arguments:");
-        }
-        for (StdArg a : argList) {
-            if (trace) {
-                System.err.println(a);
-            }
-            if (a.needsExpansion) {
-                File x = new File(a.arg);
-                File parent = x.getParentFile();
-                String glob = x.getName();
-                if (parent == null) {
-                    parent = new File(".");
-                }
-                try (DirectoryStream<Path> dstream =
-                        Files.newDirectoryStream(parent.toPath(), glob)) {
-                    int entries = 0;
-                    for (Path p : dstream) {
-                        out.add(p.normalize().toString());
-                        entries++;
-                    }
-                    if (entries == 0) {
-                        out.add(a.arg);
-                    }
-                } catch (Exception e) {
-                    out.add(a.arg);
-                    if (trace) {
-                        System.err.println("Warning: passing argument as-is " + a);
-                        System.err.print(e);
-                    }
-                }
-            } else {
-                out.add(a.arg);
-            }
+        ArrayList<String> out = new ArrayList<>(argList.size());
+        for (StdArg a: argList) {
+            out.add(a.arg);
         }
         String[] oarray = new String[out.size()];
         out.toArray(oarray);
-
-        if (trace) {
-            System.err.println("Expanded arguments:");
-            for (String x : oarray) {
-                System.err.println(x);
-            }
-        }
         return oarray;
     }
 
