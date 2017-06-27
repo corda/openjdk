@@ -33,6 +33,7 @@ package sun.net.www.protocol.file;
 
 import java.net.URL;
 import java.io.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import java.text.Collator;
 import java.security.Permission;
 import sun.net.*;
@@ -189,7 +190,7 @@ public class FileURLConnection extends URLConnection {
                     buf.append("\n");
                 }
                 // Put it into a (default) locale-specific byte-stream.
-                is = new ByteArrayInputStream(buf.toString().getBytes());
+                is = new ByteArrayInputStream(buf.toString().getBytes(UTF_8));
             } else {
                 throw new FileNotFoundException(filename);
             }

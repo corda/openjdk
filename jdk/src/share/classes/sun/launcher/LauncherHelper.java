@@ -48,6 +48,7 @@ import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import java.nio.file.Path;
 import java.text.Normalizer;
 import java.util.ResourceBundle;
@@ -192,7 +193,7 @@ public enum LauncherHelper {
     private static void printPropertyValue(String key, String value) {
         ostream.print(INDENT + key + " = ");
         if (key.equals("line.separator")) {
-            for (byte b : value.getBytes()) {
+            for (byte b : value.getBytes(UTF_8)) {
                 switch (b) {
                     case 0xd:
                         ostream.print("\\r ");

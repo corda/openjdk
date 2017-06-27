@@ -32,6 +32,7 @@ import java.io.PushbackInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * This class defines the decoding half of character encoders.
@@ -184,11 +185,10 @@ public abstract class CharacterDecoder {
      * @exception CEFormatException An error has occurred while decoding
      */
     public byte decodeBuffer(String inputString)[] throws IOException {
-        byte    inputBuffer[] = new byte[inputString.length()];
+        byte    inputBuffer[] = inputString.getBytes(UTF_8);
         ByteArrayInputStream inStream;
         ByteArrayOutputStream outStream;
 
-        inputString.getBytes(0, inputString.length(), inputBuffer, 0);
         inStream = new ByteArrayInputStream(inputBuffer);
         outStream = new ByteArrayOutputStream();
         decodeBuffer(inStream, outStream);
