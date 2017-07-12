@@ -535,26 +535,6 @@ public final class String
     }
 
     /**
-     * Constructs a new {@code String} by decoding the specified array of bytes
-     * using the platform's default charset.  The length of the new {@code
-     * String} is a function of the charset, and hence may not be equal to the
-     * length of the byte array.
-     *
-     * <p> The behavior of this constructor when the given bytes are not valid
-     * in the default charset is unspecified.  The {@link
-     * java.nio.charset.CharsetDecoder} class should be used when more control
-     * over the decoding process is required.
-     *
-     * @param  bytes
-     *         The bytes to be decoded into characters
-     *
-     * @since  JDK1.1
-     */
-    public String(byte bytes[]) {
-        this(bytes, 0, bytes.length);
-    }
-
-    /**
      * Allocates a new string that contains the sequence of characters
      * currently contained in the string buffer argument. The contents of the
      * string buffer are copied; subsequent modification of the string buffer

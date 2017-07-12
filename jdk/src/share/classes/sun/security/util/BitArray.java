@@ -26,6 +26,7 @@
 package sun.security.util;
 
 import java.io.ByteArrayOutputStream;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import java.util.Arrays;
 
 /**
@@ -259,7 +260,7 @@ public class BitArray {
             out.write(get(i) ? '1' : '0');
         }
 
-        return new String(out.toByteArray());
+        return new String(out.toByteArray(), UTF_8);
 
     }
 

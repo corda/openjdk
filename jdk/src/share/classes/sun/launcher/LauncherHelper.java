@@ -573,7 +573,7 @@ public enum LauncherHelper {
         try {
             String out = isCharsetSupported
                     ? new String(inArray, encoding)
-                    : new String(inArray);
+                    : new String(inArray, UTF_8);
             return out;
         } catch (UnsupportedEncodingException uee) {
             abort(uee, null);
