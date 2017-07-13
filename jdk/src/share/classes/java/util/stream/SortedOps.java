@@ -147,17 +147,7 @@ final class SortedOps {
         public <P_IN> Node<T> opEvaluateParallel(PipelineHelper<T> helper,
                                                  Spliterator<P_IN> spliterator,
                                                  IntFunction<T[]> generator) {
-            // If the input is already naturally sorted and this operation
-            // naturally sorts then collect the output
-            if (StreamOpFlag.SORTED.isKnown(helper.getStreamAndOpFlags()) && isNaturalSort) {
-                return helper.evaluate(spliterator, false, generator);
-            }
-            else {
-                // @@@ Weak two-pass parallel implementation; parallel collect, parallel sort
-                T[] flattenedData = helper.evaluate(spliterator, true, generator).asArray(generator);
-                Arrays.parallelSort(flattenedData, comparator);
-                return Nodes.node(flattenedData);
-            }
+            throw new UnsupportedOperationException("multi-threading not supported");
         }
     }
 
@@ -186,17 +176,7 @@ final class SortedOps {
         public <P_IN> Node<Integer> opEvaluateParallel(PipelineHelper<Integer> helper,
                                                        Spliterator<P_IN> spliterator,
                                                        IntFunction<Integer[]> generator) {
-            if (StreamOpFlag.SORTED.isKnown(helper.getStreamAndOpFlags())) {
-                return helper.evaluate(spliterator, false, generator);
-            }
-            else {
-                Node.OfInt n = (Node.OfInt) helper.evaluate(spliterator, true, generator);
-
-                int[] content = n.asPrimitiveArray();
-                Arrays.parallelSort(content);
-
-                return Nodes.node(content);
-            }
+            throw new UnsupportedOperationException("multi-threading not supported");
         }
     }
 
@@ -225,17 +205,7 @@ final class SortedOps {
         public <P_IN> Node<Long> opEvaluateParallel(PipelineHelper<Long> helper,
                                                     Spliterator<P_IN> spliterator,
                                                     IntFunction<Long[]> generator) {
-            if (StreamOpFlag.SORTED.isKnown(helper.getStreamAndOpFlags())) {
-                return helper.evaluate(spliterator, false, generator);
-            }
-            else {
-                Node.OfLong n = (Node.OfLong) helper.evaluate(spliterator, true, generator);
-
-                long[] content = n.asPrimitiveArray();
-                Arrays.parallelSort(content);
-
-                return Nodes.node(content);
-            }
+            throw new UnsupportedOperationException("multi-threading not supported");
         }
     }
 
@@ -264,17 +234,7 @@ final class SortedOps {
         public <P_IN> Node<Double> opEvaluateParallel(PipelineHelper<Double> helper,
                                                       Spliterator<P_IN> spliterator,
                                                       IntFunction<Double[]> generator) {
-            if (StreamOpFlag.SORTED.isKnown(helper.getStreamAndOpFlags())) {
-                return helper.evaluate(spliterator, false, generator);
-            }
-            else {
-                Node.OfDouble n = (Node.OfDouble) helper.evaluate(spliterator, true, generator);
-
-                double[] content = n.asPrimitiveArray();
-                Arrays.parallelSort(content);
-
-                return Nodes.node(content);
-            }
+            throw new UnsupportedOperationException("multi-threading not supported");
         }
     }
 
