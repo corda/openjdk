@@ -107,8 +107,10 @@ public final class System {
     }
 
     public final static PrintStream out = null;
+    public final static PrintStream err = null;
 
     private static native void setOut0(PrintStream out);
+    private static native void setErr0(PrintStream err);
 
     /**
      * Sets the System security.
@@ -878,7 +880,9 @@ public final class System {
         sun.misc.Version.init();
 
         FileOutputStream fdOut = new FileOutputStream(FileDescriptor.out);
+        FileOutputStream fdErr = new FileOutputStream(FileDescriptor.err);
         setOut0(newPrintStream(fdOut, props.getProperty("sun.stdout.encoding")));
+        setErr0(newPrintStream(fdErr, props.getProperty("sun.stderr.encoding")));
 
         // Load the zip library now in order to keep java.util.zip.ZipFile
         // from trying to use itself to load this library later.

@@ -449,6 +449,16 @@ Java_java_lang_System_setOut0(JNIEnv *env, jclass cla, jobject stream)
     (*env)->SetStaticObjectField(env,cla,fid,stream);
 }
 
+JNIEXPORT void JNICALL
+Java_java_lang_System_setErr0(JNIEnv *env, jclass cla, jobject stream)
+{
+    jfieldID fid =
+        (*env)->GetStaticFieldID(env,cla,"err","Ljava/io/PrintStream;");
+    if (fid == 0)
+        return;
+    (*env)->SetStaticObjectField(env,cla,fid,stream);
+}
+
 static void cpchars(jchar *dst, char *src, int n)
 {
     int i;
