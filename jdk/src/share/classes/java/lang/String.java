@@ -795,6 +795,72 @@ public final class String
     }
 
     /**
+     * Copies characters from this string into the destination byte array. Each
+     * byte receives the 8 low-order bits of the corresponding character. The
+     * eight high-order bits of each character are not copied and do not
+     * participate in the transfer in any way.
+     *
+     * <p> The first character to be copied is at index {@code srcBegin}; the
+     * last character to be copied is at index {@code srcEnd-1}.  The total
+     * number of characters to be copied is {@code srcEnd-srcBegin}. The
+     * characters, converted to bytes, are copied into the subarray of {@code
+     * dst} starting at index {@code dstBegin} and ending at index:
+     *
+     * <blockquote><pre>
+     *     dstBegin + (srcEnd-srcBegin) - 1
+     * </pre></blockquote>
+     *
+     * @deprecated  This method does not properly convert characters into
+     * bytes.  As of JDK&nbsp;1.1, the preferred way to do this is via the
+     * {@link #getBytes()} method, which uses the platform's default charset.
+     *
+     * @param  srcBegin
+     *         Index of the first character in the string to copy
+     *
+     * @param  srcEnd
+     *         Index after the last character in the string to copy
+     *
+     * @param  dst
+     *         The destination array
+     *
+     * @param  dstBegin
+     *         The start offset in the destination array
+     *
+     * @throws  IndexOutOfBoundsException
+     *          If any of the following is true:
+     *          <ul>
+     *            <li> {@code srcBegin} is negative
+     *            <li> {@code srcBegin} is greater than {@code srcEnd}
+     *            <li> {@code srcEnd} is greater than the length of this String
+     *            <li> {@code dstBegin} is negative
+     *            <li> {@code dstBegin+(srcEnd-srcBegin)} is larger than {@code
+     *                 dst.length}
+     *          </ul>
+     */
+    @Deprecated
+    public void getBytes(int srcBegin, int srcEnd, byte dst[], int dstBegin) {
+        if (srcBegin < 0) {
+            throw new StringIndexOutOfBoundsException(srcBegin);
+        }
+        if (srcEnd > value.length) {
+            throw new StringIndexOutOfBoundsException(srcEnd);
+        }
+        if (srcBegin > srcEnd) {
+            throw new StringIndexOutOfBoundsException(srcEnd - srcBegin);
+        }
+        Objects.requireNonNull(dst);
+
+        int j = dstBegin;
+        int n = srcEnd;
+        int i = srcBegin;
+        char[] val = value;   /* avoid getfield opcode */
+
+        while (i < n) {
+            dst[j++] = (byte)val[i++];
+        }
+    }
+
+    /**
      * Encodes this {@code String} into a sequence of bytes using the named
      * charset, storing the result into a new byte array.
      *
