@@ -302,6 +302,17 @@ $(eval $(call SetupArchive,BUILD_CHARSETS_JAR, , \
 
 ##########################################################################################
 
+$(eval $(call SetupArchive,BUILD_JSSE_JAR, , \
+    SRCS := $(JDK_OUTPUTDIR)/classes, \
+    INCLUDES := sun/security/provider/Sun.class \
+        sun/security/rsa/SunRsaSign.class, \
+    JAR := $(IMAGES_OUTPUTDIR)/lib/jsse.jar, \
+    SKIP_METAINF := true, \
+    MANIFEST := $(MAINMANIFEST), \
+    CHECK_COMPRESS_JAR := true))
+
+##########################################################################################
+
 # Get the CLDRVERSION
 include gensrc/GensrcCLDR.gmk
 

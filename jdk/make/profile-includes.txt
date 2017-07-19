@@ -177,6 +177,7 @@ PROFILE_1_JRE_LIB_FILES += \
     ext/sunpkcs11.jar \
     hijrah-config-umalqura.properties \
     jce.jar \
+    jsse.jar \
     logging.properties \
     meta-index \
     net.properties \
@@ -216,6 +217,7 @@ PROFILE_1_JRE_JAR_FILES := \
     ext/sunjce_provider.jar \
     ext/sunpkcs11.jar \
     jce.jar \
+    jsse.jar \
     resources.jar \
     rt.jar \
     security/policy/limited/US_export_policy.jar \
