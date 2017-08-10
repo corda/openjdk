@@ -62,54 +62,6 @@ public class Runtime {
     private Runtime() {}
 
     /**
-     * Terminates the currently running Java virtual machine by initiating its
-     * shutdown sequence.  This method never returns normally.  The argument
-     * serves as a status code; by convention, a nonzero status code indicates
-     * abnormal termination.
-     *
-     * <p> The virtual machine's shutdown sequence consists of two phases.  In
-     * the first phase all registered {@link #addShutdownHook shutdown hooks},
-     * if any, are started in some unspecified order and allowed to run
-     * concurrently until they finish.  In the second phase all uninvoked
-     * finalizers are run if {@link #runFinalizersOnExit finalization-on-exit}
-     * has been enabled.  Once this is done the virtual machine {@link #halt
-     * halts}.
-     *
-     * <p> If this method is invoked after the virtual machine has begun its
-     * shutdown sequence then if shutdown hooks are being run this method will
-     * block indefinitely.  If shutdown hooks have already been run and on-exit
-     * finalization has been enabled then this method halts the virtual machine
-     * with the given status code if the status is nonzero; otherwise, it
-     * blocks indefinitely.
-     *
-     * <p> The <tt>{@link System#exit(int) System.exit}</tt> method is the
-     * conventional and convenient means of invoking this method. <p>
-     *
-     * @param  status
-     *         Termination status.  By convention, a nonzero status code
-     *         indicates abnormal termination.
-     *
-     * @throws SecurityException
-     *         If a security manager is present and its <tt>{@link
-     *         SecurityManager#checkExit checkExit}</tt> method does not permit
-     *         exiting with the specified status
-     *
-     * @see java.lang.SecurityException
-     * @see java.lang.SecurityManager#checkExit(int)
-     * @see #addShutdownHook
-     * @see #removeShutdownHook
-     * @see #runFinalizersOnExit
-     * @see #halt(int)
-     */
-    public void exit(int status) {
-        SecurityManager security = System.getSecurityManager();
-        if (security != null) {
-            security.checkExit(status);
-        }
-        Shutdown.exit(status);
-    }
-
-    /**
      * Registers a new virtual-machine shutdown hook.
      *
      * <p> The Java virtual machine <i>shuts down</i> in response to two kinds
@@ -204,11 +156,7 @@ public class Runtime {
      * @since 1.3
      */
     public void addShutdownHook(Thread hook) {
-        SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            sm.checkPermission(new RuntimePermission("shutdownHooks"));
-        }
-        ApplicationShutdownHooks.add(hook);
+        // Do nothing!
     }
 
     /**
@@ -232,86 +180,8 @@ public class Runtime {
      * @since 1.3
      */
     public boolean removeShutdownHook(Thread hook) {
-        SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            sm.checkPermission(new RuntimePermission("shutdownHooks"));
-        }
-        return ApplicationShutdownHooks.remove(hook);
-    }
-
-    /**
-     * Forcibly terminates the currently running Java virtual machine.  This
-     * method never returns normally.
-     *
-     * <p> This method should be used with extreme caution.  Unlike the
-     * <tt>{@link #exit exit}</tt> method, this method does not cause shutdown
-     * hooks to be started and does not run uninvoked finalizers if
-     * finalization-on-exit has been enabled.  If the shutdown sequence has
-     * already been initiated then this method does not wait for any running
-     * shutdown hooks or finalizers to finish their work. <p>
-     *
-     * @param  status
-     *         Termination status.  By convention, a nonzero status code
-     *         indicates abnormal termination.  If the <tt>{@link Runtime#exit
-     *         exit}</tt> (equivalently, <tt>{@link System#exit(int)
-     *         System.exit}</tt>) method has already been invoked then this
-     *         status code will override the status code passed to that method.
-     *
-     * @throws SecurityException
-     *         If a security manager is present and its <tt>{@link
-     *         SecurityManager#checkExit checkExit}</tt> method does not permit
-     *         an exit with the specified status
-     *
-     * @see #exit
-     * @see #addShutdownHook
-     * @see #removeShutdownHook
-     * @since 1.3
-     */
-    public void halt(int status) {
-        SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            sm.checkExit(status);
-        }
-        Shutdown.halt(status);
-    }
-
-    /**
-     * Enable or disable finalization on exit; doing so specifies that the
-     * finalizers of all objects that have finalizers that have not yet been
-     * automatically invoked are to be run before the Java runtime exits.
-     * By default, finalization on exit is disabled.
-     *
-     * <p>If there is a security manager,
-     * its <code>checkExit</code> method is first called
-     * with 0 as its argument to ensure the exit is allowed.
-     * This could result in a SecurityException.
-     *
-     * @param value true to enable finalization on exit, false to disable
-     * @deprecated  This method is inherently unsafe.  It may result in
-     *      finalizers being called on live objects while other threads are
-     *      concurrently manipulating those objects, resulting in erratic
-     *      behavior or deadlock.
-     *
-     * @throws  SecurityException
-     *        if a security manager exists and its <code>checkExit</code>
-     *        method doesn't allow the exit.
-     *
-     * @see     java.lang.Runtime#exit(int)
-     * @see     java.lang.Runtime#gc()
-     * @see     java.lang.SecurityManager#checkExit(int)
-     * @since   JDK1.1
-     */
-    @Deprecated
-    public static void runFinalizersOnExit(boolean value) {
-        SecurityManager security = System.getSecurityManager();
-        if (security != null) {
-            try {
-                security.checkExit(0);
-            } catch (SecurityException e) {
-                throw new SecurityException("runFinalizersOnExit");
-            }
-        }
-        Shutdown.setRunFinalizersOnExit(value);
+        // Do nothing! Just pretend.
+        return true;
     }
 
     /**
@@ -380,69 +250,6 @@ public class Runtime {
      * means of invoking this method.
      */
     public native void gc();
-
-    /* Wormhole for calling java.lang.ref.Finalizer.runFinalization */
-    private static native void runFinalization0();
-
-    /**
-     * Runs the finalization methods of any objects pending finalization.
-     * Calling this method suggests that the Java virtual machine expend
-     * effort toward running the <code>finalize</code> methods of objects
-     * that have been found to be discarded but whose <code>finalize</code>
-     * methods have not yet been run. When control returns from the
-     * method call, the virtual machine has made a best effort to
-     * complete all outstanding finalizations.
-     * <p>
-     * The virtual machine performs the finalization process
-     * automatically as needed, in a separate thread, if the
-     * <code>runFinalization</code> method is not invoked explicitly.
-     * <p>
-     * The method {@link System#runFinalization()} is the conventional
-     * and convenient means of invoking this method.
-     *
-     * @see     java.lang.Object#finalize()
-     */
-    public void runFinalization() {
-        runFinalization0();
-    }
-
-    /**
-     * Enables/Disables tracing of instructions.
-     * If the <code>boolean</code> argument is <code>true</code>, this
-     * method suggests that the Java virtual machine emit debugging
-     * information for each instruction in the virtual machine as it
-     * is executed. The format of this information, and the file or other
-     * output stream to which it is emitted, depends on the host environment.
-     * The virtual machine may ignore this request if it does not support
-     * this feature. The destination of the trace output is system
-     * dependent.
-     * <p>
-     * If the <code>boolean</code> argument is <code>false</code>, this
-     * method causes the virtual machine to stop performing the
-     * detailed instruction trace it is performing.
-     *
-     * @param   on   <code>true</code> to enable instruction tracing;
-     *               <code>false</code> to disable this feature.
-     */
-    public native void traceInstructions(boolean on);
-
-    /**
-     * Enables/Disables tracing of method calls.
-     * If the <code>boolean</code> argument is <code>true</code>, this
-     * method suggests that the Java virtual machine emit debugging
-     * information for each method in the virtual machine as it is
-     * called. The format of this information, and the file or other output
-     * stream to which it is emitted, depends on the host environment. The
-     * virtual machine may ignore this request if it does not support
-     * this feature.
-     * <p>
-     * Calling this method with argument false suggests that the
-     * virtual machine cease emitting per-call debugging information.
-     *
-     * @param   on   <code>true</code> to enable instruction tracing;
-     *               <code>false</code> to disable this feature.
-     */
-    public native void traceMethodCalls(boolean on);
 
     /**
      * Loads the native library specified by the filename argument.  The filename

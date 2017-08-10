@@ -65,31 +65,6 @@ Java_java_lang_Runtime_gc(JNIEnv *env, jobject this)
     JVM_GC();
 }
 
-JNIEXPORT void JNICALL
-Java_java_lang_Runtime_traceInstructions(JNIEnv *env, jobject this, jboolean on)
-{
-    JVM_TraceInstructions(on);
-}
-
-JNIEXPORT void JNICALL
-Java_java_lang_Runtime_traceMethodCalls(JNIEnv *env, jobject this, jboolean on)
-{
-    JVM_TraceMethodCalls(on);
-}
-
-JNIEXPORT void JNICALL
-Java_java_lang_Runtime_runFinalization0(JNIEnv *env, jobject this)
-{
-    jclass cl;
-    jmethodID mid;
-
-    if ((cl = (*env)->FindClass(env, "java/lang/ref/Finalizer"))
-        && (mid = (*env)->GetStaticMethodID(env, cl,
-                                            "runFinalization", "()V"))) {
-        (*env)->CallStaticVoidMethod(env, cl, mid);
-    }
-}
-
 JNIEXPORT jint JNICALL
 Java_java_lang_Runtime_availableProcessors(JNIEnv *env, jobject this)
 {

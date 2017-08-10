@@ -365,30 +365,4 @@ class Crypt {
 /* EXPORT DELETE END */
         return(iobuf);
     }
-
-    /**
-     * program to test the crypt routine.
-     *
-     * The first parameter is the cleartext password, the second is
-     * the salt to use. The salt should be two characters from the
-     * set [a-zA-Z0-9./]. Outputs the crypt result.
-     *
-     * @param arg command line arguments.
-     *
-     */
-
-    public static void main(String arg[]) {
-
-        if (arg.length!=2) {
-            System.exit(1);
-        }
-
-        Crypt c = new Crypt();
-        try {
-            byte result[] = c.crypt
-                (arg[0].getBytes("ISO-8859-1"), arg[1].getBytes("ISO-8859-1"));
-        } catch (java.io.UnsupportedEncodingException uee) {
-            // cannot happen
-        }
-    }
 }

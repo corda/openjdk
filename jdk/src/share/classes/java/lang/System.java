@@ -663,7 +663,7 @@ public final class System {
      * @see        java.lang.Runtime#exit(int)
      */
     public static void exit(int status) {
-        Runtime.getRuntime().exit(status);
+        throw new UnsupportedOperationException("System.exit() disallowed");
     }
 
     /**
@@ -686,58 +686,6 @@ public final class System {
      */
     public static void gc() {
         Runtime.getRuntime().gc();
-    }
-
-    /**
-     * Runs the finalization methods of any objects pending finalization.
-     * <p>
-     * Calling this method suggests that the Java Virtual Machine expend
-     * effort toward running the <code>finalize</code> methods of objects
-     * that have been found to be discarded but whose <code>finalize</code>
-     * methods have not yet been run. When control returns from the
-     * method call, the Java Virtual Machine has made a best effort to
-     * complete all outstanding finalizations.
-     * <p>
-     * The call <code>System.runFinalization()</code> is effectively
-     * equivalent to the call:
-     * <blockquote><pre>
-     * Runtime.getRuntime().runFinalization()
-     * </pre></blockquote>
-     *
-     * @see     java.lang.Runtime#runFinalization()
-     */
-    public static void runFinalization() {
-        Runtime.getRuntime().runFinalization();
-    }
-
-    /**
-     * Enable or disable finalization on exit; doing so specifies that the
-     * finalizers of all objects that have finalizers that have not yet been
-     * automatically invoked are to be run before the Java runtime exits.
-     * By default, finalization on exit is disabled.
-     *
-     * <p>If there is a security manager,
-     * its <code>checkExit</code> method is first called
-     * with 0 as its argument to ensure the exit is allowed.
-     * This could result in a SecurityException.
-     *
-     * @deprecated  This method is inherently unsafe.  It may result in
-     *      finalizers being called on live objects while other threads are
-     *      concurrently manipulating those objects, resulting in erratic
-     *      behavior or deadlock.
-     * @param value indicating enabling or disabling of finalization
-     * @throws  SecurityException
-     *        if a security manager exists and its <code>checkExit</code>
-     *        method doesn't allow the exit.
-     *
-     * @see     java.lang.Runtime#exit(int)
-     * @see     java.lang.Runtime#gc()
-     * @see     java.lang.SecurityManager#checkExit(int)
-     * @since   JDK1.1
-     */
-    @Deprecated
-    public static void runFinalizersOnExit(boolean value) {
-        Runtime.runFinalizersOnExit(value);
     }
 
     /**
