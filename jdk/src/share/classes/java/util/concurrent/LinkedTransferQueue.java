@@ -586,7 +586,6 @@ public class LinkedTransferQueue<E> extends AbstractQueue<E>
     private static final int NOW   = 0; // for untimed poll, tryTransfer
     private static final int ASYNC = 1; // for offer, put, add
     private static final int SYNC  = 2; // for transfer, take
-    private static final int TIMED = 3; // for timed poll, tryTransfer
 
     @SuppressWarnings("unchecked")
     static <E> E cast(Object item) {
@@ -644,7 +643,7 @@ public class LinkedTransferQueue<E> extends AbstractQueue<E>
                 if (pred == null)
                     continue retry;           // lost race vs opposite mode
                 if (how != ASYNC)
-                    return awaitMatch(s, pred, e, (how == TIMED), nanos);
+                    return awaitMatch(s, pred, e, false, nanos);
             }
             return e; // not waiting
         }
@@ -698,7 +697,6 @@ public class LinkedTransferQueue<E> extends AbstractQueue<E>
      * @return matched item, or e if unmatched on interrupt or timeout
      */
     private E awaitMatch(Node s, Node pred, E e, boolean timed, long nanos) {
-        final long deadline = timed ? System.nanoTime() + nanos : 0L;
         Thread w = Thread.currentThread();
         int spins = -1; // initialized after first item and cancel checks
         ThreadLocalRandom randomYields = null; // bound if needed
@@ -710,8 +708,7 @@ public class LinkedTransferQueue<E> extends AbstractQueue<E>
                 s.forgetContents();           // avoid garbage
                 return LinkedTransferQueue.<E>cast(item);
             }
-            if ((w.isInterrupted() || (timed && nanos <= 0)) &&
-                    s.casItem(e, s)) {        // cancel
+            if (w.isInterrupted() && s.casItem(e, s)) {        // cancel
                 unsplice(pred, s);
                 return e;
             }
@@ -727,11 +724,6 @@ public class LinkedTransferQueue<E> extends AbstractQueue<E>
             }
             else if (s.waiter == null) {
                 s.waiter = w;                 // request unpark then recheck
-            }
-            else if (timed) {
-                nanos = deadline - System.nanoTime();
-                if (nanos > 0L)
-                    LockSupport.parkNanos(this, nanos);
             }
             else {
                 LockSupport.park(this);
@@ -1258,11 +1250,7 @@ public class LinkedTransferQueue<E> extends AbstractQueue<E>
      */
     public boolean tryTransfer(E e, long timeout, TimeUnit unit)
         throws InterruptedException {
-        if (xfer(e, true, TIMED, unit.toNanos(timeout)) == null)
-            return true;
-        if (!Thread.interrupted())
-            return false;
-        throw new InterruptedException();
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     public E take() throws InterruptedException {
@@ -1274,10 +1262,7 @@ public class LinkedTransferQueue<E> extends AbstractQueue<E>
     }
 
     public E poll(long timeout, TimeUnit unit) throws InterruptedException {
-        E e = xfer(null, false, TIMED, unit.toNanos(timeout));
-        if (e != null || !Thread.interrupted())
-            return e;
-        throw new InterruptedException();
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     public E poll() {
