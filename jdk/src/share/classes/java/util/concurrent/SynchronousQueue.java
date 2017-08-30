@@ -737,31 +737,21 @@ public class SynchronousQueue<E> extends AbstractQueue<E>
          */
         Object awaitFulfill(QNode s, E e, boolean timed, long nanos) {
             /* Same idea as TransferStack.awaitFulfill */
-            final long deadline = timed ? System.nanoTime() + nanos : 0L;
             Thread w = Thread.currentThread();
             int spins = ((head.next == s) ?
-                         (timed ? maxTimedSpins : maxUntimedSpins) : 0);
+                         maxUntimedSpins : 0);
             for (;;) {
                 if (w.isInterrupted())
                     s.tryCancel(e);
                 Object x = s.item;
                 if (x != e)
                     return x;
-                if (timed) {
-                    nanos = deadline - System.nanoTime();
-                    if (nanos <= 0L) {
-                        s.tryCancel(e);
-                        continue;
-                    }
-                }
                 if (spins > 0)
                     --spins;
                 else if (s.waiter == null)
                     s.waiter = w;
-                else if (!timed)
+                else
                     LockSupport.park(this);
-                else if (nanos > spinForTimeoutThreshold)
-                    LockSupport.parkNanos(this, nanos);
             }
         }
 
