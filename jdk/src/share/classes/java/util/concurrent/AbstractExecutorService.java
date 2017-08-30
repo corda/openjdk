@@ -160,7 +160,6 @@ public abstract class AbstractExecutorService implements ExecutorService {
             // Record exceptions so that if we fail to obtain any
             // result, we can throw the last exception we got.
             ExecutionException ee = null;
-            final long deadline = timed ? System.nanoTime() + nanos : 0L;
             Iterator<? extends Callable<T>> it = tasks.iterator();
 
             // Start one task for sure; the rest incrementally
@@ -178,12 +177,6 @@ public abstract class AbstractExecutorService implements ExecutorService {
                     }
                     else if (active == 0)
                         break;
-                    else if (timed) {
-                        f = ecs.poll(nanos, TimeUnit.NANOSECONDS);
-                        if (f == null)
-                            throw new TimeoutException();
-                        nanos = deadline - System.nanoTime();
-                    }
                     else
                         f = ecs.take();
                 }
@@ -222,7 +215,7 @@ public abstract class AbstractExecutorService implements ExecutorService {
     public <T> T invokeAny(Collection<? extends Callable<T>> tasks,
                            long timeout, TimeUnit unit)
         throws InterruptedException, ExecutionException, TimeoutException {
-        return doInvokeAny(tasks, true, unit.toNanos(timeout));
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)
