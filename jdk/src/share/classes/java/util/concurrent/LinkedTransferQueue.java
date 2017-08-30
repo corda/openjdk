@@ -1235,18 +1235,9 @@ public class LinkedTransferQueue<E> extends AbstractQueue<E>
     }
 
     /**
-     * Transfers the element to a consumer if it is possible to do so
-     * before the timeout elapses.
+     * This function is not supported.
      *
-     * <p>More precisely, transfers the specified element immediately
-     * if there exists a consumer already waiting to receive it (in
-     * {@link #take} or timed {@link #poll(long,TimeUnit) poll}),
-     * else inserts the specified element at the tail of this queue
-     * and waits until the element is received by a consumer,
-     * returning {@code false} if the specified wait time elapses
-     * before the element can be transferred.
-     *
-     * @throws NullPointerException if the specified element is null
+     * @throws UnsupportedOperationException
      */
     public boolean tryTransfer(E e, long timeout, TimeUnit unit)
         throws InterruptedException {
