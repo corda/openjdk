@@ -350,26 +350,6 @@ public enum TimeUnit {
     }
 
     /**
-     * Performs a timed {@link Thread#join(long, int) Thread.join}
-     * using this time unit.
-     * This is a convenience method that converts time arguments into the
-     * form required by the {@code Thread.join} method.
-     *
-     * @param thread the thread to wait for
-     * @param timeout the maximum time to wait. If less than
-     * or equal to zero, do not wait at all.
-     * @throws InterruptedException if interrupted while waiting
-     */
-    public void timedJoin(Thread thread, long timeout)
-            throws InterruptedException {
-        if (timeout > 0) {
-            long ms = toMillis(timeout);
-            int ns = excessNanos(timeout, ms);
-            thread.join(ms, ns);
-        }
-    }
-
-    /**
      * Performs a {@link Thread#sleep(long, int) Thread.sleep} using
      * this time unit.
      * This is a convenience method that converts time arguments into the
