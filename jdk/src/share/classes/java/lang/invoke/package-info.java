@@ -204,6 +204,7 @@
  * since each call site could be given its own unique bootstrap method.
  * Such a practice is likely to produce large class files and constant pools.
  *
+ * @exclude Not deterministic.
  * @author John Rose, JSR 292 EG
  * @since 1.7
  */

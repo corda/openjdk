@@ -130,6 +130,7 @@ import sun.security.util.SecurityConstants;
  * or method in this class will cause a {@link NullPointerException} to be
  * thrown.
  *
+ * @exclude Not deterministic.
  * @author  unascribed
  * @see     Runnable
  * @see     Runtime#exit(int)
@@ -1648,6 +1649,7 @@ class Thread implements Runnable {
      * These states are virtual machine states which do not reflect
      * any operating system thread states.
      *
+     * @exclude
      * @since   1.5
      * @see #getState
      */

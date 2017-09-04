@@ -68,6 +68,7 @@ import java.util.function.Supplier;
  * thread-local instances are subject to garbage collection (unless other
  * references to these copies exist).
  *
+ * @exclude Not deterministic
  * @author  Josh Bloch and Doug Lea
  * @since   1.2
  */

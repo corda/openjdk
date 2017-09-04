@@ -74,6 +74,7 @@
  * useful for those developers implementing their own customized lock
  * classes.
  *
+ * @exclude Not deterministic.
  * @since 1.5
  */
 package java.util.concurrent.locks;

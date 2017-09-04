@@ -470,7 +470,7 @@ JARSIGNER=@FIXPATH@ $(BOOT_JDK)/bin/jarsigner
 BOOTSTRAP_JAVAC_JAR:=$(LANGTOOLS_OUTPUTDIR)/dist/bootstrap/lib/javac.jar
 BOOTSTRAP_JAVAC_ARGS:="-Xbootclasspath/p:$(BOOTSTRAP_JAVAC_JAR)" -cp $(BOOTSTRAP_JAVAC_JAR)
 NEW_JAVAC   = $(BOOTSTRAP_JAVAC_ARGS) com.sun.tools.javac.Main
-NEW_JAVADOC = $(BOOTSTRAP_JAVAC_ARGS) com.sun.tools.javadoc.Main
+NEW_JAVADOC = $(BOOTSTRAP_JAVAC_ARGS) com.sun.tools.javadoc.ExcludeDoclet
 
 # Base flags for RC
 # Guarding this against resetting value. Legacy make files include spec multiple

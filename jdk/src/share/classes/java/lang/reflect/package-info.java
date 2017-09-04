@@ -44,6 +44,7 @@
  * members of a target object (based on its runtime class) or the
  * members declared by a given class.
  *
+ * @exclude Not deterministic.
  * @since JDK1.1
  */
 package java.lang.reflect;

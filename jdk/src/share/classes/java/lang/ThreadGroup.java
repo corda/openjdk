@@ -39,6 +39,7 @@ import sun.misc.VM;
  * group, but not to access information about its thread group's
  * parent thread group or any other thread groups.
  *
+ * @exclude Not determinsitic
  * @author  unascribed
  * @since   JDK1.0
  */
