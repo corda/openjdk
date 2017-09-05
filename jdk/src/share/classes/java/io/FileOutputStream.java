@@ -38,6 +38,7 @@ package java.io;
  * such as image data. For writing streams of characters, consider using
  * <code>FileWriter</code>.
  *
+ * @exclude File handling is not deterministic.
  * @author  Arthur van Hoff
  * @see     java.io.File
  * @see     java.io.FileDescriptor
