@@ -70,6 +70,7 @@ import sun.misc.Unsafe;
  * get a cryptographically secure pseudo-random number generator for use
  * by security-sensitive applications.
  *
+ * @exclude Not deterministic.
  * @author  Frank Yellin
  * @since   1.0
  */

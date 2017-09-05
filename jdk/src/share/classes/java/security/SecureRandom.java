@@ -87,6 +87,7 @@ import sun.security.util.Debug;
  * @see java.security.SecureRandomSpi
  * @see java.util.Random
  *
+ * @exclude Not deterministic.
  * @author Benjamin Renaud
  * @author Josh Bloch
  */

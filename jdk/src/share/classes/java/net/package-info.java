@@ -156,7 +156,7 @@
  *            Networking System Properties</a></li>
  * </ul>
  *
- * @exclude Not deterministic.
+ * @exclude Network access is not deterministic.
  * @since JDK1.0
  */
 package java.net;

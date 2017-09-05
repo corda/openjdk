@@ -172,6 +172,7 @@ import sun.security.util.SecurityConstants;
  *   "java.net.URLClassLoader$3$1"
  * </pre></blockquote>
  *
+ * @exclude  Access to ClassLoader is blocked within the enclave.
  * @see      #resolveClass(Class)
  * @since 1.0
  */

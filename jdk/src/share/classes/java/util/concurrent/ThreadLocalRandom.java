@@ -76,6 +76,7 @@ import java.util.stream.StreamSupport;
  * seed unless the {@linkplain System#getProperty system property}
  * {@code java.util.secureRandomSeed} is set to {@code true}.
  *
+ * @exclude Not deterministic.
  * @since 1.7
  * @author Doug Lea
  */

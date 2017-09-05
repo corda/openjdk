@@ -45,6 +45,7 @@ package java.io;
  * @see OutputStreamWriter
  * @see FileOutputStream
  *
+ * @exclude     File handling is not deterministic.
  * @author      Mark Reinhold
  * @since       JDK1.1
  */

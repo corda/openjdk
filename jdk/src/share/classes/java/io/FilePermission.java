@@ -90,6 +90,7 @@ import sun.security.util.SecurityConstants;
  * @see java.security.PermissionCollection
  *
  *
+ * @exclude File handling is not deterministic.
  * @author Marianne Mueller
  * @author Roland Schemers
  * @since 1.2
