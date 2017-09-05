@@ -32,6 +32,7 @@ package java.io;
  * <code>File</code>, and by the Abstract Window Toolkit's file
  * dialog component.
  *
+ * @exclude File handling is not deterministic.
  * @author  Arthur van Hoff
  * @author  Jonathan Payne
  * @see     java.awt.FileDialog#setFilenameFilter(java.io.FilenameFilter)

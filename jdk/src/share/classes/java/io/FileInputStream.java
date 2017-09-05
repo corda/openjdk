@@ -38,6 +38,7 @@ import sun.nio.ch.FileChannelImpl;
  * such as image data. For reading streams of characters, consider using
  * <code>FileReader</code>.
  *
+ * @exclude File handling is not deterministic.
  * @author  Arthur van Hoff
  * @see     java.io.File
  * @see     java.io.FileDescriptor

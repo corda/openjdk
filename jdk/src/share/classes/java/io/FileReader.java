@@ -39,6 +39,7 @@ package java.io;
  * @see InputStreamReader
  * @see FileInputStream
  *
+ * @exclude     File handling is not deterministic.
  * @author      Mark Reinhold
  * @since       JDK1.1
  */

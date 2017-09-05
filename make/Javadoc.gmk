@@ -138,8 +138,6 @@ ALL_SOURCE_DIRS = $(JDK_SHARE_CLASSES) \
     $(JDK_GENSRC) \
     $(JDK_OUTPUTDIR)/gendocsrc_rmic \
     $(JDK_TOPDIR)/src/solaris/classes \
-    $(JDK_TOPDIR)/src/windows/classes \
-    $(NASHORN_TOPDIR)/src/ \
     $(JDK_SHARE_SRC)/doc/stub
 
 # List of directories that actually exist
@@ -327,7 +325,7 @@ include NON_CORE_PKGS.gmk
 #
 
 all: docs
-docs: coredocs otherdocs
+docs: coredocs # otherdocs
 
 #################################################################
 # Production Targets -- USE THESE TARGETS WHEN:

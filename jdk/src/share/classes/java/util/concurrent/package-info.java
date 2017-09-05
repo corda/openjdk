@@ -302,6 +302,7 @@
  *
  * </ul>
  *
+ * @exclude Not deterministic.
  * @since 1.5
  */
 package java.util.concurrent;

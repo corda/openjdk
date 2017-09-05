@@ -33,6 +33,7 @@ package java.io;
  * File#listFiles(java.io.FileFilter) listFiles(FileFilter)}</code> method
  * of the <code>{@link java.io.File}</code> class.
  *
+ * @exclude File handling is not deterministic.
  * @since 1.2
  */
 @FunctionalInterface

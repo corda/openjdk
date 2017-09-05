@@ -365,7 +365,6 @@ public final class String
      * @see  #String(byte[], int, int)
      * @see  #String(byte[], java.lang.String)
      * @see  #String(byte[], java.nio.charset.Charset)
-     * @see  #String(byte[])
      */
     @Deprecated
     public String(byte ascii[], int hibyte) {

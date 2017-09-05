@@ -207,6 +207,7 @@
  * {@link java.lang.Double#doubleToRawLongBits} and
  * {@link java.lang.Double#longBitsToDouble} conversions.
  *
+ * @exclude Not deterministic.
  * @since 1.5
  */
 package java.util.concurrent.atomic;
