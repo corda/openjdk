@@ -27,8 +27,6 @@ package com.sun.xml.internal.bind.v2.runtime;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.ValidationEventHandler;
-import javax.xml.bind.attachment.AttachmentMarshaller;
-import javax.xml.bind.attachment.AttachmentUnmarshaller;
 
 import com.sun.xml.internal.bind.api.BridgeContext;
 import com.sun.xml.internal.bind.v2.runtime.unmarshaller.UnmarshallerImpl;
@@ -58,19 +56,19 @@ public final class BridgeContextImpl extends BridgeContext {
         }
     }
 
-    public void setAttachmentMarshaller(AttachmentMarshaller m) {
-        marshaller.setAttachmentMarshaller(m);
+    public void setAttachmentMarshaller(Object m) {
+        throw new UnsupportedOperationException("Attachments not supported");
     }
 
-    public void setAttachmentUnmarshaller(AttachmentUnmarshaller u) {
-        unmarshaller.setAttachmentUnmarshaller(u);
+    public void setAttachmentUnmarshaller(Object u) {
+        throw new UnsupportedOperationException("Attachments not supported");
     }
 
-    public AttachmentMarshaller getAttachmentMarshaller() {
-        return marshaller.getAttachmentMarshaller();
+    public Object getAttachmentMarshaller() {
+        throw new UnsupportedOperationException("Attachments not supported");
     }
 
-    public AttachmentUnmarshaller getAttachmentUnmarshaller() {
-        return unmarshaller.getAttachmentUnmarshaller();
+    public Object getAttachmentUnmarshaller() {
+        throw new UnsupportedOperationException("Attachments not supported");
     }
 }
