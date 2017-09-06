@@ -40,6 +40,7 @@ import java.lang.ref.*;
  * maintained in the variable (e.g., User ID, Transaction ID) must be
  * automatically transmitted to any child threads that are created.
  *
+ * @exclude Thread handling is not allowed.
  * @author  Josh Bloch and Doug Lea
  * @see     ThreadLocal
  * @since   1.2
