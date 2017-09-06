@@ -43,7 +43,6 @@ import javax.crypto.spec.*;
 import java.nio.ByteBuffer;
 import java.nio.ReadOnlyBufferException;
 
-import sun.security.util.Debug;
 import sun.security.jca.*;
 
 /**
@@ -163,14 +162,6 @@ import sun.security.jca.*;
  */
 
 public class Cipher {
-
-    private static final Debug debug =
-                        Debug.getInstance("jca", "Cipher");
-
-    private static final Debug pdebug =
-                        Debug.getInstance("provider", "Provider");
-    private static final boolean skipDebug =
-        Debug.isOn("engine=") && !Debug.isOn("cipher");
 
     /**
      * Constant used to initialize cipher to encryption mode.
@@ -721,18 +712,6 @@ public class Cipher {
             if (spi != null) {
                 return;
             }
-            if (debug != null) {
-                int w = --warnCount;
-                if (w >= 0) {
-                    debug.println("Cipher.init() not first method "
-                        + "called, disabling delayed provider selection");
-                    if (w == 0) {
-                        debug.println("Further warnings of this type will "
-                            + "be suppressed");
-                    }
-                    new Exception("Call trace").printStackTrace();
-                }
-            }
             Exception lastException = null;
             while ((firstService != null) || serviceIterator.hasNext()) {
                 Service s;
@@ -1079,11 +1058,6 @@ public class Cipher {
             new CryptoPermission(algComponent, keySize, params, em);
 
         if (!cryptoPerm.implies(checkPerm)) {
-            if (debug != null) {
-                debug.println("Crypto Permission check failed");
-                debug.println("granted: " + cryptoPerm);
-                debug.println("requesting: " + checkPerm);
-            }
             return false;
         }
         if (exmech == null) {
@@ -1091,17 +1065,9 @@ public class Cipher {
         }
         try {
             if (!exmech.isCryptoAllowed(key)) {
-                if (debug != null) {
-                    debug.println(exmech.getName() + " isn't enforced");
-                }
                 return false;
             }
         } catch (ExemptionMechanismException eme) {
-            if (debug != null) {
-                debug.println("Cannot determine whether "+
-                              exmech.getName() + " has been enforced");
-                eme.printStackTrace();
-            }
             return false;
         }
         return true;
@@ -1181,10 +1147,11 @@ public class Cipher {
      * @throws UnsupportedOperationException if (@code opmode} is
      * {@code WRAP_MODE} or {@code UNWRAP_MODE} but the mode is not implemented
      * by the underlying {@code CipherSpi}.
-     */
+     *
     public final void init(int opmode, Key key) throws InvalidKeyException {
         init(opmode, key, JceSecurity.RANDOM);
     }
+     */
 
     /**
      * Initializes this cipher with a key and a source of randomness.
@@ -1255,12 +1222,6 @@ public class Cipher {
 
         initialized = true;
         this.opmode = opmode;
-
-        if (!skipDebug && pdebug != null) {
-            pdebug.println("Cipher." + transformation + " " +
-                getOpmodeString(opmode) + " algorithm from: " +
-                this.provider.getName());
-        }
     }
 
     /**
@@ -1320,12 +1281,13 @@ public class Cipher {
      * @throws UnsupportedOperationException if (@code opmode} is
      * {@code WRAP_MODE} or {@code UNWRAP_MODE} but the mode is not implemented
      * by the underlying {@code CipherSpi}.
-     */
+     *
     public final void init(int opmode, Key key, AlgorithmParameterSpec params)
             throws InvalidKeyException, InvalidAlgorithmParameterException
     {
         init(opmode, key, params, JceSecurity.RANDOM);
     }
+     */
 
     /**
      * Initializes this cipher with a key, a set of algorithm
@@ -1398,12 +1360,6 @@ public class Cipher {
 
         initialized = true;
         this.opmode = opmode;
-
-        if (!skipDebug && pdebug != null) {
-            pdebug.println("Cipher." + transformation + " " +
-                getOpmodeString(opmode) + " algorithm from: " +
-                this.provider.getName());
-        }
     }
 
     /**
@@ -1463,12 +1419,13 @@ public class Cipher {
      * @throws UnsupportedOperationException if (@code opmode} is
      * {@code WRAP_MODE} or {@code UNWRAP_MODE} but the mode is not implemented
      * by the underlying {@code CipherSpi}.
-     */
+     *
     public final void init(int opmode, Key key, AlgorithmParameters params)
             throws InvalidKeyException, InvalidAlgorithmParameterException
     {
         init(opmode, key, params, JceSecurity.RANDOM);
     }
+     */
 
     /**
      * Initializes this cipher with a key, a set of algorithm
@@ -1541,12 +1498,6 @@ public class Cipher {
 
         initialized = true;
         this.opmode = opmode;
-
-        if (!skipDebug && pdebug != null) {
-            pdebug.println("Cipher." + transformation + " " +
-                getOpmodeString(opmode) + " algorithm from: " +
-                this.provider.getName());
-        }
     }
 
     /**
@@ -1611,12 +1562,13 @@ public class Cipher {
      * @throws UnsupportedOperationException if (@code opmode} is
      * {@code WRAP_MODE} or {@code UNWRAP_MODE} but the mode is not implemented
      * by the underlying {@code CipherSpi}.
-     */
+     *
     public final void init(int opmode, Certificate certificate)
             throws InvalidKeyException
     {
         init(opmode, certificate, JceSecurity.RANDOM);
     }
+     */
 
     /**
      * Initializes this cipher with the public key from the given certificate
@@ -1731,12 +1683,6 @@ public class Cipher {
 
         initialized = true;
         this.opmode = opmode;
-
-        if (!skipDebug && pdebug != null) {
-            pdebug.println("Cipher." + transformation + " " +
-                getOpmodeString(opmode) + " algorithm from: " +
-                this.provider.getName());
-        }
     }
 
     /**

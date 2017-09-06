@@ -66,7 +66,6 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.MONTHS;
 
 import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.Clock;
 import java.time.DateTimeException;
@@ -285,17 +284,17 @@ public final class JapaneseChronology extends AbstractChronology implements Seri
 
     @Override
     public JapaneseDate dateNow() {
-        return dateNow(Clock.systemDefaultZone());
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     @Override
     public JapaneseDate dateNow(ZoneId zone) {
-        return dateNow(Clock.system(zone));
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     @Override
     public JapaneseDate dateNow(Clock clock) {
-        return date(LocalDate.now(clock));
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     @Override
@@ -520,15 +519,5 @@ public final class JapaneseChronology extends AbstractChronology implements Seri
     @Override
     Object writeReplace() {
         return super.writeReplace();
-    }
-
-    /**
-     * Defend against malicious streams.
-     *
-     * @param s the stream to read
-     * @throws InvalidObjectException always
-     */
-    private void readObject(ObjectInputStream s) throws InvalidObjectException {
-        throw new InvalidObjectException("Deserialization via serialization delegate");
     }
 }

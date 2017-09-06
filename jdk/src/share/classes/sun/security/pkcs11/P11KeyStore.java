@@ -63,7 +63,6 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import sun.security.util.Debug;
 import sun.security.util.DerValue;
 import sun.security.util.ECUtil;
 
@@ -108,8 +107,6 @@ final class P11KeyStore extends KeyStoreSpi {
     private static final String ALIAS_SEP = "/";
 
     private static final boolean NSS_TEST = false;
-    private static final Debug debug =
-                        Debug.getInstance("pkcs11keystore");
     private static boolean CKA_TRUSTED_SUPPORTED = true;
 
     private final Token token;
@@ -771,9 +768,6 @@ final class P11KeyStore extends KeyStoreSpi {
                 // CKA_LABELs are shared by multiple certs
                 writeDisabled = true;
             }
-            if (debug != null) {
-                dumpTokenMap();
-            }
         } catch (KeyStoreException | PKCS11Exception e) {
             throw new IOException("load failed", e);
         }
@@ -851,9 +845,6 @@ final class P11KeyStore extends KeyStoreSpi {
                 // CKA_LABELs are shared by multiple certs
                 writeDisabled = true;
             }
-            if (debug != null) {
-                dumpTokenMap();
-            }
         } catch (LoginException | KeyStoreException | PKCS11Exception e) {
             throw new IOException("load failed", e);
         }
@@ -910,11 +901,6 @@ final class P11KeyStore extends KeyStoreSpi {
 
         AliasInfo aliasInfo = aliasMap.get(alias);
         if (aliasInfo == null) {
-            if (debug != null) {
-                debug.println("engineGetEntry did not find alias [" +
-                        alias +
-                        "] in map");
-            }
             return null;
         }
 
@@ -924,15 +910,9 @@ final class P11KeyStore extends KeyStoreSpi {
 
             if (aliasInfo.type == ATTR_CLASS_CERT) {
                 // trusted certificate entry
-                if (debug != null) {
-                    debug.println("engineGetEntry found trusted cert entry");
-                }
                 return new KeyStore.TrustedCertificateEntry(aliasInfo.cert);
             } else if (aliasInfo.type == ATTR_CLASS_SKEY) {
                 // secret key entry
-                if (debug != null) {
-                    debug.println("engineGetEntry found secret key entry");
-                }
 
                 THandle h = getTokenObject
                         (session, ATTR_CLASS_SKEY, null, aliasInfo.label);
@@ -945,9 +925,6 @@ final class P11KeyStore extends KeyStoreSpi {
                 }
             } else {
                 // private key entry
-                if (debug != null) {
-                    debug.println("engineGetEntry found private key entry");
-                }
 
                 THandle h = getTokenObject
                         (session, ATTR_CLASS_PKEY, aliasInfo.id, null);
@@ -959,11 +936,6 @@ final class P11KeyStore extends KeyStoreSpi {
                     Certificate[] chain = aliasInfo.chain;
                     if ((pkey != null) && (chain != null)) {
                         return new KeyStore.PrivateKeyEntry(pkey, chain);
-                    } else {
-                        if (debug != null) {
-                            debug.println
-                                ("engineGetEntry got null cert chain or private key");
-                        }
                     }
                 }
             }
@@ -1141,19 +1113,9 @@ final class P11KeyStore extends KeyStoreSpi {
                 // (can not simply update aliasMap)
 
                 mapLabels();
-                if (debug != null) {
-                    dumpTokenMap();
-                }
             } catch (PKCS11Exception | CertificateException pe) {
                 throw new KeyStoreException(pe);
             }
-        }
-
-        if (debug != null) {
-            debug.println
-                ("engineSetEntry added new entry for [" +
-                alias +
-                "] to token");
         }
     }
 
@@ -1224,14 +1186,6 @@ final class P11KeyStore extends KeyStoreSpi {
                 break;
             } else {
                 // if more than one found, use first
-                if (debug != null && ch.length > 1) {
-                    debug.println("engineGetEntry found " +
-                                ch.length +
-                                " certificate entries for subject [" +
-                                next.getIssuerX500Principal().toString() +
-                                "] in token - using first entry");
-                }
-
                 next = loadCert(session, ch[0]);
                 lChain.add(next);
                 if (next.getSubjectX500Principal().equals
@@ -1274,11 +1228,6 @@ final class P11KeyStore extends KeyStoreSpi {
             } else if (kType == CKK_RC4) {
                 keyType = "ARCFOUR";
             } else {
-                if (debug != null) {
-                    debug.println("unknown key type [" +
-                                kType +
-                                "] - using 'Generic Secret'");
-                }
                 keyType = "Generic Secret";
             }
 
@@ -1378,9 +1327,6 @@ final class P11KeyStore extends KeyStoreSpi {
             return P11Key.privateKey(session, oHandle, "EC", keyLength, null);
 
         } else {
-            if (debug != null) {
-                debug.println("unknown key type [" + kType + "]");
-            }
             throw new KeyStoreException("unknown key type");
         }
     }
@@ -1475,12 +1421,6 @@ final class P11KeyStore extends KeyStoreSpi {
             CK_ATTRIBUTE[] attrs = new CK_ATTRIBUTE[] {
                                 new CK_ATTRIBUTE(CKA_ID, alias) };
             token.p11.C_SetAttributeValue(session.id(), pKeyHandle, attrs);
-
-            if (debug != null) {
-                debug.println("updatePkey set new alias [" +
-                                alias +
-                                "] for private key entry");
-            }
         } finally {
             token.releaseSession(session);
         }
@@ -1503,11 +1443,6 @@ final class P11KeyStore extends KeyStoreSpi {
                                 new CK_ATTRIBUTE(CKA_ID, alias) };
                 token.p11.C_SetAttributeValue
                                 (session.id(), key.keyID, attrs);
-                if (debug != null) {
-                    debug.println("updateP11Pkey set new alias [" +
-                                alias +
-                                "] for key entry");
-                }
             } else {
 
                 // session key - convert to token key and set CKA_ID
@@ -1520,12 +1455,6 @@ final class P11KeyStore extends KeyStoreSpi {
                     attrs = addAttribute(attrs, attribute);
                 }
                 token.p11.C_CopyObject(session.id(), key.keyID, attrs);
-                if (debug != null) {
-                    debug.println("updateP11Pkey copied private session key " +
-                                "for [" +
-                                alias +
-                                "] to token entry");
-                }
             }
         } finally {
             token.releaseSession(session);
@@ -1607,10 +1536,6 @@ final class P11KeyStore extends KeyStoreSpi {
         for (int i = start; i < chain.length; i++) {
             if (!cacerts.contains(chain[i])) {
                 storeCert(null, chain[i]);
-            } else if (debug != null) {
-                debug.println("ignoring duplicate CA cert for [" +
-                        chain[i].getSubjectX500Principal() +
-                        "]");
             }
         }
     }
@@ -1635,11 +1560,6 @@ final class P11KeyStore extends KeyStoreSpi {
 
         // update global alias map
         aliasMap.put(alias, new AliasInfo(alias));
-
-        if (debug != null) {
-            debug.println("storeSkey created token secret key for [" +
-                          alias + "]");
-        }
     }
 
     private static CK_ATTRIBUTE[] addAttribute(CK_ATTRIBUTE[] attrs, CK_ATTRIBUTE attr) {
@@ -1704,10 +1624,6 @@ final class P11KeyStore extends KeyStoreSpi {
             attrs = token.getAttributes
                 (TemplateManager.O_IMPORT, CKO_PRIVATE_KEY, CKK_DSA, attrs);
 
-            if (debug != null) {
-                debug.println("storePkey created DSA template");
-            }
-
         } else if (key instanceof DHPrivateKey) {
 
             DHPrivateKey dhKey = (DHPrivateKey)key;
@@ -1761,10 +1677,6 @@ final class P11KeyStore extends KeyStoreSpi {
             attrs = token.getAttributes
                 (TemplateManager.O_IMPORT, CKO_PRIVATE_KEY, CKK_EC, attrs);
 
-            if (debug != null) {
-                debug.println("storePkey created EC template");
-            }
-
         } else if (key instanceof P11Key) {
             // sensitive/non-extractable P11Key
             P11Key p11Key = (P11Key)key;
@@ -1798,11 +1710,6 @@ final class P11KeyStore extends KeyStoreSpi {
 
             // create private key entry
             token.p11.C_CreateObject(session.id(), attrs);
-            if (debug != null) {
-                debug.println("storePkey created token key for [" +
-                                alias +
-                                "]");
-            }
         } finally {
             token.releaseSession(session);
         }
@@ -1818,11 +1725,6 @@ final class P11KeyStore extends KeyStoreSpi {
 
         CK_ATTRIBUTE[] attrs = null;
         if (key instanceof RSAPrivateCrtKey) {
-
-            if (debug != null) {
-                debug.println("creating RSAPrivateCrtKey attrs");
-            }
-
             RSAPrivateCrtKey rsaKey = (RSAPrivateCrtKey)key;
 
             attrs = new CK_ATTRIBUTE[] {
@@ -1851,11 +1753,6 @@ final class P11KeyStore extends KeyStoreSpi {
                 (TemplateManager.O_IMPORT, CKO_PRIVATE_KEY, CKK_RSA, attrs);
 
         } else {
-
-            if (debug != null) {
-                debug.println("creating RSAPrivateKey attrs");
-            }
-
             RSAPrivateKey rsaKey = key;
 
             attrs = new CK_ATTRIBUTE[] {
@@ -1946,11 +1843,6 @@ final class P11KeyStore extends KeyStoreSpi {
             }
 
             token.p11.C_DestroyObject(session.id(), h.handle);
-            if (debug != null) {
-                debug.println("destroyCert destroyed cert with CKA_ID [" +
-                                                getID(cka_id) +
-                                                "]");
-            }
             return true;
         } finally {
             token.releaseSession(session);
@@ -1969,23 +1861,11 @@ final class P11KeyStore extends KeyStoreSpi {
 
             THandle h = getTokenObject(session, ATTR_CLASS_CERT, cka_id, null);
             if (h.type != ATTR_CLASS_CERT) {
-                if (debug != null) {
-                    debug.println("destroyChain could not find " +
-                        "end entity cert with CKA_ID [0x" +
-                        Functions.toHexString(cka_id) +
-                        "]");
-                }
                 return false;
             }
 
             X509Certificate endCert = loadCert(session, h.handle);
             token.p11.C_DestroyObject(session.id(), h.handle);
-            if (debug != null) {
-                debug.println("destroyChain destroyed end entity cert " +
-                        "with CKA_ID [" +
-                        getID(cka_id) +
-                        "]");
-            }
 
             // build chain following issuer->subject links
 
@@ -2010,14 +1890,6 @@ final class P11KeyStore extends KeyStoreSpi {
                     break;
                 } else {
                     // if more than one found, use first
-                    if (debug != null && ch.length > 1) {
-                        debug.println("destroyChain found " +
-                                ch.length +
-                                " certificate entries for subject [" +
-                                next.getIssuerX500Principal() +
-                                "] in token - using first entry");
-                    }
-
                     next = loadCert(session, ch[0]);
 
                     // only delete if not part of any other chain
@@ -2045,18 +1917,6 @@ final class P11KeyStore extends KeyStoreSpi {
 
                     if (destroyIt) {
                         token.p11.C_DestroyObject(session.id(), ch[0]);
-                        if (debug != null) {
-                            debug.println
-                                ("destroyChain destroyed cert in chain " +
-                                "with subject [" +
-                                next.getSubjectX500Principal() + "]");
-                        }
-                    } else {
-                        if (debug != null) {
-                            debug.println("destroyChain did not destroy " +
-                                "shared cert in chain with subject [" +
-                                next.getSubjectX500Principal() + "]");
-                        }
                     }
                 }
             }
@@ -2079,12 +1939,6 @@ final class P11KeyStore extends KeyStoreSpi {
 
             THandle h = getTokenObject(session, ATTR_CLASS_SKEY, null, alias);
             if (h.type != ATTR_CLASS_SKEY) {
-                if (debug != null) {
-                    debug.println("destroySkey did not find secret key " +
-                        "with CKA_LABEL [" +
-                        alias +
-                        "]");
-                }
                 return false;
             }
             token.p11.C_DestroyObject(session.id(), h.handle);
@@ -2105,12 +1959,6 @@ final class P11KeyStore extends KeyStoreSpi {
 
             THandle h = getTokenObject(session, ATTR_CLASS_PKEY, cka_id, null);
             if (h.type != ATTR_CLASS_PKEY) {
-                if (debug != null) {
-                    debug.println
-                        ("destroyPkey did not find private key with CKA_ID [" +
-                        getID(cka_id) +
-                        "]");
-                }
                 return false;
             }
             token.p11.C_DestroyObject(session.id(), h.handle);
@@ -2184,24 +2032,6 @@ final class P11KeyStore extends KeyStoreSpi {
         }
         long[] h = findObjects(session, attrs);
         if (h.length == 0) {
-            if (debug != null) {
-                if (type == ATTR_CLASS_SKEY) {
-                    debug.println("getTokenObject did not find secret key " +
-                                "with CKA_LABEL [" +
-                                cka_label +
-                                "]");
-                } else if (type == ATTR_CLASS_CERT) {
-                    debug.println
-                        ("getTokenObject did not find cert with CKA_ID [" +
-                        getID(cka_id) +
-                        "]");
-                } else {
-                    debug.println("getTokenObject did not find private key " +
-                        "with CKA_ID [" +
-                        getID(cka_id) +
-                        "]");
-                }
-            }
         } else if (h.length == 1) {
 
             // found object handle - return it
@@ -2371,10 +2201,6 @@ final class P11KeyStore extends KeyStoreSpi {
                             if (pe.getErrorCode() == CKR_ATTRIBUTE_TYPE_INVALID) {
                                 // XXX  NSS, ibutton, sca1000
                                 CKA_TRUSTED_SUPPORTED = false;
-                                if (debug != null) {
-                                    debug.println
-                                            ("CKA_TRUSTED attribute not supported");
-                                }
                             }
                         }
                     }
@@ -2500,12 +2326,6 @@ final class P11KeyStore extends KeyStoreSpi {
             }
 
             if (!foundMatch) {
-                if (debug != null) {
-                    debug.println
-                        ("did not find match for private key with CKA_ID [" +
-                        getID(pkeyID) +
-                        "] (ignoring entry)");
-                }
             }
         }
 
@@ -2643,18 +2463,6 @@ final class P11KeyStore extends KeyStoreSpi {
             }
         }
         aliasMap.putAll(sKeyMap);
-    }
-
-    private void dumpTokenMap() {
-        Set<String> aliases = aliasMap.keySet();
-        System.out.println("Token Alias Map:");
-        if (aliases.isEmpty()) {
-            System.out.println("  [empty]");
-        } else {
-            for (String s : aliases) {
-                System.out.println("  " + s + aliasMap.get(s));
-            }
-        }
     }
 
     private void checkWrite() throws KeyStoreException {

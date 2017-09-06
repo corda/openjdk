@@ -58,8 +58,6 @@ import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
  */
 public final class Secmod {
 
-    private final static boolean DEBUG = false;
-
     private final static Secmod INSTANCE;
 
     static {
@@ -206,9 +204,7 @@ public final class Secmod {
             }
         }
 
-        if (DEBUG) System.out.println("lib: " + platformPath);
         nssHandle = nssLoadLibrary(platformPath);
-        if (DEBUG) System.out.println("handle: " + nssHandle);
         fetchVersions();
         if (supported == false) {
             throw new IOException
@@ -216,10 +212,8 @@ public final class Secmod {
                 + "3.7 or later required");
         }
 
-        if (DEBUG) System.out.println("dir: " + configDir);
         boolean initok = nssInitialize(dbMode.functionName, nssHandle,
             configDir, nssOptimizeSpace);
-        if (DEBUG) System.out.println("init: " + initok);
         if (initok == false) {
             throw new IOException("NSS initialization failed");
         }
@@ -753,7 +747,6 @@ public final class Secmod {
             token.p11.C_FindObjectsInit(session.id(), attrs);
             long[] handles = token.p11.C_FindObjects(session.id(), MAX_NUM);
             token.p11.C_FindObjectsFinal(session.id());
-            if (DEBUG) System.out.println("handles: " + handles.length);
 
             for (long handle : handles) {
                 try {

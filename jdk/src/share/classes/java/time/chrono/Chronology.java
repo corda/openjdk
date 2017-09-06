@@ -383,7 +383,7 @@ public interface Chronology extends Comparable<Chronology> {
      * @throws DateTimeException if unable to create the date
      */
     default ChronoLocalDate dateNow() {
-        return dateNow(Clock.systemDefaultZone());
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     /**
@@ -403,7 +403,7 @@ public interface Chronology extends Comparable<Chronology> {
      * @throws DateTimeException if unable to create the date
      */
     default ChronoLocalDate dateNow(ZoneId zone) {
-        return dateNow(Clock.system(zone));
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     /**
@@ -421,8 +421,7 @@ public interface Chronology extends Comparable<Chronology> {
      * @throws DateTimeException if unable to create the date
      */
     default ChronoLocalDate dateNow(Clock clock) {
-        Objects.requireNonNull(clock, "clock");
-        return date(LocalDate.now(clock));
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     //-----------------------------------------------------------------------

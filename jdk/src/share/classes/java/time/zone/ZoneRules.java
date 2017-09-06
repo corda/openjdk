@@ -65,7 +65,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
@@ -314,16 +313,6 @@ public final class ZoneRules implements Serializable {
         this.savingsLocalTransitions = EMPTY_LDT_ARRAY;
         this.wallOffsets = standardOffsets;
         this.lastRules = EMPTY_LASTRULES;
-    }
-
-    /**
-     * Defend against malicious streams.
-     *
-     * @param s the stream to read
-     * @throws InvalidObjectException always
-     */
-    private void readObject(ObjectInputStream s) throws InvalidObjectException {
-        throw new InvalidObjectException("Deserialization via serialization delegate");
     }
 
     /**

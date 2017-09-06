@@ -25,7 +25,6 @@
 
 package java.util;
 import java.io.Serializable;
-import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.function.BiConsumer;
@@ -386,91 +385,6 @@ public class Collections {
                 Object tmp = fwd.next();
                 fwd.set(rev.previous());
                 rev.set(tmp);
-            }
-        }
-    }
-
-    /**
-     * Randomly permutes the specified list using a default source of
-     * randomness.  All permutations occur with approximately equal
-     * likelihood.
-     *
-     * <p>The hedge "approximately" is used in the foregoing description because
-     * default source of randomness is only approximately an unbiased source
-     * of independently chosen bits. If it were a perfect source of randomly
-     * chosen bits, then the algorithm would choose permutations with perfect
-     * uniformity.
-     *
-     * <p>This implementation traverses the list backwards, from the last
-     * element up to the second, repeatedly swapping a randomly selected element
-     * into the "current position".  Elements are randomly selected from the
-     * portion of the list that runs from the first element to the current
-     * position, inclusive.
-     *
-     * <p>This method runs in linear time.  If the specified list does not
-     * implement the {@link RandomAccess} interface and is large, this
-     * implementation dumps the specified list into an array before shuffling
-     * it, and dumps the shuffled array back into the list.  This avoids the
-     * quadratic behavior that would result from shuffling a "sequential
-     * access" list in place.
-     *
-     * @param  list the list to be shuffled.
-     * @throws UnsupportedOperationException if the specified list or
-     *         its list-iterator does not support the <tt>set</tt> operation.
-     */
-    public static void shuffle(List<?> list) {
-        Random rnd = r;
-        if (rnd == null)
-            r = rnd = new Random(); // harmless race.
-        shuffle(list, rnd);
-    }
-
-    private static Random r;
-
-    /**
-     * Randomly permute the specified list using the specified source of
-     * randomness.  All permutations occur with equal likelihood
-     * assuming that the source of randomness is fair.<p>
-     *
-     * This implementation traverses the list backwards, from the last element
-     * up to the second, repeatedly swapping a randomly selected element into
-     * the "current position".  Elements are randomly selected from the
-     * portion of the list that runs from the first element to the current
-     * position, inclusive.<p>
-     *
-     * This method runs in linear time.  If the specified list does not
-     * implement the {@link RandomAccess} interface and is large, this
-     * implementation dumps the specified list into an array before shuffling
-     * it, and dumps the shuffled array back into the list.  This avoids the
-     * quadratic behavior that would result from shuffling a "sequential
-     * access" list in place.
-     *
-     * @param  list the list to be shuffled.
-     * @param  rnd the source of randomness to use to shuffle the list.
-     * @throws UnsupportedOperationException if the specified list or its
-     *         list-iterator does not support the <tt>set</tt> operation.
-     */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public static void shuffle(List<?> list, Random rnd) {
-        int size = list.size();
-        if (size < SHUFFLE_THRESHOLD || list instanceof RandomAccess) {
-            for (int i=size; i>1; i--)
-                swap(list, i-1, rnd.nextInt(i));
-        } else {
-            Object arr[] = list.toArray();
-
-            // Shuffle array
-            for (int i=size; i>1; i--)
-                swap(arr, i-1, rnd.nextInt(i));
-
-            // Dump array back into list
-            // instead of using a raw type here, it's possible to capture
-            // the wildcard but it will require a call to a supplementary
-            // private method
-            ListIterator it = list.listIterator();
-            for (int i=0; i<arr.length; i++) {
-                it.next();
-                it.set(arr[i]);
             }
         }
     }
@@ -1093,11 +1007,6 @@ public class Collections {
         public Stream<E> stream() {
             return (Stream<E>)c.stream();
         }
-        @SuppressWarnings("unchecked")
-        @Override
-        public Stream<E> parallelStream() {
-            return (Stream<E>)c.parallelStream();
-        }
     }
 
     /**
@@ -1642,12 +1551,7 @@ public class Collections {
 
             @Override
             public Stream<Entry<K,V>> stream() {
-                return StreamSupport.stream(spliterator(), false);
-            }
-
-            @Override
-            public Stream<Entry<K,V>> parallelStream() {
-                return StreamSupport.stream(spliterator(), true);
+                return StreamSupport.stream(spliterator());
             }
 
             public Iterator<Map.Entry<K,V>> iterator() {
@@ -2072,13 +1976,6 @@ public class Collections {
         @Override
         public Stream<E> stream() {
             return c.stream(); // Must be manually synched by user!
-        }
-        @Override
-        public Stream<E> parallelStream() {
-            return c.parallelStream(); // Must be manually synched by user!
-        }
-        private void writeObject(ObjectOutputStream s) throws IOException {
-            synchronized (mutex) {s.defaultWriteObject();}
         }
     }
 
@@ -2686,10 +2583,6 @@ public class Collections {
                 BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
             synchronized (mutex) {return m.merge(key, value, remappingFunction);}
         }
-
-        private void writeObject(ObjectOutputStream s) throws IOException {
-            synchronized (mutex) {s.defaultWriteObject();}
-        }
     }
 
     /**
@@ -3128,8 +3021,6 @@ public class Collections {
         public Spliterator<E> spliterator() {return c.spliterator();}
         @Override
         public Stream<E> stream()           {return c.stream();}
-        @Override
-        public Stream<E> parallelStream()   {return c.parallelStream();}
     }
 
     /**
@@ -5067,11 +4958,6 @@ public class Collections {
         }
 
         @Override
-        public Stream<E> parallelStream() {
-            return IntStream.range(0, n).parallel().mapToObj(i -> element);
-        }
-
-        @Override
         public Spliterator<E> spliterator() {
             return stream().spliterator();
         }
@@ -5484,17 +5370,8 @@ public class Collections {
         public Spliterator<E> spliterator() {return s.spliterator();}
         @Override
         public Stream<E> stream()           {return s.stream();}
-        @Override
-        public Stream<E> parallelStream()   {return s.parallelStream();}
 
         private static final long serialVersionUID = 2454657854757543876L;
-
-        private void readObject(java.io.ObjectInputStream stream)
-            throws IOException, ClassNotFoundException
-        {
-            stream.defaultReadObject();
-            s = m.keySet();
-        }
     }
 
     /**
@@ -5558,7 +5435,5 @@ public class Collections {
         public Spliterator<E> spliterator() {return q.spliterator();}
         @Override
         public Stream<E> stream()           {return q.stream();}
-        @Override
-        public Stream<E> parallelStream()   {return q.parallelStream();}
     }
 }

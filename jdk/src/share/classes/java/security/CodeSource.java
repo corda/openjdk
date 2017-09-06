@@ -27,7 +27,6 @@ package java.security;
 
 
 import java.net.URL;
-import java.net.SocketPermission;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Hashtable;
@@ -65,9 +64,6 @@ public class CodeSource implements java.io.Serializable {
      * The code signers. Certificate chains are concatenated.
      */
     private transient java.security.cert.Certificate certs[] = null;
-
-    // cached SocketPermission used for matchLocation
-    private transient SocketPermission sp;
 
     // for generating cert paths
     private transient CertificateFactory factory = null;
@@ -436,18 +432,7 @@ public class CodeSource implements java.io.Serializable {
                 ("".equals(thatHost) || "localhost".equals(thatHost))) {
                 // ok
             } else if (!thisHost.equals(thatHost)) {
-                if (thatHost == null) {
-                    return false;
-                }
-                if (this.sp == null) {
-                    this.sp = new SocketPermission(thisHost, "resolve");
-                }
-                if (that.sp == null) {
-                    that.sp = new SocketPermission(thatHost, "resolve");
-                }
-                if (!this.sp.implies(that.sp)) {
-                    return false;
-                }
+                throw new UnsupportedOperationException("Networking unavailable");
             }
         }
         // everything matches
@@ -480,114 +465,6 @@ public class CodeSource implements java.io.Serializable {
         }
         sb.append(")");
         return sb.toString();
-    }
-
-    /**
-     * Writes this object out to a stream (i.e., serializes it).
-     *
-     * @serialData An initial {@code URL} is followed by an
-     * {@code int} indicating the number of certificates to follow
-     * (a value of "zero" denotes that there are no certificates associated
-     * with this object).
-     * Each certificate is written out starting with a {@code String}
-     * denoting the certificate type, followed by an
-     * {@code int} specifying the length of the certificate encoding,
-     * followed by the certificate encoding itself which is written out as an
-     * array of bytes. Finally, if any code signers are present then the array
-     * of code signers is serialized and written out too.
-     */
-    private void writeObject(java.io.ObjectOutputStream oos)
-        throws IOException
-    {
-        oos.defaultWriteObject(); // location
-
-        // Serialize the array of certs
-        if (certs == null || certs.length == 0) {
-            oos.writeInt(0);
-        } else {
-            // write out the total number of certs
-            oos.writeInt(certs.length);
-            // write out each cert, including its type
-            for (int i = 0; i < certs.length; i++) {
-                java.security.cert.Certificate cert = certs[i];
-                try {
-                    oos.writeUTF(cert.getType());
-                    byte[] encoded = cert.getEncoded();
-                    oos.writeInt(encoded.length);
-                    oos.write(encoded);
-                } catch (CertificateEncodingException cee) {
-                    throw new IOException(cee.getMessage());
-                }
-            }
-        }
-
-        // Serialize the array of code signers (if any)
-        if (signers != null && signers.length > 0) {
-            oos.writeObject(signers);
-        }
-    }
-
-    /**
-     * Restores this object from a stream (i.e., deserializes it).
-     */
-    private void readObject(java.io.ObjectInputStream ois)
-        throws IOException, ClassNotFoundException
-    {
-        CertificateFactory cf;
-        Hashtable<String, CertificateFactory> cfs = null;
-
-        ois.defaultReadObject(); // location
-
-        // process any new-style certs in the stream (if present)
-        int size = ois.readInt();
-        if (size > 0) {
-            // we know of 3 different cert types: X.509, PGP, SDSI, which
-            // could all be present in the stream at the same time
-            cfs = new Hashtable<String, CertificateFactory>(3);
-            this.certs = new java.security.cert.Certificate[size];
-        }
-
-        for (int i = 0; i < size; i++) {
-            // read the certificate type, and instantiate a certificate
-            // factory of that type (reuse existing factory if possible)
-            String certType = ois.readUTF();
-            if (cfs.containsKey(certType)) {
-                // reuse certificate factory
-                cf = cfs.get(certType);
-            } else {
-                // create new certificate factory
-                try {
-                    cf = CertificateFactory.getInstance(certType);
-                } catch (CertificateException ce) {
-                    throw new ClassNotFoundException
-                        ("Certificate factory for " + certType + " not found");
-                }
-                // store the certificate factory so we can reuse it later
-                cfs.put(certType, cf);
-            }
-            // parse the certificate
-            byte[] encoded = null;
-            try {
-                encoded = new byte[ois.readInt()];
-            } catch (OutOfMemoryError oome) {
-                throw new IOException("Certificate too big");
-            }
-            ois.readFully(encoded);
-            ByteArrayInputStream bais = new ByteArrayInputStream(encoded);
-            try {
-                this.certs[i] = cf.generateCertificate(bais);
-            } catch (CertificateException ce) {
-                throw new IOException(ce.getMessage());
-            }
-            bais.close();
-        }
-
-        // Deserialize array of code signers (if any)
-        try {
-            this.signers = ((CodeSigner[])ois.readObject()).clone();
-        } catch (IOException ioe) {
-            // no signers present
-        }
     }
 
     /*

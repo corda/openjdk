@@ -56,9 +56,6 @@ import sun.security.pkcs.SignerInfo;
 
 public class SignatureFileVerifier {
 
-    /* Are we debugging ? */
-    private static final Debug debug = Debug.getInstance("jar");
-
     private static final DisabledAlgorithmConstraints JAR_DISABLED_CHECK =
             new DisabledAlgorithmConstraints(
                     DisabledAlgorithmConstraints.PROPERTY_JAR_DISABLED_ALGS);
@@ -303,9 +300,6 @@ public class SignatureFileVerifier {
          * has no timestamp, use current time (aka null).
          */
         for (CodeSigner s: newSigners) {
-            if (debug != null) {
-                debug.println("Gathering timestamp for:  " + s.toString());
-            }
             if (s.getTimestamp() == null) {
                 timestamp = null;
                 break;
@@ -347,13 +341,6 @@ public class SignatureFileVerifier {
                     name = name.substring(1);
 
                 updateSigners(newSigners, signers, name);
-
-                if (debug != null) {
-                    debug.println("processSignature signed name = "+name);
-                }
-
-            } else if (debug != null) {
-                debug.println("processSignature unsigned name = "+name);
             }
         }
 
@@ -376,15 +363,6 @@ public class SignatureFileVerifier {
             } catch(GeneralSecurityException e) {
                 permittedAlgs.put(algorithm, Boolean.FALSE);
                 permittedAlgs.put(key.toUpperCase(), Boolean.FALSE);
-                if (debug != null) {
-                    if (e.getMessage() != null) {
-                        debug.println(key + ":  " + e.getMessage());
-                    } else {
-                        debug.println(key + ":  " + algorithm +
-                                " was disabled, no exception msg given.");
-                        e.printStackTrace();
-                    }
-                }
                 return false;
             }
 
@@ -465,28 +443,12 @@ public class SignatureFileVerifier {
                     byte[] expectedHash =
                         Base64.getMimeDecoder().decode((String)se.getValue());
 
-                    if (debug != null) {
-                        debug.println("Signature File: Manifest digest " +
-                                algorithm);
-                        debug.println( "  sigfile  " + toHex(expectedHash));
-                        debug.println( "  computed " + toHex(computedHash));
-                        debug.println();
-                    }
-
                     if (MessageDigest.isEqual(computedHash, expectedHash)) {
                         manifestSigned = true;
                     } else {
                         //XXX: we will continue and verify each section
                     }
                 }
-            }
-        }
-
-        if (debug != null) {
-            debug.println("PermittedAlgs mapping: ");
-            for (String key : permittedAlgs.keySet()) {
-                debug.println(key + " : " +
-                        permittedAlgs.get(key).toString());
             }
         }
 
@@ -536,36 +498,14 @@ public class SignatureFileVerifier {
                     byte[] expectedHash =
                         Base64.getMimeDecoder().decode((String)se.getValue());
 
-                    if (debug != null) {
-                     debug.println("Signature File: " +
-                                        "Manifest Main Attributes digest " +
-                                        digest.getAlgorithm());
-                     debug.println( "  sigfile  " + toHex(expectedHash));
-                     debug.println( "  computed " + toHex(computedHash));
-                     debug.println();
-                    }
-
                     if (MessageDigest.isEqual(computedHash, expectedHash)) {
                         // good
                     } else {
                         // we will *not* continue and verify each section
                         attrsVerified = false;
-                        if (debug != null) {
-                            debug.println("Verification of " +
-                                        "Manifest main attributes failed");
-                            debug.println();
-                        }
                         break;
                     }
                 }
-            }
-        }
-
-        if (debug != null) {
-            debug.println("PermittedAlgs mapping: ");
-            for (String key : permittedAlgs.keySet()) {
-                debug.println(key + " : " +
-                        permittedAlgs.get(key).toString());
             }
         }
 
@@ -645,14 +585,6 @@ public class SignatureFileVerifier {
                             computed = mde.digest(digest);
                         }
 
-                        if (debug != null) {
-                          debug.println("Signature Block File: " +
-                                   name + " digest=" + digest.getAlgorithm());
-                          debug.println("  expected " + toHex(expected));
-                          debug.println("  computed " + toHex(computed));
-                          debug.println();
-                        }
-
                         if (MessageDigest.isEqual(computed, expected)) {
                             oneDigestVerified = true;
                             ok = true;
@@ -661,10 +593,6 @@ public class SignatureFileVerifier {
                             if (!workaround) {
                                computed = mde.digestWorkaround(digest);
                                if (MessageDigest.isEqual(computed, expected)) {
-                                   if (debug != null) {
-                                       debug.println("  re-computed " + toHex(computed));
-                                       debug.println();
-                                   }
                                    workaround = true;
                                    oneDigestVerified = true;
                                    ok = true;
@@ -678,14 +606,6 @@ public class SignatureFileVerifier {
                         }
                     }
                 }
-            }
-        }
-
-        if (debug != null) {
-            debug.println("PermittedAlgs mapping: ");
-            for (String key : permittedAlgs.keySet()) {
-                debug.println(key + " : " +
-                        permittedAlgs.get(key).toString());
             }
         }
 
@@ -720,11 +640,6 @@ public class SignatureFileVerifier {
             }
             // Append the new code signer
             signers.add(new CodeSigner(certChain, info.getTimestamp()));
-
-            if (debug != null) {
-                debug.println("Signature Block Certificate: " +
-                    chain.get(0));
-            }
         }
 
         if (signers != null) {

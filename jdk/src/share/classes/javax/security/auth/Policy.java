@@ -30,7 +30,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.Objects;
-import sun.security.util.Debug;
 
 /**
  * <p> This is an abstract class for representing the system policy for
@@ -290,13 +289,8 @@ public abstract class Policy {
      * @return true if a custom (not AUTH_POLICY) system-wide policy object
      * has been set; false otherwise
      */
-    static boolean isCustomPolicySet(Debug debug) {
+    static boolean isCustomPolicySet() {
         if (policy != null) {
-            if (debug != null && isCustomPolicy) {
-                debug.println("Providing backwards compatibility for " +
-                              "javax.security.auth.policy implementation: " +
-                              policy.toString());
-            }
             return isCustomPolicy;
         }
         // check if custom policy has been set using auth.policy.provider prop
@@ -307,11 +301,6 @@ public abstract class Policy {
                 }
         });
         if (policyClass != null && !policyClass.equals(AUTH_POLICY)) {
-            if (debug != null) {
-                debug.println("Providing backwards compatibility for " +
-                              "javax.security.auth.policy implementation: " +
-                              policyClass);
-            }
             return true;
         }
         return false;

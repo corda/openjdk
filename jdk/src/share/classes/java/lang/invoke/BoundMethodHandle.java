@@ -701,7 +701,6 @@ import jdk.internal.org.objectweb.asm.MethodVisitor;
 
             // load class
             final byte[] classFile = cw.toByteArray();
-            InvokerBytecodeGenerator.maybeDump(className, classFile);
             Class<? extends BoundMethodHandle> bmhClass =
                 //UNSAFE.defineAnonymousClass(BoundMethodHandle.class, classFile, null).asSubclass(BoundMethodHandle.class);
                 UNSAFE.defineClass(className, classFile, 0, classFile.length,

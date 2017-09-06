@@ -27,7 +27,6 @@ package java.nio;
 
 import java.security.AccessController;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.LongAdder;
 
 import sun.misc.JavaLangRefAccess;
 import sun.misc.SharedSecrets;

@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import sun.misc.JavaSecurityProtectionDomainAccess;
 import static sun.misc.JavaSecurityProtectionDomainAccess.ProtectionDomainCache;
-import sun.security.util.Debug;
 import sun.security.util.SecurityConstants;
 import sun.misc.JavaSecurityAccess;
 import sun.misc.SharedSecrets;
@@ -126,8 +125,6 @@ public class ProtectionDomain {
      * An object used as a key when the ProtectionDomain is stored in a Map.
      */
     final Key key = new Key();
-
-    private static final Debug debug = Debug.getInstance("domain");
 
     /**
      * Creates a new ProtectionDomain with the given CodeSource and
@@ -334,13 +331,11 @@ public class ProtectionDomain {
      * . SecurityManager is null
      *
      * . SecurityManager is not null,
-     *          debug is not null,
      *          SecurityManager impelmentation is in bootclasspath,
      *          Policy implementation is in bootclasspath
      *          (the bootclasspath restrictions avoid recursion)
      *
      * . SecurityManager is not null,
-     *          debug is null,
      *          caller has Policy.getPolicy permission
      */
     private static boolean seeAllp() {
@@ -349,19 +344,11 @@ public class ProtectionDomain {
         if (sm == null) {
             return true;
         } else {
-            if (debug != null) {
-                if (sm.getClass().getClassLoader() == null &&
-                    Policy.getPolicyNoCheck().getClass().getClassLoader()
-                                                                == null) {
-                    return true;
-                }
-            } else {
-                try {
-                    sm.checkPermission(SecurityConstants.GET_POLICY_PERMISSION);
-                    return true;
-                } catch (SecurityException se) {
-                    // fall thru and return false
-                }
+            try {
+                sm.checkPermission(SecurityConstants.GET_POLICY_PERMISSION);
+                return true;
+            } catch (SecurityException se) {
+                // fall thru and return false
             }
         }
 

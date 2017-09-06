@@ -36,16 +36,12 @@ import sun.misc.JarIndex;
 import sun.security.util.ManifestDigester;
 import sun.security.util.ManifestEntryVerifier;
 import sun.security.util.SignatureFileVerifier;
-import sun.security.util.Debug;
 
 /**
  *
  * @author      Roland Schemers
  */
 class JarVerifier {
-
-    /* Are we debugging ? */
-    static final Debug debug = Debug.getInstance("jar");
 
     /* a table mapping names to code signers, for jar entries that have
        had their actual hashes verified */
@@ -113,10 +109,6 @@ class JarVerifier {
     {
         if (je == null)
             return;
-
-        if (debug != null) {
-            debug.println("beginEntry "+je.getName());
-        }
 
         String name = je.getName();
 
@@ -246,10 +238,6 @@ class JarVerifier {
             try {
                 parsingBlockOrSF = false;
 
-                if (debug != null) {
-                    debug.println("processEntry: processing block");
-                }
-
                 String uname = mev.getEntry().getName()
                                              .toUpperCase(Locale.ENGLISH);
 
@@ -264,11 +252,6 @@ class JarVerifier {
                     while (it.hasNext()) {
                         SignatureFileVerifier sfv = it.next();
                         if (sfv.needSignatureFile(key)) {
-                            if (debug != null) {
-                                debug.println(
-                                 "processEntry: processing pending block");
-                            }
-
                             sfv.setSignatureFile(bytes);
                             sfv.process(sigFileSigners, manifestDigests);
                         }
@@ -304,9 +287,6 @@ class JarVerifier {
                         // put this block on queue for later processing
                         // since we don't have the .SF bytes yet
                         // (uname, block);
-                        if (debug != null) {
-                            debug.println("adding pending block");
-                        }
                         pendingBlocks.add(sfv);
                         return;
                     } else {
@@ -317,16 +297,12 @@ class JarVerifier {
 
             } catch (IOException ioe) {
                 // e.g. sun.security.pkcs.ParsingException
-                if (debug != null) debug.println("processEntry caught: "+ioe);
                 // ignore and treat as unsigned
             } catch (SignatureException se) {
-                if (debug != null) debug.println("processEntry caught: "+se);
                 // ignore and treat as unsigned
             } catch (NoSuchAlgorithmException nsae) {
-                if (debug != null) debug.println("processEntry caught: "+nsae);
                 // ignore and treat as unsigned
             } catch (CertificateException ce) {
-                if (debug != null) debug.println("processEntry caught: "+ce);
                 // ignore and treat as unsigned
             }
         }

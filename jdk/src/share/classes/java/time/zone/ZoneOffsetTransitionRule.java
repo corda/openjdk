@@ -68,7 +68,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -232,16 +231,6 @@ public final class ZoneOffsetTransitionRule implements Serializable {
     }
 
     //-----------------------------------------------------------------------
-    /**
-     * Defend against malicious streams.
-     *
-     * @param s the stream to read
-     * @throws InvalidObjectException always
-     */
-    private void readObject(ObjectInputStream s) throws InvalidObjectException {
-        throw new InvalidObjectException("Deserialization via serialization delegate");
-    }
-
     /**
      * Writes the object using a
      * <a href="../../../serialized-form.html#java.time.zone.Ser">dedicated serialized form</a>.

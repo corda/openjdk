@@ -30,6 +30,7 @@ package java.io;
  * objects. DataInput includes methods for the input of primitive types,
  * ObjectInput extends that interface to include objects, arrays, and Strings.
  *
+ * @exclude Not supported.
  * @author  unascribed
  * @see java.io.InputStream
  * @see java.io.ObjectOutputStream

@@ -73,9 +73,6 @@ public class JarURLConnection extends java.net.JarURLConnection {
     /* the jar file corresponding to this connection */
     private JarFile jarFile;
 
-    /* the content type for this connection */
-    private String contentType;
-
     public JarURLConnection(URL url, Handler handler)
     throws MalformedURLException, IOException {
         super(url);
@@ -199,31 +196,6 @@ public class JarURLConnection extends java.net.JarURLConnection {
             result = super.getContent();
         }
         return result;
-    }
-
-    public String getContentType() {
-        if (contentType == null) {
-            if (entryName == null) {
-                contentType = "x-java/jar";
-            } else {
-                try {
-                    connect();
-                    InputStream in = jarFile.getInputStream(jarEntry);
-                    contentType = guessContentTypeFromStream(
-                                        new BufferedInputStream(in));
-                    in.close();
-                } catch (IOException e) {
-                    // don't do anything
-                }
-            }
-            if (contentType == null) {
-                contentType = guessContentTypeFromName(entryName);
-            }
-            if (contentType == null) {
-                contentType = "content/unknown";
-            }
-        }
-        return contentType;
     }
 
     public String getHeaderField(String name) {

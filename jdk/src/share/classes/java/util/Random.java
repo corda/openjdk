@@ -98,27 +98,12 @@ class Random implements java.io.Serializable {
     static final String BadSize  = "size must be non-negative";
 
     /**
-     * Creates a new random number generator. This constructor sets
-     * the seed of the random number generator to a value very likely
-     * to be distinct from any other invocation of this constructor.
+     * Creates a new random number generator. Determinism
+     * requires that we always use the same seed.
      */
     public Random() {
-        this(seedUniquifier() ^ System.nanoTime());
+        this(8006694155008225895L);
     }
-
-    private static long seedUniquifier() {
-        // L'Ecuyer, "Tables of Linear Congruential Generators of
-        // Different Sizes and Good Lattice Structure", 1999
-        for (;;) {
-            long current = seedUniquifier.get();
-            long next = current * 181783497276652981L;
-            if (seedUniquifier.compareAndSet(current, next))
-                return next;
-        }
-    }
-
-    private static final AtomicLong seedUniquifier
-        = new AtomicLong(8682522807148012L);
 
     /**
      * Creates a new random number generator using a single {@code long} seed.
@@ -621,8 +606,7 @@ class Random implements java.io.Serializable {
             throw new IllegalArgumentException(BadSize);
         return StreamSupport.intStream
                 (new RandomIntsSpliterator
-                         (this, 0L, streamSize, Integer.MAX_VALUE, 0),
-                 false);
+                         (this, 0L, streamSize, Integer.MAX_VALUE, 0));
     }
 
     /**
@@ -641,8 +625,7 @@ class Random implements java.io.Serializable {
     public IntStream ints() {
         return StreamSupport.intStream
                 (new RandomIntsSpliterator
-                         (this, 0L, Long.MAX_VALUE, Integer.MAX_VALUE, 0),
-                 false);
+                         (this, 0L, Long.MAX_VALUE, Integer.MAX_VALUE, 0));
     }
 
     /**
@@ -685,8 +668,7 @@ class Random implements java.io.Serializable {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.intStream
                 (new RandomIntsSpliterator
-                         (this, 0L, streamSize, randomNumberOrigin, randomNumberBound),
-                 false);
+                         (this, 0L, streamSize, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -727,8 +709,7 @@ class Random implements java.io.Serializable {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.intStream
                 (new RandomIntsSpliterator
-                         (this, 0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound),
-                 false);
+                         (this, 0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -749,8 +730,7 @@ class Random implements java.io.Serializable {
             throw new IllegalArgumentException(BadSize);
         return StreamSupport.longStream
                 (new RandomLongsSpliterator
-                         (this, 0L, streamSize, Long.MAX_VALUE, 0L),
-                 false);
+                         (this, 0L, streamSize, Long.MAX_VALUE, 0L));
     }
 
     /**
@@ -769,8 +749,7 @@ class Random implements java.io.Serializable {
     public LongStream longs() {
         return StreamSupport.longStream
                 (new RandomLongsSpliterator
-                         (this, 0L, Long.MAX_VALUE, Long.MAX_VALUE, 0L),
-                 false);
+                         (this, 0L, Long.MAX_VALUE, Long.MAX_VALUE, 0L));
     }
 
     /**
@@ -818,8 +797,7 @@ class Random implements java.io.Serializable {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.longStream
                 (new RandomLongsSpliterator
-                         (this, 0L, streamSize, randomNumberOrigin, randomNumberBound),
-                 false);
+                         (this, 0L, streamSize, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -865,8 +843,7 @@ class Random implements java.io.Serializable {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.longStream
                 (new RandomLongsSpliterator
-                         (this, 0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound),
-                 false);
+                         (this, 0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -888,8 +865,7 @@ class Random implements java.io.Serializable {
             throw new IllegalArgumentException(BadSize);
         return StreamSupport.doubleStream
                 (new RandomDoublesSpliterator
-                         (this, 0L, streamSize, Double.MAX_VALUE, 0.0),
-                 false);
+                         (this, 0L, streamSize, Double.MAX_VALUE, 0.0));
     }
 
     /**
@@ -909,8 +885,7 @@ class Random implements java.io.Serializable {
     public DoubleStream doubles() {
         return StreamSupport.doubleStream
                 (new RandomDoublesSpliterator
-                         (this, 0L, Long.MAX_VALUE, Double.MAX_VALUE, 0.0),
-                 false);
+                         (this, 0L, Long.MAX_VALUE, Double.MAX_VALUE, 0.0));
     }
 
     /**
@@ -948,8 +923,7 @@ class Random implements java.io.Serializable {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.doubleStream
                 (new RandomDoublesSpliterator
-                         (this, 0L, streamSize, randomNumberOrigin, randomNumberBound),
-                 false);
+                         (this, 0L, streamSize, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -984,8 +958,7 @@ class Random implements java.io.Serializable {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.doubleStream
                 (new RandomDoublesSpliterator
-                         (this, 0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound),
-                 false);
+                         (this, 0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -1157,60 +1130,6 @@ class Random implements java.io.Serializable {
                 } while (++i < f);
             }
         }
-    }
-
-    /**
-     * Serializable fields for Random.
-     *
-     * @serialField    seed long
-     *              seed for random computations
-     * @serialField    nextNextGaussian double
-     *              next Gaussian to be returned
-     * @serialField      haveNextNextGaussian boolean
-     *              nextNextGaussian is valid
-     */
-    private static final ObjectStreamField[] serialPersistentFields = {
-        new ObjectStreamField("seed", Long.TYPE),
-        new ObjectStreamField("nextNextGaussian", Double.TYPE),
-        new ObjectStreamField("haveNextNextGaussian", Boolean.TYPE)
-    };
-
-    /**
-     * Reconstitute the {@code Random} instance from a stream (that is,
-     * deserialize it).
-     */
-    private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
-
-        ObjectInputStream.GetField fields = s.readFields();
-
-        // The seed is read in as {@code long} for
-        // historical reasons, but it is converted to an AtomicLong.
-        long seedVal = fields.get("seed", -1L);
-        if (seedVal < 0)
-          throw new java.io.StreamCorruptedException(
-                              "Random: invalid seed");
-        resetSeed(seedVal);
-        nextNextGaussian = fields.get("nextNextGaussian", 0.0);
-        haveNextNextGaussian = fields.get("haveNextNextGaussian", false);
-    }
-
-    /**
-     * Save the {@code Random} instance to a stream.
-     */
-    synchronized private void writeObject(ObjectOutputStream s)
-        throws IOException {
-
-        // set the values of the Serializable fields
-        ObjectOutputStream.PutField fields = s.putFields();
-
-        // The seed is serialized as a long for historical reasons.
-        fields.put("seed", seed.get());
-        fields.put("nextNextGaussian", nextNextGaussian);
-        fields.put("haveNextNextGaussian", haveNextNextGaussian);
-
-        // save them
-        s.writeFields();
     }
 
     // Support for resetting seed while deserializing

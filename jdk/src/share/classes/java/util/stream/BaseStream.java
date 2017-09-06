@@ -25,12 +25,10 @@
 package java.util.stream;
 
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Spliterator;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.IntConsumer;
 import java.util.function.Predicate;
 
@@ -84,15 +82,6 @@ public interface BaseStream<T, S extends BaseStream<T, S>>
     Spliterator<T> spliterator();
 
     /**
-     * Returns whether this stream, if a terminal operation were to be executed,
-     * would execute in parallel.  Calling this method after invoking an
-     * terminal stream operation method may yield unpredictable results.
-     *
-     * @return {@code true} if this stream would execute in parallel if executed
-     */
-    boolean isParallel();
-
-    /**
      * Returns an equivalent stream that is sequential.  May return
      * itself, either because the stream was already sequential, or because
      * the underlying stream state was modified to be sequential.
@@ -103,18 +92,6 @@ public interface BaseStream<T, S extends BaseStream<T, S>>
      * @return a sequential stream
      */
     S sequential();
-
-    /**
-     * Returns an equivalent stream that is parallel.  May return
-     * itself, either because the stream was already parallel, or because
-     * the underlying stream state was modified to be parallel.
-     *
-     * <p>This is an <a href="package-summary.html#StreamOps">intermediate
-     * operation</a>.
-     *
-     * @return a parallel stream
-     */
-    S parallel();
 
     /**
      * Returns an equivalent stream that is

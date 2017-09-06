@@ -28,7 +28,6 @@ package sun.net.www.protocol.file;
 import java.net.InetAddress;
 import java.net.URLConnection;
 import java.net.URL;
-import java.net.Proxy;
 import java.net.MalformedURLException;
 import java.net.URLStreamHandler;
 import java.io.InputStream;
@@ -68,11 +67,6 @@ public class Handler extends URLStreamHandler {
     }
 
     public synchronized URLConnection openConnection(URL u)
-        throws IOException {
-        return openConnection(u, null);
-    }
-
-    public synchronized URLConnection openConnection(URL u, Proxy p)
            throws IOException {
         String host = u.getHost();
         if (host == null || host.equals("") || host.equals("~") ||
@@ -90,11 +84,7 @@ public class Handler extends URLStreamHandler {
         try {
             ru = new URL("ftp", host, u.getFile() +
                              (u.getRef() == null ? "": "#" + u.getRef()));
-            if (p != null) {
-                uc = ru.openConnection(p);
-            } else {
-                uc = ru.openConnection();
-            }
+            uc = ru.openConnection();
         } catch (IOException e) {
             uc = null;
         }

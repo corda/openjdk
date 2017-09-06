@@ -71,20 +71,4 @@ public class UncheckedIOException extends RuntimeException {
     public IOException getCause() {
         return (IOException) super.getCause();
     }
-
-    /**
-     * Called to read the object from a stream.
-     *
-     * @throws  InvalidObjectException
-     *          if the object is invalid or has a cause that is not
-     *          an {@code IOException}
-     */
-    private void readObject(ObjectInputStream s)
-        throws IOException, ClassNotFoundException
-    {
-        s.defaultReadObject();
-        Throwable cause = super.getCause();
-        if (!(cause instanceof IOException))
-            throw new InvalidObjectException("Cause must be an IOException");
-    }
 }

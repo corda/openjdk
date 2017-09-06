@@ -133,11 +133,7 @@ implements java.io.Serializable {
      */
     @Override
     public byte[] engineGenerateSeed(int numBytes) {
-        // Neither of the SeedGenerator implementations require
-        // locking, so no sync needed here.
-        byte[] b = new byte[numBytes];
-        SeedGenerator.generateSeed(b);
-        return b;
+        throw new UnsupportedOperationException("Seed generation disabled");
     }
 
     /**
@@ -184,28 +180,6 @@ implements java.io.Serializable {
     }
 
     /**
-     * This static object will be seeded by SeedGenerator, and used
-     * to seed future instances of SHA1PRNG SecureRandoms.
-     *
-     * Bloch, Effective Java Second Edition: Item 71
-     */
-    private static class SeederHolder {
-
-        private static final SecureRandom seeder;
-
-        static {
-            /*
-             * Call to SeedGenerator.generateSeed() to add additional
-             * seed material (likely from the Native implementation).
-             */
-            seeder = new SecureRandom(SeedGenerator.getSystemEntropy());
-            byte [] b = new byte[DIGEST_SIZE];
-            SeedGenerator.generateSeed(b);
-            seeder.engineSetSeed(b);
-        }
-    }
-
-    /**
      * Generates a user-specified number of random bytes.
      *
      * @param bytes the array to be filled in with random bytes.
@@ -217,9 +191,7 @@ implements java.io.Serializable {
         byte[] output = remainder;
 
         if (state == null) {
-            byte[] seed = new byte[DIGEST_SIZE];
-            SeederHolder.seeder.engineNextBytes(seed);
-            state = digest.digest(seed);
+            throw new UnsupportedOperationException("Seed generation disabled");
         }
 
         // Use remainder from last time
@@ -258,37 +230,5 @@ implements java.io.Serializable {
         // Store remainder for next time
         remainder = output;
         remCount %= DIGEST_SIZE;
-    }
-
-    /*
-     * readObject is called to restore the state of the random object from
-     * a stream.  We have to create a new instance of MessageDigest, because
-     * it is not included in the stream (it is marked "transient").
-     *
-     * Note that the engineNextBytes() method invoked on the restored random
-     * object will yield the exact same (random) bytes as the original.
-     * If you do not want this behaviour, you should re-seed the restored
-     * random object, using engineSetSeed().
-     */
-    private void readObject(java.io.ObjectInputStream s)
-        throws IOException, ClassNotFoundException {
-
-        s.defaultReadObject ();
-
-        try {
-            /*
-             * Use the local SUN implementation to avoid native
-             * performance overhead.
-             */
-            digest = MessageDigest.getInstance("SHA", "SUN");
-        } catch (NoSuchProviderException | NoSuchAlgorithmException e) {
-            // Fallback to any available.
-            try {
-                digest = MessageDigest.getInstance("SHA");
-            } catch (NoSuchAlgorithmException exc) {
-                throw new InternalError(
-                    "internal error: SHA-1 not available.", exc);
-            }
-        }
     }
 }

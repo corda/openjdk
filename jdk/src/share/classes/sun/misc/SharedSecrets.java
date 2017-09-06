@@ -25,11 +25,8 @@
 
 package sun.misc;
 
-import java.io.ObjectInputStream;
 import java.util.jar.JarFile;
-import java.io.Console;
 import java.io.FileDescriptor;
-import java.io.ObjectInputStream;
 import java.security.ProtectionDomain;
 
 import java.security.AccessController;
@@ -48,17 +45,12 @@ public class SharedSecrets {
     private static JavaUtilJarAccess javaUtilJarAccess;
     private static JavaLangAccess javaLangAccess;
     private static JavaLangRefAccess javaLangRefAccess;
-    private static JavaIOAccess javaIOAccess;
     private static JavaNetAccess javaNetAccess;
-    private static JavaNetHttpCookieAccess javaNetHttpCookieAccess;
     private static JavaNioAccess javaNioAccess;
     private static JavaIOFileDescriptorAccess javaIOFileDescriptorAccess;
     private static JavaSecurityProtectionDomainAccess javaSecurityProtectionDomainAccess;
     private static JavaSecurityAccess javaSecurityAccess;
     private static JavaUtilZipFileAccess javaUtilZipFileAccess;
-    private static JavaAWTAccess javaAWTAccess;
-    private static JavaOISAccess javaOISAccess;
-    private static JavaObjectInputStreamAccess javaObjectInputStreamAccess;
 
     public static JavaUtilJarAccess javaUtilJarAccess() {
         if (javaUtilJarAccess == null) {
@@ -97,16 +89,6 @@ public class SharedSecrets {
         return javaNetAccess;
     }
 
-    public static void setJavaNetHttpCookieAccess(JavaNetHttpCookieAccess a) {
-        javaNetHttpCookieAccess = a;
-    }
-
-    public static JavaNetHttpCookieAccess getJavaNetHttpCookieAccess() {
-        if (javaNetHttpCookieAccess == null)
-            unsafe.ensureClassInitialized(java.net.HttpCookie.class);
-        return javaNetHttpCookieAccess;
-    }
-
     public static void setJavaNioAccess(JavaNioAccess jna) {
         javaNioAccess = jna;
     }
@@ -121,17 +103,6 @@ public class SharedSecrets {
         return javaNioAccess;
     }
 
-    public static void setJavaIOAccess(JavaIOAccess jia) {
-        javaIOAccess = jia;
-    }
-
-    public static JavaIOAccess getJavaIOAccess() {
-        if (javaIOAccess == null) {
-            unsafe.ensureClassInitialized(Console.class);
-        }
-        return javaIOAccess;
-    }
-
     public static void setJavaIOFileDescriptorAccess(JavaIOFileDescriptorAccess jiofda) {
         javaIOFileDescriptorAccess = jiofda;
     }
@@ -142,18 +113,6 @@ public class SharedSecrets {
 
         return javaIOFileDescriptorAccess;
     }
-
-    public static void setJavaOISAccess(JavaOISAccess access) {
-        javaOISAccess = access;
-    }
-
-    public static JavaOISAccess getJavaOISAccess() {
-        if (javaOISAccess == null)
-            unsafe.ensureClassInitialized(ObjectInputStream.class);
-
-        return javaOISAccess;
-    }
-
 
     public static void setJavaSecurityProtectionDomainAccess
         (JavaSecurityProtectionDomainAccess jspda) {
@@ -186,29 +145,5 @@ public class SharedSecrets {
 
     public static void setJavaUtilZipFileAccess(JavaUtilZipFileAccess access) {
         javaUtilZipFileAccess = access;
-    }
-
-    public static void setJavaAWTAccess(JavaAWTAccess jaa) {
-        javaAWTAccess = jaa;
-    }
-
-    public static JavaAWTAccess getJavaAWTAccess() {
-        // this may return null in which case calling code needs to
-        // provision for.
-        if (javaAWTAccess == null) {
-            return null;
-        }
-        return javaAWTAccess;
-    }
-
-    public static JavaObjectInputStreamAccess getJavaObjectInputStreamAccess() {
-        if (javaObjectInputStreamAccess == null) {
-            unsafe.ensureClassInitialized(ObjectInputStream.class);
-        }
-        return javaObjectInputStreamAccess;
-    }
-
-    public static void setJavaObjectInputStreamAccess(JavaObjectInputStreamAccess access) {
-        javaObjectInputStreamAccess = access;
     }
 }

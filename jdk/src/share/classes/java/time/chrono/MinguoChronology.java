@@ -60,7 +60,6 @@ import java.io.InvalidObjectException;
 import static java.time.temporal.ChronoField.PROLEPTIC_MONTH;
 import static java.time.temporal.ChronoField.YEAR;
 
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.Clock;
 import java.time.DateTimeException;
@@ -236,17 +235,17 @@ public final class MinguoChronology extends AbstractChronology implements Serial
 
     @Override
     public MinguoDate dateNow() {
-        return dateNow(Clock.systemDefaultZone());
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     @Override
     public MinguoDate dateNow(ZoneId zone) {
-        return dateNow(Clock.system(zone));
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     @Override
     public MinguoDate dateNow(Clock clock) {
-        return date(LocalDate.now(clock));
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     @Override
@@ -350,15 +349,5 @@ public final class MinguoChronology extends AbstractChronology implements Serial
     @Override
     Object writeReplace() {
         return super.writeReplace();
-    }
-
-    /**
-     * Defend against malicious streams.
-     *
-     * @param s the stream to read
-     * @throws InvalidObjectException always
-     */
-    private void readObject(ObjectInputStream s) throws InvalidObjectException {
-        throw new InvalidObjectException("Deserialization via serialization delegate");
     }
 }

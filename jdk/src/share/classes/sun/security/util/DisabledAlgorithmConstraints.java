@@ -57,7 +57,6 @@ import java.util.regex.Matcher;
  * for the syntax of the disabled algorithm string.
  */
 public class DisabledAlgorithmConstraints extends AbstractAlgorithmConstraints {
-    private static final Debug debug = Debug.getInstance("certpath");
 
     // the known security property, jdk.certpath.disabledAlgorithms
     public static final String PROPERTY_CERTPATH_DISABLED_ALGS =
@@ -228,9 +227,6 @@ public class DisabledAlgorithmConstraints extends AbstractAlgorithmConstraints {
                 }
 
                 constraintEntry = constraintEntry.trim();
-                if (debug != null) {
-                    debug.println("Constraints: " + constraintEntry);
-                }
 
                 // Check if constraint is a complete disabling of an
                 // algorithm or has conditions.
@@ -262,10 +258,6 @@ public class DisabledAlgorithmConstraints extends AbstractAlgorithmConstraints {
 
                     Matcher matcher;
                     if (entry.startsWith("keySize")) {
-                        if (debug != null) {
-                            debug.println("Constraints set to keySize: " +
-                                    entry);
-                        }
                         StringTokenizer tokens = new StringTokenizer(entry);
                         if (!"keySize".equals(tokens.nextToken())) {
                             throw new IllegalArgumentException("Error in " +
@@ -277,9 +269,6 @@ public class DisabledAlgorithmConstraints extends AbstractAlgorithmConstraints {
                                 Integer.parseInt(tokens.nextToken()));
 
                     } else if (entry.equalsIgnoreCase("jdkCA")) {
-                        if (debug != null) {
-                            debug.println("Constraints set to jdkCA.");
-                        }
                         if (jdkCALimit) {
                             throw new IllegalArgumentException("Only one " +
                                     "jdkCA entry allowed in property. " +
@@ -291,9 +280,6 @@ public class DisabledAlgorithmConstraints extends AbstractAlgorithmConstraints {
                     } else if (entry.startsWith("denyAfter") &&
                             (matcher = Holder.DENY_AFTER_PATTERN.matcher(entry))
                                     .matches()) {
-                        if (debug != null) {
-                            debug.println("Constraints set to denyAfter");
-                        }
                         if (denyAfterLimit) {
                             throw new IllegalArgumentException("Only one " +
                                     "denyAfter entry allowed in property. " +
@@ -308,9 +294,6 @@ public class DisabledAlgorithmConstraints extends AbstractAlgorithmConstraints {
                     } else if (entry.startsWith("usage")) {
                         String s[] = (entry.substring(5)).trim().split(" ");
                         c = new UsageConstraint(algorithm, s);
-                        if (debug != null) {
-                            debug.println("Constraints usage length is " + s.length);
-                        }
                     } else {
                         throw new IllegalArgumentException("Error in security" +
                                 " property. Constraint unknown: " + entry);
@@ -341,10 +324,6 @@ public class DisabledAlgorithmConstraints extends AbstractAlgorithmConstraints {
             }
             for (Constraint constraint : list) {
                 if (!constraint.permits(key)) {
-                    if (debug != null) {
-                        debug.println("keySizeConstraint: failed key " +
-                                "constraint check " + KeyUtil.getKeySize(key));
-                    }
                     return false;
                 }
             }
@@ -355,11 +334,6 @@ public class DisabledAlgorithmConstraints extends AbstractAlgorithmConstraints {
         public void permits(String algorithm, ConstraintsParameters cp)
                 throws CertPathValidatorException {
             X509Certificate cert = cp.getCertificate();
-
-            if (debug != null) {
-                debug.println("Constraints.permits(): " + algorithm +
-                        " Variant: " + cp.getVariant());
-            }
 
             // Get all signature algorithms to check for constraints
             Set<String> algorithms = new HashSet<>();
@@ -530,10 +504,6 @@ public class DisabledAlgorithmConstraints extends AbstractAlgorithmConstraints {
          */
         public void permits(ConstraintsParameters cp)
                 throws CertPathValidatorException {
-            if (debug != null) {
-                debug.println("jdkCAConstraints.permits(): " + algorithm);
-            }
-
             // Check chain has a trust anchor in cacerts
             if (cp.isTrustedMatch()) {
                 if (next(cp)) {
@@ -561,11 +531,6 @@ public class DisabledAlgorithmConstraints extends AbstractAlgorithmConstraints {
 
              algorithm = algo;
 
-             if (debug != null) {
-                 debug.println("DenyAfterConstraint read in as:  year " +
-                         year + ", month = " + month + ", day = " + day);
-             }
-
              c = new Calendar.Builder().setTimeZone(TimeZone.getTimeZone("GMT"))
                      .setDate(year, month - 1, day).build();
 
@@ -586,10 +551,6 @@ public class DisabledAlgorithmConstraints extends AbstractAlgorithmConstraints {
              }
 
              denyAfterDate = c.getTime();
-             if (debug != null) {
-                 debug.println("DenyAfterConstraint date set to: " +
-                         dateFormat.format(denyAfterDate));
-             }
          }
 
          /*
@@ -638,10 +599,6 @@ public class DisabledAlgorithmConstraints extends AbstractAlgorithmConstraints {
              if (next(key)) {
                  return true;
              }
-             if (debug != null) {
-                 debug.println("DenyAfterConstraints.permits(): " + algorithm);
-             }
-
              return denyAfterDate.after(new Date());
          }
      }
@@ -671,16 +628,6 @@ public class DisabledAlgorithmConstraints extends AbstractAlgorithmConstraints {
                     v = Validator.VAR_PLUGIN_CODE_SIGNING;
                 }
 
-                if (debug != null) {
-                    debug.println("Checking if usage constraint \"" + v +
-                            "\" matches \"" + cp.getVariant() + "\"");
-                    // Because usage checking can come from many places
-                    // a stack trace is very helpful.
-                    ByteArrayOutputStream ba = new ByteArrayOutputStream();
-                    PrintStream ps = new PrintStream(ba);
-                    (new Exception()).printStackTrace(ps);
-                    debug.println(ba.toString());
-                }
                 if (cp.getVariant().compareTo(v) == 0) {
                     if (next(cp)) {
                         return;
@@ -776,10 +723,6 @@ public class DisabledAlgorithmConstraints extends AbstractAlgorithmConstraints {
             if (nextConstraint != null && nextConstraint.permits(key)) {
                 return true;
             }
-            if (debug != null) {
-                debug.println("KeySizeConstraints.permits(): " + algorithm);
-            }
-
             return permitsImpl(key);
         }
 

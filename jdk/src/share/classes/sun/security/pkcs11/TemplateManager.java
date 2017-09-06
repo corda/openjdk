@@ -54,8 +54,6 @@ import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
  */
 final class TemplateManager {
 
-    private final static boolean DEBUG = false;
-
     // constant for any operation (either O_IMPORT or O_GENERATE)
     final static String O_ANY      = "*";
     // constant for operation create ("importing" existing key material)
@@ -94,9 +92,6 @@ final class TemplateManager {
             CK_ATTRIBUTE[] attrs) {
         TemplateKey key = new TemplateKey(op, objectClass, keyAlgorithm);
         Template template = new Template(attrs);
-        if (DEBUG) {
-            System.out.println("Adding " + key + " -> " + template);
-        }
         primitiveTemplates.add(new KeyAndTemplate(key, template));
     }
 
@@ -117,9 +112,6 @@ final class TemplateManager {
         TemplateKey key = new TemplateKey(op, type, alg);
         Template template = getTemplate(key);
         CK_ATTRIBUTE[] newAttrs = template.getAttributes(attrs);
-        if (DEBUG) {
-            System.out.println(key + " -> " + Arrays.asList(newAttrs));
-        }
         return newAttrs;
     }
 

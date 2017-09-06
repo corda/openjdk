@@ -222,9 +222,6 @@ public class LoginContext {
     private LoginException firstRequiredError = null;
     private boolean success = false;
 
-    private static final sun.security.util.Debug debug =
-        sun.security.util.Debug.getInstance("logincontext", "\t[LoginContext]");
-
     private void init(String name) throws LoginException {
 
         SecurityManager sm = System.getSecurityManager();
@@ -765,18 +762,9 @@ public class LoginContext {
 
                         // clear state
                         clearState();
-
-                        if (debug != null)
-                            debug.println(methodName + " SUFFICIENT success");
                         return;
                     }
-
-                    if (debug != null)
-                        debug.println(methodName + " success");
                     success = true;
-                } else {
-                    if (debug != null)
-                        debug.println(methodName + " ignored");
                 }
 
             } catch (NoSuchMethodException nsme) {
@@ -839,13 +827,6 @@ public class LoginContext {
 
                     le = new LoginException("Security Exception");
                     le.initCause(new SecurityException());
-                    if (debug != null) {
-                        debug.println
-                            ("original security exception with detail msg " +
-                            "replaced by new exception with empty detail msg");
-                        debug.println("original security exception: " +
-                                ite.getCause().toString());
-                    }
                 } else {
 
                     // capture an unexpected LoginModule exception
@@ -859,9 +840,6 @@ public class LoginContext {
                 if (moduleStack[i].entry.getControlFlag() ==
                     AppConfigurationEntry.LoginModuleControlFlag.REQUISITE) {
 
-                    if (debug != null)
-                        debug.println(methodName + " REQUISITE failure");
-
                     // if REQUISITE, then immediately throw an exception
                     if (methodName.equals(ABORT_METHOD) ||
                         methodName.equals(LOGOUT_METHOD)) {
@@ -874,18 +852,11 @@ public class LoginContext {
                 } else if (moduleStack[i].entry.getControlFlag() ==
                     AppConfigurationEntry.LoginModuleControlFlag.REQUIRED) {
 
-                    if (debug != null)
-                        debug.println(methodName + " REQUIRED failure");
-
                     // mark down that a REQUIRED module failed
                     if (firstRequiredError == null)
                         firstRequiredError = le;
 
                 } else {
-
-                    if (debug != null)
-                        debug.println(methodName + " OPTIONAL failure");
-
                     // mark down that an OPTIONAL module failed
                     if (firstError == null)
                         firstError = le;

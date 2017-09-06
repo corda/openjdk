@@ -32,8 +32,6 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateException;
 import java.util.*;
 
-import sun.security.util.Debug;
-
 /**
  * This class delegates to a primary or secondary keystore implementation.
  *
@@ -43,7 +41,6 @@ import sun.security.util.Debug;
 class KeyStoreDelegator extends KeyStoreSpi {
 
     private static final String KEYSTORE_TYPE_COMPAT = "keystore.type.compat";
-    private static final Debug debug = Debug.getInstance("keystore");
 
     private final String primaryType;   // the primary keystore's type
     private final String secondaryType; // the secondary keystore's type
@@ -82,11 +79,6 @@ class KeyStoreDelegator extends KeyStoreSpi {
             this.secondaryType = null;
             this.primaryKeyStore = primaryKeyStore;
             this.secondaryKeyStore = null;
-
-            if (debug != null) {
-                debug.println("WARNING: compatibility mode disabled for " +
-                    primaryType + " and " + secondaryType + " keystore types");
-            }
         }
     }
 
@@ -189,9 +181,6 @@ class KeyStoreDelegator extends KeyStoreSpi {
     public void engineStore(OutputStream stream, char[] password)
         throws IOException, NoSuchAlgorithmException, CertificateException {
 
-        if (debug != null) {
-            debug.println("Storing keystore in " + type + " format");
-        }
         keystore.engineStore(stream, password);
     }
 
@@ -209,9 +198,6 @@ class KeyStoreDelegator extends KeyStoreSpi {
             }
             type = primaryType;
 
-            if (debug != null && stream == null) {
-                debug.println("Creating a new keystore in " + type + " format");
-            }
             keystore.engineLoad(stream, password);
 
         } else {
@@ -236,14 +222,6 @@ class KeyStoreDelegator extends KeyStoreSpi {
                     type = secondaryType;
                     bufferedStream.reset();
                     keystore.engineLoad(bufferedStream, password);
-
-                    if (debug != null) {
-                        debug.println("WARNING: switching from " +
-                          primaryType + " to " + secondaryType +
-                          " keystore file format has altered the " +
-                          "keystore security level");
-                    }
-
                 } catch (InstantiationException |
                     IllegalAccessException e2) {
                     // can safely ignore
@@ -267,10 +245,6 @@ class KeyStoreDelegator extends KeyStoreSpi {
                         throw (NoSuchAlgorithmException)e;
                     }
                 }
-            }
-
-            if (debug != null) {
-                debug.println("Loaded a keystore in " + type + " format");
             }
         }
     }

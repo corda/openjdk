@@ -69,7 +69,6 @@ import static java.time.temporal.ChronoField.PROLEPTIC_MONTH;
 import static java.time.temporal.ChronoField.YEAR;
 import static java.time.temporal.ChronoField.YEAR_OF_ERA;
 
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.Clock;
 import java.time.DateTimeException;
@@ -321,7 +320,7 @@ public final class IsoChronology extends AbstractChronology implements Serializa
      */
     @Override  // override with covariant return type
     public LocalDate dateNow() {
-        return dateNow(Clock.systemDefaultZone());
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     /**
@@ -338,7 +337,7 @@ public final class IsoChronology extends AbstractChronology implements Serializa
      */
     @Override  // override with covariant return type
     public LocalDate dateNow(ZoneId zone) {
-        return dateNow(Clock.system(zone));
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     /**
@@ -354,8 +353,7 @@ public final class IsoChronology extends AbstractChronology implements Serializa
      */
     @Override  // override with covariant return type
     public LocalDate dateNow(Clock clock) {
-        Objects.requireNonNull(clock, "clock");
-        return date(LocalDate.now(clock));
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     //-----------------------------------------------------------------------
@@ -599,15 +597,5 @@ public final class IsoChronology extends AbstractChronology implements Serializa
     @Override
     Object writeReplace() {
         return super.writeReplace();
-    }
-
-    /**
-     * Defend against malicious streams.
-     *
-     * @param s the stream to read
-     * @throws InvalidObjectException always
-     */
-    private void readObject(ObjectInputStream s) throws InvalidObjectException {
-        throw new InvalidObjectException("Deserialization via serialization delegate");
     }
 }

@@ -755,94 +755,6 @@ CounterGet()
     return (tv.tv_sec * 1000) + tv.tv_usec;
 }
 
-
-/* --- Splash Screen shared library support --- */
-
-static JavaVM* SetJavaVMValue()
-{
-    JavaVM * jvm = NULL;
-
-    // The handle is good for both the launcher and the libosxapp.dylib
-    void * handle = dlopen(NULL, RTLD_LAZY | RTLD_GLOBAL);
-    if (handle) {
-        typedef JavaVM* (*JLI_GetJavaVMInstance_t)();
-
-        JLI_GetJavaVMInstance_t JLI_GetJavaVMInstance =
-            (JLI_GetJavaVMInstance_t)dlsym(handle,
-                    "JLI_GetJavaVMInstance");
-        if (JLI_GetJavaVMInstance) {
-            jvm = JLI_GetJavaVMInstance();
-        }
-
-        if (jvm) {
-            typedef void (*OSXAPP_SetJavaVM_t)(JavaVM*);
-
-            OSXAPP_SetJavaVM_t OSXAPP_SetJavaVM =
-                (OSXAPP_SetJavaVM_t)dlsym(handle, "OSXAPP_SetJavaVM");
-            if (OSXAPP_SetJavaVM) {
-                OSXAPP_SetJavaVM(jvm);
-            } else {
-                jvm = NULL;
-            }
-        }
-
-        dlclose(handle);
-    }
-
-    return jvm;
-}
-
-static const char* SPLASHSCREEN_SO = JNI_LIB_NAME("splashscreen");
-
-static void* hSplashLib = NULL;
-
-void* SplashProcAddress(const char* name) {
-    if (!hSplashLib) {
-        char jrePath[PATH_MAX];
-        if (!GetJREPath(jrePath, sizeof(jrePath), GetArch(), JNI_FALSE)) {
-            JLI_ReportErrorMessage(JRE_ERROR1);
-            return NULL;
-        }
-
-        char splashPath[PATH_MAX];
-        const int ret = JLI_Snprintf(splashPath, sizeof(splashPath),
-                "%s/lib/%s", jrePath, SPLASHSCREEN_SO);
-        if (ret >= (int)sizeof(splashPath)) {
-            JLI_ReportErrorMessage(JRE_ERROR11);
-            return NULL;
-        }
-        if (ret < 0) {
-            JLI_ReportErrorMessage(JRE_ERROR13);
-            return NULL;
-        }
-
-        hSplashLib = dlopen(splashPath, RTLD_LAZY | RTLD_GLOBAL);
-        // It's OK if dlopen() fails. The splash screen library binary file
-        // might have been stripped out from the JRE image to reduce its size
-        // (e.g. on embedded platforms).
-
-        if (hSplashLib) {
-            if (!SetJavaVMValue()) {
-                dlclose(hSplashLib);
-                hSplashLib = NULL;
-            }
-        }
-    }
-    if (hSplashLib) {
-        void* sym = dlsym(hSplashLib, name);
-        return sym;
-    } else {
-        return NULL;
-    }
-}
-
-void SplashFreeLibrary() {
-    if (hSplashLib) {
-        dlclose(hSplashLib);
-        hSplashLib = NULL;
-    }
-}
-
 /*
  * Block current thread and continue execution in a new thread
  */
@@ -1049,7 +961,6 @@ void PostJVMInit(JNIEnv *env, jstring mainClass, JavaVM *vm) {
     jvmInstance = vm;
     SetMainClassForAWT(env, mainClass);
     CHECK_EXCEPTION_RETURN();
-    ShowSplashScreen();
 }
 
 jboolean

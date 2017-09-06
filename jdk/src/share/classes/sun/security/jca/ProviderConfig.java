@@ -42,9 +42,6 @@ import sun.security.util.PropertyExpander;
  */
 final class ProviderConfig {
 
-    private final static sun.security.util.Debug debug =
-        sun.security.util.Debug.getInstance("jca", "ProviderConfig");
-
     // classname of the SunPKCS11-Solaris provider
     private static final String P11_SOL_NAME =
         "sun.security.pkcs11.SunPKCS11";
@@ -175,10 +172,6 @@ final class ProviderConfig {
         if (isLoading) {
             // because this method is synchronized, this can only
             // happen if there is recursion.
-            if (debug != null) {
-                debug.println("Recursion loading provider: " + this);
-                new Exception("Call trace").printStackTrace();
-            }
             return null;
         }
         try {
@@ -205,9 +198,6 @@ final class ProviderConfig {
     private Provider doLoadProvider() {
         return AccessController.doPrivileged(new PrivilegedAction<Provider>() {
             public Provider run() {
-                if (debug != null) {
-                    debug.println("Loading provider: " + ProviderConfig.this);
-                }
                 try {
                     ClassLoader cl = ClassLoader.getSystemClassLoader();
                     Class<?> provClass;
@@ -224,14 +214,8 @@ final class ProviderConfig {
                         obj = cons.newInstance(argument);
                     }
                     if (obj instanceof Provider) {
-                        if (debug != null) {
-                            debug.println("Loaded provider " + obj);
-                        }
                         return (Provider)obj;
                     } else {
-                        if (debug != null) {
-                            debug.println(className + " is not a provider");
-                        }
                         disableLoad();
                         return null;
                     }
@@ -241,10 +225,6 @@ final class ProviderConfig {
                         t = ((InvocationTargetException)e).getCause();
                     } else {
                         t = e;
-                    }
-                    if (debug != null) {
-                        debug.println("Error loading provider " + ProviderConfig.this);
-                        t.printStackTrace();
                     }
                     // provider indicates fatal error, pass through exception
                     if (t instanceof ProviderException) {
@@ -258,10 +238,6 @@ final class ProviderConfig {
                 } catch (ExceptionInInitializerError err) {
                     // unexpected exception thrown from static initialization block in provider
                     // (ex: insufficient permission to initialize provider class)
-                    if (debug != null) {
-                        debug.println("Error loading provider " + ProviderConfig.this);
-                        err.printStackTrace();
-                    }
                     disableLoad();
                     return null;
                 }

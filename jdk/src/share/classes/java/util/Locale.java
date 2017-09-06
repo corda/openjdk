@@ -41,9 +41,6 @@
 package java.util;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamField;
 import java.io.Serializable;
 import java.security.AccessController;
 import java.text.MessageFormat;
@@ -2116,80 +2113,6 @@ public final class Locale implements Cloneable, Serializable {
     private static boolean isUnicodeExtensionKey(String s) {
         // 2alphanum
         return (s.length() == 2) && LocaleUtils.isAlphaNumericString(s);
-    }
-
-    /**
-     * @serialField language    String
-     *      language subtag in lower case. (See <a href="java/util/Locale.html#getLanguage()">getLanguage()</a>)
-     * @serialField country     String
-     *      country subtag in upper case. (See <a href="java/util/Locale.html#getCountry()">getCountry()</a>)
-     * @serialField variant     String
-     *      variant subtags separated by LOWLINE characters. (See <a href="java/util/Locale.html#getVariant()">getVariant()</a>)
-     * @serialField hashcode    int
-     *      deprecated, for forward compatibility only
-     * @serialField script      String
-     *      script subtag in title case (See <a href="java/util/Locale.html#getScript()">getScript()</a>)
-     * @serialField extensions  String
-     *      canonical representation of extensions, that is,
-     *      BCP47 extensions in alphabetical order followed by
-     *      BCP47 private use subtags, all in lower case letters
-     *      separated by HYPHEN-MINUS characters.
-     *      (See <a href="java/util/Locale.html#getExtensionKeys()">getExtensionKeys()</a>,
-     *      <a href="java/util/Locale.html#getExtension(char)">getExtension(char)</a>)
-     */
-    private static final ObjectStreamField[] serialPersistentFields = {
-        new ObjectStreamField("language", String.class),
-        new ObjectStreamField("country", String.class),
-        new ObjectStreamField("variant", String.class),
-        new ObjectStreamField("hashcode", int.class),
-        new ObjectStreamField("script", String.class),
-        new ObjectStreamField("extensions", String.class),
-    };
-
-    /**
-     * Serializes this <code>Locale</code> to the specified <code>ObjectOutputStream</code>.
-     * @param out the <code>ObjectOutputStream</code> to write
-     * @throws IOException
-     * @since 1.7
-     */
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        ObjectOutputStream.PutField fields = out.putFields();
-        fields.put("language", baseLocale.getLanguage());
-        fields.put("script", baseLocale.getScript());
-        fields.put("country", baseLocale.getRegion());
-        fields.put("variant", baseLocale.getVariant());
-        fields.put("extensions", localeExtensions == null ? "" : localeExtensions.getID());
-        fields.put("hashcode", -1); // place holder just for backward support
-        out.writeFields();
-    }
-
-    /**
-     * Deserializes this <code>Locale</code>.
-     * @param in the <code>ObjectInputStream</code> to read
-     * @throws IOException
-     * @throws ClassNotFoundException
-     * @throws IllformedLocaleException
-     * @since 1.7
-     */
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        ObjectInputStream.GetField fields = in.readFields();
-        String language = (String)fields.get("language", "");
-        String script = (String)fields.get("script", "");
-        String country = (String)fields.get("country", "");
-        String variant = (String)fields.get("variant", "");
-        String extStr = (String)fields.get("extensions", "");
-        baseLocale = BaseLocale.getInstance(convertOldISOCodes(language), script, country, variant);
-        if (extStr.length() > 0) {
-            try {
-                InternalLocaleBuilder bldr = new InternalLocaleBuilder();
-                bldr.setExtensions(extStr);
-                localeExtensions = bldr.getLocaleExtensions();
-            } catch (LocaleSyntaxException e) {
-                throw new IllformedLocaleException(e.getMessage());
-            }
-        } else {
-            localeExtensions = null;
-        }
     }
 
     /**

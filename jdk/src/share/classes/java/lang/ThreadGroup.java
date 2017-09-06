@@ -978,42 +978,6 @@ class ThreadGroup implements Thread.UncaughtExceptionHandler {
     }
 
     /**
-     * Prints information about this thread group to the standard
-     * output. This method is useful only for debugging.
-     *
-     * @since   JDK1.0
-     */
-    public void list() {
-        list(System.out, 0);
-    }
-    void list(PrintStream out, int indent) {
-        int ngroupsSnapshot;
-        ThreadGroup[] groupsSnapshot;
-        synchronized (this) {
-            for (int j = 0 ; j < indent ; j++) {
-                out.print(" ");
-            }
-            out.println(this);
-            indent += 4;
-            for (int i = 0 ; i < nthreads ; i++) {
-                for (int j = 0 ; j < indent ; j++) {
-                    out.print(" ");
-                }
-                out.println(threads[i]);
-            }
-            ngroupsSnapshot = ngroups;
-            if (groups != null) {
-                groupsSnapshot = Arrays.copyOf(groups, ngroupsSnapshot);
-            } else {
-                groupsSnapshot = null;
-            }
-        }
-        for (int i = 0 ; i < ngroupsSnapshot ; i++) {
-            groupsSnapshot[i].list(out, indent);
-        }
-    }
-
-    /**
      * Called by the Java Virtual Machine when a thread in this
      * thread group stops because of an uncaught exception, and the thread
      * does not have a specific {@link Thread.UncaughtExceptionHandler}
@@ -1057,9 +1021,6 @@ class ThreadGroup implements Thread.UncaughtExceptionHandler {
             if (ueh != null) {
                 ueh.uncaughtException(t, e);
             } else if (!(e instanceof ThreadDeath)) {
-                System.err.print("Exception in thread \""
-                                 + t.getName() + "\" ");
-                e.printStackTrace(System.err);
             }
         }
     }

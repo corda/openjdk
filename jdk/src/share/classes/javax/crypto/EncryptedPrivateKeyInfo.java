@@ -270,7 +270,7 @@ public class EncryptedPrivateKeyInfo {
             } else {
                 c = Cipher.getInstance(algid.getName(), provider);
             }
-            c.init(Cipher.DECRYPT_MODE, decryptKey, algid.getParameters());
+            c.init(Cipher.DECRYPT_MODE, decryptKey, algid.getParameters(), null);
             encoded = c.doFinal(encryptedData);
             checkPKCS8Encoding(encoded);
         } catch (NoSuchAlgorithmException nsae) {

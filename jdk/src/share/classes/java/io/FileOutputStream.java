@@ -25,10 +25,6 @@
 
 package java.io;
 
-import java.nio.channels.FileChannel;
-import sun.nio.ch.FileChannelImpl;
-
-
 /**
  * A file output stream is an output stream for writing data to a
  * <code>File</code> or to a <code>FileDescriptor</code>. Whether or not
@@ -62,11 +58,6 @@ class FileOutputStream extends OutputStream
      * True if the file is opened for append.
      */
     private final boolean append;
-
-    /**
-     * The associated channel, initialized lazily.
-     */
-    private FileChannel channel;
 
     /**
      * The path of the referenced file
@@ -327,29 +318,12 @@ class FileOutputStream extends OutputStream
         writeBytes(b, off, len, append);
     }
 
-    /**
-     * Closes this file output stream and releases any system resources
-     * associated with this stream. This file output stream may no longer
-     * be used for writing bytes.
-     *
-     * <p> If this stream has an associated channel then the channel is closed
-     * as well.
-     *
-     * @exception  IOException  if an I/O error occurs.
-     *
-     * @revised 1.4
-     * @spec JSR-51
-     */
     public void close() throws IOException {
         synchronized (closeLock) {
             if (closed) {
                 return;
             }
             closed = true;
-        }
-
-        if (channel != null) {
-            channel.close();
         }
 
         fd.closeAll(new Closeable() {
@@ -375,32 +349,6 @@ class FileOutputStream extends OutputStream
         }
         throw new IOException();
      }
-
-    /**
-     * Returns the unique {@link java.nio.channels.FileChannel FileChannel}
-     * object associated with this file output stream.
-     *
-     * <p> The initial {@link java.nio.channels.FileChannel#position()
-     * position} of the returned channel will be equal to the
-     * number of bytes written to the file so far unless this stream is in
-     * append mode, in which case it will be equal to the size of the file.
-     * Writing bytes to this stream will increment the channel's position
-     * accordingly.  Changing the channel's position, either explicitly or by
-     * writing, will change this stream's file position.
-     *
-     * @return  the file channel associated with this file output stream
-     *
-     * @since 1.4
-     * @spec JSR-51
-     */
-    public FileChannel getChannel() {
-        synchronized (this) {
-            if (channel == null) {
-                channel = FileChannelImpl.open(fd, path, false, true, append, this);
-            }
-            return channel;
-        }
-    }
 
     /**
      * Cleans up the connection to the file, and ensures that the

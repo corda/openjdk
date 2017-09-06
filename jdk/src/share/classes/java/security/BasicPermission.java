@@ -30,9 +30,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Collections;
-import java.io.ObjectStreamField;
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
 import java.io.IOException;
 
 /**
@@ -253,18 +250,6 @@ public abstract class BasicPermission extends Permission
     }
 
     /**
-     * readObject is called to restore the state of the BasicPermission from
-     * a stream.
-     */
-    private void readObject(ObjectInputStream s)
-         throws IOException, ClassNotFoundException
-    {
-        s.defaultReadObject();
-        // init is called to initialize the rest of the values.
-        init(getName());
-    }
-
-    /**
      * Returns the canonical name of this BasicPermission.
      * All internal invocations of getName should invoke this method, so
      * that the pre-JDK 1.6 "exitVM" and current "exitVM.*" permission are
@@ -469,86 +454,4 @@ final class BasicPermissionCollection
     // @serial the Hashtable is indexed by the BasicPermission name
     //
     // private Hashtable permissions;
-    /**
-     * @serialField permissions java.util.Hashtable
-     *    The BasicPermissions in this BasicPermissionCollection.
-     *    All BasicPermissions in the collection must belong to the same class.
-     *    The Hashtable is indexed by the BasicPermission name; the value
-     *    of the Hashtable entry is the permission.
-     * @serialField all_allowed boolean
-     *   This is set to {@code true} if this BasicPermissionCollection
-     *   contains a BasicPermission with '*' as its permission name.
-     * @serialField permClass java.lang.Class
-     *   The class to which all BasicPermissions in this
-     *   BasicPermissionCollection belongs.
-     */
-    private static final ObjectStreamField[] serialPersistentFields = {
-        new ObjectStreamField("permissions", Hashtable.class),
-        new ObjectStreamField("all_allowed", Boolean.TYPE),
-        new ObjectStreamField("permClass", Class.class),
-    };
-
-    /**
-     * @serialData Default fields.
-     */
-    /*
-     * Writes the contents of the perms field out as a Hashtable for
-     * serialization compatibility with earlier releases. all_allowed
-     * and permClass unchanged.
-     */
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        // Don't call out.defaultWriteObject()
-
-        // Copy perms into a Hashtable
-        Hashtable<String, Permission> permissions =
-                new Hashtable<>(perms.size()*2);
-
-        synchronized (this) {
-            permissions.putAll(perms);
-        }
-
-        // Write out serializable fields
-        ObjectOutputStream.PutField pfields = out.putFields();
-        pfields.put("all_allowed", all_allowed);
-        pfields.put("permissions", permissions);
-        pfields.put("permClass", permClass);
-        out.writeFields();
-    }
-
-    /**
-     * readObject is called to restore the state of the
-     * BasicPermissionCollection from a stream.
-     */
-    private void readObject(java.io.ObjectInputStream in)
-         throws IOException, ClassNotFoundException
-    {
-        // Don't call defaultReadObject()
-
-        // Read in serialized fields
-        ObjectInputStream.GetField gfields = in.readFields();
-
-        // Get permissions
-        // writeObject writes a Hashtable<String, Permission> for the
-        // permissions key, so this cast is safe, unless the data is corrupt.
-        @SuppressWarnings("unchecked")
-        Hashtable<String, Permission> permissions =
-                (Hashtable<String, Permission>)gfields.get("permissions", null);
-        perms = new HashMap<String, Permission>(permissions.size()*2);
-        perms.putAll(permissions);
-
-        // Get all_allowed
-        all_allowed = gfields.get("all_allowed", false);
-
-        // Get permClass
-        permClass = (Class<?>) gfields.get("permClass", null);
-
-        if (permClass == null) {
-            // set permClass
-            Enumeration<Permission> e = permissions.elements();
-            if (e.hasMoreElements()) {
-                Permission p = e.nextElement();
-                permClass = p.getClass();
-            }
-        }
-    }
 }

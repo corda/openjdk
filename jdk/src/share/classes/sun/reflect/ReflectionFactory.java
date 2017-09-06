@@ -26,9 +26,6 @@
 package sun.reflect;
 
 import java.io.Externalizable;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamClass;
 import java.io.OptionalDataException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -442,7 +439,7 @@ public class ReflectionFactory {
      * @param cl a serializable classLook
      * @return {@code true} if the class has a static initializer,
      *          otherwise {@code false}
-     */
+     *
     public final boolean hasStaticInitializerForSerialization(Class<?> cl) {
         Method m = hasStaticInitializerMethod;
         if (m == null) {
@@ -462,6 +459,7 @@ public class ReflectionFactory {
             throw new InternalError("Exception invoking hasStaticInitializer", ex);
         }
     }
+     */
 
     /**
      * Returns a new OptionalDataException with {@code eof} set to {@code true}

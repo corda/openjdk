@@ -44,7 +44,6 @@
 #include "manifest_info.h"
 #include "version_comp.h"
 #include "wildcard.h"
-#include "splashscreen.h"
 
 # define KB (1024UL)
 # define MB (1024UL * KB)

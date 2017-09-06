@@ -737,31 +737,21 @@ public class SynchronousQueue<E> extends AbstractQueue<E>
          */
         Object awaitFulfill(QNode s, E e, boolean timed, long nanos) {
             /* Same idea as TransferStack.awaitFulfill */
-            final long deadline = timed ? System.nanoTime() + nanos : 0L;
             Thread w = Thread.currentThread();
             int spins = ((head.next == s) ?
-                         (timed ? maxTimedSpins : maxUntimedSpins) : 0);
+                         maxUntimedSpins : 0);
             for (;;) {
                 if (w.isInterrupted())
                     s.tryCancel(e);
                 Object x = s.item;
                 if (x != e)
                     return x;
-                if (timed) {
-                    nanos = deadline - System.nanoTime();
-                    if (nanos <= 0L) {
-                        s.tryCancel(e);
-                        continue;
-                    }
-                }
                 if (spins > 0)
                     --spins;
                 else if (s.waiter == null)
                     s.waiter = w;
-                else if (!timed)
+                else
                     LockSupport.park(this);
-                else if (nanos > spinForTimeoutThreshold)
-                    LockSupport.parkNanos(this, nanos);
             }
         }
 
@@ -1158,55 +1148,4 @@ public class SynchronousQueue<E> extends AbstractQueue<E>
     private ReentrantLock qlock;
     private WaitQueue waitingProducers;
     private WaitQueue waitingConsumers;
-
-    /**
-     * Saves this queue to a stream (that is, serializes it).
-     * @param s the stream
-     * @throws java.io.IOException if an I/O error occurs
-     */
-    private void writeObject(java.io.ObjectOutputStream s)
-        throws java.io.IOException {
-        boolean fair = transferer instanceof TransferQueue;
-        if (fair) {
-            qlock = new ReentrantLock(true);
-            waitingProducers = new FifoWaitQueue();
-            waitingConsumers = new FifoWaitQueue();
-        }
-        else {
-            qlock = new ReentrantLock();
-            waitingProducers = new LifoWaitQueue();
-            waitingConsumers = new LifoWaitQueue();
-        }
-        s.defaultWriteObject();
-    }
-
-    /**
-     * Reconstitutes this queue from a stream (that is, deserializes it).
-     * @param s the stream
-     * @throws ClassNotFoundException if the class of a serialized object
-     *         could not be found
-     * @throws java.io.IOException if an I/O error occurs
-     */
-    private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
-        s.defaultReadObject();
-        if (waitingProducers instanceof FifoWaitQueue)
-            transferer = new TransferQueue<E>();
-        else
-            transferer = new TransferStack<E>();
-    }
-
-    // Unsafe mechanics
-    static long objectFieldOffset(sun.misc.Unsafe UNSAFE,
-                                  String field, Class<?> klazz) {
-        try {
-            return UNSAFE.objectFieldOffset(klazz.getDeclaredField(field));
-        } catch (NoSuchFieldException e) {
-            // Convert Exception to corresponding Error
-            NoSuchFieldError error = new NoSuchFieldError(field);
-            error.initCause(e);
-            throw error;
-        }
-    }
-
 }

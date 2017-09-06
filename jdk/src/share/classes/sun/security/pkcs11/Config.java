@@ -93,14 +93,6 @@ final class Config {
         return configMap.remove(name);
     }
 
-    private final static boolean DEBUG = false;
-
-    private static void debug(Object o) {
-        if (DEBUG) {
-            System.out.println(o);
-        }
-    }
-
     // Reader and StringTokenizer used during parsing
     private Reader reader;
 
@@ -249,7 +241,7 @@ final class Config {
     }
 
     boolean getShowInfo() {
-        return (SunPKCS11.debug != null) || showInfo;
+        return showInfo;
     }
 
     TemplateManager getTemplateManager() {
@@ -504,7 +496,6 @@ final class Config {
 
     private int nextToken() throws IOException {
         int token = st.nextToken();
-        debug(st);
         return token;
     }
 
@@ -551,7 +542,6 @@ final class Config {
         }
         String value = st.sval;
 
-        debug(keyword + ": " + value);
         return value;
     }
 
@@ -559,7 +549,6 @@ final class Config {
         checkDup(keyword);
         parseEquals();
         boolean value = parseBoolean();
-        debug(keyword + ": " + value);
         return value;
     }
 
@@ -567,7 +556,6 @@ final class Config {
         checkDup(keyword);
         parseEquals();
         int value = decodeNumber(parseWord());
-        debug(keyword + ": " + value);
         return value;
     }
 
@@ -682,7 +670,6 @@ final class Config {
                 lib = prefix + suffix;
             }
         }
-        debug(keyword + ": " + lib);
 
         // Check to see if full path is specified to prevent the DLL
         // preloading attack
@@ -697,7 +684,6 @@ final class Config {
         checkDup(keyword);
         parseEquals();
         description = parseLine();
-        debug("description: " + description);
     }
 
     private void parseSlotID(String keyword) throws IOException {
@@ -711,7 +697,6 @@ final class Config {
         parseEquals();
         String slotString = parseWord();
         slotID = decodeNumber(slotString);
-        debug("slot: " + slotID);
     }
 
     private void parseSlotListIndex(String keyword) throws IOException {
@@ -725,7 +710,6 @@ final class Config {
         parseEquals();
         String slotString = parseWord();
         slotListIndex = decodeNumber(slotString);
-        debug("slotListIndex: " + slotListIndex);
     }
 
     private void parseEnabledMechanisms(String keyword) throws IOException {
@@ -754,14 +738,6 @@ final class Config {
             }
             long mech = parseMechanism(st.sval);
             mechs.add(Long.valueOf(mech));
-        }
-        if (DEBUG) {
-            System.out.print("mechanisms: [");
-            for (Long mech : mechs) {
-                System.out.print(Functions.getMechanismName(mech));
-                System.out.print(", ");
-            }
-            System.out.println("]");
         }
         return mechs;
     }
@@ -987,7 +963,6 @@ final class Config {
             throw excToken("Expected quoted string");
         }
         nssArgs = expand(st.sval);
-        debug("nssArgs: " + nssArgs);
     }
 
     private void parseHandleStartupErrors(String keyword) throws IOException {
@@ -1003,7 +978,6 @@ final class Config {
         } else {
             throw excToken("Invalid value for handleStartupErrors:");
         }
-        debug("handleStartupErrors: " + handleStartupErrors);
     }
 
 }

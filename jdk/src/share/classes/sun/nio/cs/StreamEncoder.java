@@ -185,15 +185,7 @@ public class StreamEncoder extends Writer
         this.cs = enc.charset();
         this.encoder = enc;
 
-        // This path disabled until direct buffers are faster
-        if (false && out instanceof FileOutputStream) {
-                ch = ((FileOutputStream)out).getChannel();
-        if (ch != null)
-                    bb = ByteBuffer.allocateDirect(DEFAULT_BYTE_BUFFER_SIZE);
-        }
-            if (ch == null) {
         bb = ByteBuffer.allocate(DEFAULT_BYTE_BUFFER_SIZE);
-        }
     }
 
     private StreamEncoder(WritableByteChannel ch, CharsetEncoder enc, int mbc) {

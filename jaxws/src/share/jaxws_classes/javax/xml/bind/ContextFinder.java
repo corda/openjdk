@@ -37,7 +37,6 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.security.AccessController;
@@ -58,24 +57,6 @@ class ContextFinder {
     private static final Logger logger;
     static {
         logger = Logger.getLogger("javax.xml.bind");
-        try {
-            if (AccessController.doPrivileged(new GetPropertyAction("jaxb.debug")) != null) {
-                // disconnect the logger from a bigger framework (if any)
-                // and take the matters into our own hands
-                logger.setUseParentHandlers(false);
-                logger.setLevel(Level.ALL);
-                ConsoleHandler handler = new ConsoleHandler();
-                handler.setLevel(Level.ALL);
-                logger.addHandler(handler);
-            } else {
-                // don't change the setting of this logger
-                // to honor what other frameworks
-                // have done on configurations.
-            }
-        } catch(Throwable t) {
-            // just to be extra safe. in particular System.getProperty may throw
-            // SecurityException.
-        }
     }
 
     /**

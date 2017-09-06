@@ -27,9 +27,7 @@ package sun.net.www.protocol.jar;
 
 import java.io.*;
 import java.net.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.jar.*;
 import java.util.zip.ZipFile;
@@ -68,7 +66,7 @@ public class URLJarFile extends JarFile {
         if (isFileURL(url))
             return new URLJarFile(url, closeController);
         else {
-            return retrieve(url, closeController);
+            throw new UnsupportedOperationException("Networking not supported");
         }
     }
 
@@ -180,63 +178,6 @@ public class URLJarFile extends JarFile {
             return true;
         } else
             return false;
-    }
-
-    /**
-     * Given a URL, retrieves a JAR file, caches it to disk, and creates a
-     * cached JAR file object.
-     */
-    private static JarFile retrieve(final URL url) throws IOException {
-        return retrieve(url, null);
-    }
-
-    /**
-     * Given a URL, retrieves a JAR file, caches it to disk, and creates a
-     * cached JAR file object.
-     */
-     private static JarFile retrieve(final URL url, final URLJarFileCloseController closeController) throws IOException {
-        /*
-         * See if interface is set, then call retrieve function of the class
-         * that implements URLJarFileCallBack interface (sun.plugin - to
-         * handle the cache failure for JARJAR file.)
-         */
-        if (callback != null)
-        {
-            return callback.retrieve(url);
-        }
-
-        else
-        {
-
-            JarFile result = null;
-
-            /* get the stream before asserting privileges */
-            try (final InputStream in = url.openConnection().getInputStream()) {
-                result = AccessController.doPrivileged(
-                    new PrivilegedExceptionAction<JarFile>() {
-                        public JarFile run() throws IOException {
-                            Path tmpFile = Files.createTempFile("jar_cache", null);
-                            try {
-                                Files.copy(in, tmpFile, StandardCopyOption.REPLACE_EXISTING);
-                                JarFile jarFile = new URLJarFile(tmpFile.toFile(), closeController);
-                                tmpFile.toFile().deleteOnExit();
-                                return jarFile;
-                            } catch (Throwable thr) {
-                                try {
-                                    Files.delete(tmpFile);
-                                } catch (IOException ioe) {
-                                    thr.addSuppressed(ioe);
-                                }
-                                throw thr;
-                            }
-                        }
-                    });
-            } catch (PrivilegedActionException pae) {
-                throw (IOException) pae.getException();
-            }
-
-            return result;
-        }
     }
 
     /*

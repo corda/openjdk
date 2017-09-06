@@ -76,7 +76,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -256,38 +255,6 @@ public final class Instant
      * This is always positive, and never exceeds 999,999,999.
      */
     private final int nanos;
-
-    //-----------------------------------------------------------------------
-    /**
-     * Obtains the current instant from the system clock.
-     * <p>
-     * This will query the {@link Clock#systemUTC() system UTC clock} to
-     * obtain the current instant.
-     * <p>
-     * Using this method will prevent the ability to use an alternate time-source for
-     * testing because the clock is effectively hard-coded.
-     *
-     * @return the current instant using the system clock, not null
-     */
-    public static Instant now() {
-        return Clock.systemUTC().instant();
-    }
-
-    /**
-     * Obtains the current instant from the specified clock.
-     * <p>
-     * This will query the specified clock to obtain the current time.
-     * <p>
-     * Using this method allows the use of an alternate clock for testing.
-     * The alternate clock may be introduced using {@link Clock dependency injection}.
-     *
-     * @param clock  the clock to use, not null
-     * @return the current instant, not null
-     */
-    public static Instant now(Clock clock) {
-        Objects.requireNonNull(clock, "clock");
-        return clock.instant();
-    }
 
     //-----------------------------------------------------------------------
     /**
@@ -1345,16 +1312,6 @@ public final class Instant
      */
     private Object writeReplace() {
         return new Ser(Ser.INSTANT_TYPE, this);
-    }
-
-    /**
-     * Defend against malicious streams.
-     *
-     * @param s the stream to read
-     * @throws InvalidObjectException always
-     */
-    private void readObject(ObjectInputStream s) throws InvalidObjectException {
-        throw new InvalidObjectException("Deserialization via serialization delegate");
     }
 
     void writeExternal(DataOutput out) throws IOException {

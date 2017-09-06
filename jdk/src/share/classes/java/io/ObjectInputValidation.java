@@ -30,6 +30,7 @@ package java.io;
  * Allows an object to be called when a complete graph of objects has
  * been deserialized.
  *
+ * @exclude Not supported.
  * @author  unascribed
  * @see     ObjectInputStream
  * @see     ObjectInputStream#registerValidation(java.io.ObjectInputValidation, int)

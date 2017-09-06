@@ -240,7 +240,6 @@ public abstract class Handler {
         try {
             errorManager.error(msg, ex, code);
         } catch (Exception ex2) {
-            System.err.println("Handler.reportError caught:");
             ex2.printStackTrace();
         }
     }

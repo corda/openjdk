@@ -28,13 +28,6 @@ package java.security;
 import java.io.*;
 import java.util.Locale;
 
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
-import java.security.spec.InvalidKeySpecException;
-
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.SecretKeySpec;
-
 /**
  * Standardized representation for serialized Key objects.
  *
@@ -140,57 +133,5 @@ public class KeyRep implements Serializable {
         this.algorithm = algorithm;
         this.format = format.toUpperCase(Locale.ENGLISH);
         this.encoded = encoded.clone();
-    }
-
-    /**
-     * Resolve the Key object.
-     *
-     * <p> This method supports three Type/format combinations:
-     * <ul>
-     * <li> Type.SECRET/"RAW" - returns a SecretKeySpec object
-     * constructed using encoded key bytes and algorithm
-     * <li> Type.PUBLIC/"X.509" - gets a KeyFactory instance for
-     * the key algorithm, constructs an X509EncodedKeySpec with the
-     * encoded key bytes, and generates a public key from the spec
-     * <li> Type.PRIVATE/"PKCS#8" - gets a KeyFactory instance for
-     * the key algorithm, constructs a PKCS8EncodedKeySpec with the
-     * encoded key bytes, and generates a private key from the spec
-     * </ul>
-     *
-     * <p>
-     *
-     * @return the resolved Key object
-     *
-     * @exception ObjectStreamException if the Type/format
-     *  combination is unrecognized, if the algorithm, key format, or
-     *  encoded key bytes are unrecognized/invalid, of if the
-     *  resolution of the key fails for any reason
-     */
-    protected Object readResolve() throws ObjectStreamException {
-        try {
-            if (type == Type.SECRET && RAW.equals(format)) {
-                return new SecretKeySpec(encoded, algorithm);
-            } else if (type == Type.PUBLIC && X509.equals(format)) {
-                KeyFactory f = KeyFactory.getInstance(algorithm);
-                return f.generatePublic(new X509EncodedKeySpec(encoded));
-            } else if (type == Type.PRIVATE && PKCS8.equals(format)) {
-                KeyFactory f = KeyFactory.getInstance(algorithm);
-                return f.generatePrivate(new PKCS8EncodedKeySpec(encoded));
-            } else {
-                throw new NotSerializableException
-                        ("unrecognized type/format combination: " +
-                        type + "/" + format);
-            }
-        } catch (NotSerializableException nse) {
-            throw nse;
-        } catch (Exception e) {
-            NotSerializableException nse = new NotSerializableException
-                                        ("java.security.Key: " +
-                                        "[" + type + "] " +
-                                        "[" + algorithm + "] " +
-                                        "[" + format + "]");
-            nse.initCause(e);
-            throw nse;
-        }
     }
 }

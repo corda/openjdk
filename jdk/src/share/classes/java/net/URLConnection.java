@@ -282,61 +282,6 @@ public abstract class URLConnection {
      */
     private MessageHeader requests;
 
-   /**
-    * @since   JDK1.1
-    */
-    private static FileNameMap fileNameMap;
-
-    /**
-     * @since 1.2.2
-     */
-    private static boolean fileNameMapLoaded = false;
-
-    /**
-     * Loads filename map (a mimetable) from a data file. It will
-     * first try to load the user-specific table, defined
-     * by &quot;content.types.user.table&quot; property. If that fails,
-     * it tries to load the default built-in table.
-     *
-     * @return the FileNameMap
-     * @since 1.2
-     * @see #setFileNameMap(java.net.FileNameMap)
-     */
-    public static synchronized FileNameMap getFileNameMap() {
-        if ((fileNameMap == null) && !fileNameMapLoaded) {
-            fileNameMap = sun.net.www.MimeTable.loadTable();
-            fileNameMapLoaded = true;
-        }
-
-        return new FileNameMap() {
-            private FileNameMap map = fileNameMap;
-            public String getContentTypeFor(String fileName) {
-                return map.getContentTypeFor(fileName);
-            }
-        };
-    }
-
-    /**
-     * Sets the FileNameMap.
-     * <p>
-     * If there is a security manager, this method first calls
-     * the security manager's {@code checkSetFactory} method
-     * to ensure the operation is allowed.
-     * This could result in a SecurityException.
-     *
-     * @param map the FileNameMap to be set
-     * @exception  SecurityException  if a security manager exists and its
-     *             {@code checkSetFactory} method doesn't allow the operation.
-     * @see        SecurityManager#checkSetFactory
-     * @see #getFileNameMap()
-     * @since 1.2
-     */
-    public static void setFileNameMap(FileNameMap map) {
-        SecurityManager sm = System.getSecurityManager();
-        if (sm != null) sm.checkSetFactory();
-        fileNameMap = map;
-    }
-
     /**
      * Opens a communications link to the resource referenced by this
      * URL, if such a connection has not already been established.
@@ -1368,21 +1313,6 @@ public abstract class URLConnection {
         }
 
         return packagePrefixList + contentClassPrefix;
-    }
-
-    /**
-     * Tries to determine the content type of an object, based
-     * on the specified "file" component of a URL.
-     * This is a convenience method that can be used by
-     * subclasses that override the {@code getContentType} method.
-     *
-     * @param   fname   a filename.
-     * @return  a guess as to what the content type of the object is,
-     *          based upon its file name.
-     * @see     java.net.URLConnection#getContentType()
-     */
-    public static String guessContentTypeFromName(String fname) {
-        return getFileNameMap().getContentTypeFor(fname);
     }
 
     /**

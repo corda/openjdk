@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Enumeration;
 
-import sun.security.util.Debug;
 import sun.security.util.DerOutputStream;
 import sun.security.util.DerValue;
 import sun.security.util.ObjectIdentifier;
@@ -63,8 +62,6 @@ import sun.security.util.ObjectIdentifier;
  */
 public class InhibitAnyPolicyExtension extends Extension
 implements CertAttrSet<String> {
-
-    private static final Debug debug = Debug.getInstance("certpath");
 
     /**
      * Identifier for this attribute, to be used with the

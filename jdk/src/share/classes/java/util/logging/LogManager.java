@@ -197,8 +197,6 @@ public class LogManager {
                         }
                     }
                 } catch (Exception ex) {
-                    System.err.println("Could not load Logmanager \"" + cname + "\"");
-                    ex.printStackTrace();
                 }
                 if (mgr == null) {
                     mgr = new LogManager();
@@ -496,31 +494,7 @@ public class LogManager {
     // Returns the LoggerContext for the user code (i.e. application or AppContext).
     // Loggers are isolated from each AppContext.
     private LoggerContext getUserContext() {
-        LoggerContext context = null;
-
-        SecurityManager sm = System.getSecurityManager();
-        JavaAWTAccess javaAwtAccess = SharedSecrets.getJavaAWTAccess();
-        if (sm != null && javaAwtAccess != null) {
-            // for each applet, it has its own LoggerContext isolated from others
-            final Object ecx = javaAwtAccess.getAppletContext();
-            if (ecx != null) {
-                synchronized (javaAwtAccess) {
-                    // find the AppContext of the applet code
-                    // will be null if we are in the main app context.
-                    if (contextsMap == null) {
-                        contextsMap = new WeakHashMap<>();
-                    }
-                    context = contextsMap.get(ecx);
-                    if (context == null) {
-                        // Create a new LoggerContext for the applet.
-                        context = new LoggerContext();
-                        contextsMap.put(ecx, context);
-                    }
-                }
-            }
-        }
-        // for standalone app, return userContext
-        return context != null ? context : userContext;
+        return userContext;
     }
 
     // The system context.
@@ -973,15 +947,11 @@ public class LogManager {
                                 hdl.setLevel(l);
                             } else {
                                 // Probably a bad level. Drop through.
-                                System.err.println("Can't set level for " + word);
                             }
                         }
                         // Add this Handler to the logger
                         logger.addHandler(hdl);
                     } catch (Exception ex) {
-                        System.err.println("Can't load log handler \"" + word + "\"");
-                        System.err.println("" + ex);
-                        ex.printStackTrace();
                     }
                 }
                 return null;
@@ -1282,8 +1252,6 @@ public class LogManager {
                     return;
                 }
             } catch (Exception ex) {
-                System.err.println("Logging configuration class \"" + cname + "\" failed");
-                System.err.println("" + ex);
                 // keep going and useful config file.
             }
         }
@@ -1416,9 +1384,6 @@ public class LogManager {
                 Class<?> clz = ClassLoader.getSystemClassLoader().loadClass(word);
                 clz.newInstance();
             } catch (Exception ex) {
-                System.err.println("Can't load config class \"" + word + "\"");
-                System.err.println("" + ex);
-                // ex.printStackTrace();
             }
         }
 
@@ -1684,7 +1649,6 @@ public class LogManager {
             String name = key.substring(0, ix);
             Level level = getLevelProperty(key, null);
             if (level == null) {
-                System.err.println("Bad level value for property: " + key);
                 continue;
             }
             for (LoggerContext cx : contexts()) {
@@ -1695,43 +1659,6 @@ public class LogManager {
                 l.setLevel(level);
             }
         }
-    }
-
-    // Management Support
-    private static LoggingMXBean loggingMXBean = null;
-    /**
-     * String representation of the
-     * {@link javax.management.ObjectName} for the management interface
-     * for the logging facility.
-     *
-     * @see java.lang.management.PlatformLoggingMXBean
-     * @see java.util.logging.LoggingMXBean
-     *
-     * @since 1.5
-     */
-    public final static String LOGGING_MXBEAN_NAME
-        = "java.util.logging:type=Logging";
-
-    /**
-     * Returns <tt>LoggingMXBean</tt> for managing loggers.
-     * An alternative way to manage loggers is through the
-     * {@link java.lang.management.PlatformLoggingMXBean} interface
-     * that can be obtained by calling:
-     * <pre>
-     *     PlatformLoggingMXBean logging = {@link java.lang.management.ManagementFactory#getPlatformMXBean(Class)
-     *         ManagementFactory.getPlatformMXBean}(PlatformLoggingMXBean.class);
-     * </pre>
-     *
-     * @return a {@link LoggingMXBean} object.
-     *
-     * @see java.lang.management.PlatformLoggingMXBean
-     * @since 1.5
-     */
-    public static synchronized LoggingMXBean getLoggingMXBean() {
-        if (loggingMXBean == null) {
-            loggingMXBean =  new Logging();
-        }
-        return loggingMXBean;
     }
 
     /**

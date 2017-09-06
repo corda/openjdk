@@ -85,40 +85,6 @@ final class SunEntries {
     static void putEntries(Map<Object, Object> map) {
 
         /*
-         * SecureRandom
-         *
-         * Register these first to speed up "new SecureRandom()",
-         * which iterates through the list of algorithms
-         */
-        // register the native PRNG, if available
-        // if user selected /dev/urandom, we put it before SHA1PRNG,
-        // otherwise after it
-        boolean nativeAvailable = NativePRNG.isAvailable();
-        boolean useNativePRNG = seedSource.equals(URL_DEV_URANDOM) ||
-            seedSource.equals(URL_DEV_RANDOM);
-
-        if (nativeAvailable && useNativePRNG) {
-            map.put("SecureRandom.NativePRNG",
-                "sun.security.provider.NativePRNG");
-        }
-        map.put("SecureRandom.SHA1PRNG",
-             "sun.security.provider.SecureRandom");
-        if (nativeAvailable && !useNativePRNG) {
-            map.put("SecureRandom.NativePRNG",
-                "sun.security.provider.NativePRNG");
-        }
-
-        if (NativePRNG.Blocking.isAvailable()) {
-            map.put("SecureRandom.NativePRNGBlocking",
-                "sun.security.provider.NativePRNG$Blocking");
-        }
-
-        if (NativePRNG.NonBlocking.isAvailable()) {
-            map.put("SecureRandom.NativePRNGNonBlocking",
-                "sun.security.provider.NativePRNG$NonBlocking");
-        }
-
-        /*
          * Signature engines
          */
         map.put("Signature.SHA1withDSA",
@@ -157,15 +123,6 @@ final class SunEntries {
         map.put("Alg.Alias.Signature.2.16.840.1.101.3.4.3.2", "SHA256withDSA");
 
         /*
-         *  Key Pair Generator engines
-         */
-        map.put("KeyPairGenerator.DSA",
-            "sun.security.provider.DSAKeyPairGenerator");
-        map.put("Alg.Alias.KeyPairGenerator.OID.1.2.840.10040.4.1", "DSA");
-        map.put("Alg.Alias.KeyPairGenerator.1.2.840.10040.4.1", "DSA");
-        map.put("Alg.Alias.KeyPairGenerator.1.3.14.3.2.12", "DSA");
-
-        /*
          * Digest engines
          */
         map.put("MessageDigest.MD2", "sun.security.provider.MD2");
@@ -194,12 +151,6 @@ final class SunEntries {
         map.put("Alg.Alias.MessageDigest.2.16.840.1.101.3.4.2.3", "SHA-512");
         map.put("Alg.Alias.MessageDigest.OID.2.16.840.1.101.3.4.2.3",
                 "SHA-512");
-
-        /*
-         * Algorithm Parameter Generator engines
-         */
-        map.put("AlgorithmParameterGenerator.DSA",
-            "sun.security.provider.DSAParameterGenerator");
 
         /*
          * Algorithm Parameter engines
@@ -244,33 +195,6 @@ final class SunEntries {
          */
         map.put("Configuration.JavaLoginConfig",
                         "sun.security.provider.ConfigFile$Spi");
-
-        /*
-         * CertPathBuilder
-         */
-        map.put("CertPathBuilder.PKIX",
-            "sun.security.provider.certpath.SunCertPathBuilder");
-        map.put("CertPathBuilder.PKIX ValidationAlgorithm",
-            "RFC3280");
-
-        /*
-         * CertPathValidator
-         */
-        map.put("CertPathValidator.PKIX",
-            "sun.security.provider.certpath.PKIXCertPathValidator");
-        map.put("CertPathValidator.PKIX ValidationAlgorithm",
-            "RFC3280");
-
-        /*
-         * CertStores
-         */
-        map.put("CertStore.LDAP",
-            "sun.security.provider.certpath.ldap.LDAPCertStore");
-        map.put("CertStore.LDAP LDAPSchema", "RFC2587");
-        map.put("CertStore.Collection",
-            "sun.security.provider.certpath.CollectionCertStore");
-        map.put("CertStore.com.sun.security.IndexedCollection",
-            "sun.security.provider.certpath.IndexedCollectionCertStore");
 
         /*
          * KeySize

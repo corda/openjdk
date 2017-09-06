@@ -144,9 +144,6 @@ public class Cleaner
         } catch (final Throwable x) {
             AccessController.doPrivileged(new PrivilegedAction<Void>() {
                     public Void run() {
-                        if (System.err != null)
-                            new Error("Cleaner terminated abnormally", x)
-                                .printStackTrace();
                         System.exit(1);
                         return null;
                     }});

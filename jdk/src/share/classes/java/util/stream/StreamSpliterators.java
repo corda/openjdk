@@ -64,11 +64,6 @@ class StreamSpliterators {
         // @@@ Detect if stateful operations are present or not
         //     If not then can split otherwise cannot
 
-        /**
-         * True if this spliterator supports splitting
-         */
-        final boolean isParallel;
-
         final PipelineHelper<P_OUT> ph;
 
         /**
@@ -113,12 +108,10 @@ class StreamSpliterators {
          * {@code Supplier<Spliterator>}.
          */
         AbstractWrappingSpliterator(PipelineHelper<P_OUT> ph,
-                                    Supplier<Spliterator<P_IN>> spliteratorSupplier,
-                                    boolean parallel) {
+                                    Supplier<Spliterator<P_IN>> spliteratorSupplier) {
             this.ph = ph;
             this.spliteratorSupplier = spliteratorSupplier;
             this.spliterator = null;
-            this.isParallel = parallel;
         }
 
         /**
@@ -126,12 +119,10 @@ class StreamSpliterators {
          * {@code Spliterator}.
          */
         AbstractWrappingSpliterator(PipelineHelper<P_OUT> ph,
-                                    Spliterator<P_IN> spliterator,
-                                    boolean parallel) {
+                                    Spliterator<P_IN> spliterator) {
             this.ph = ph;
             this.spliteratorSupplier = null;
             this.spliterator = spliterator;
-            this.isParallel = parallel;
         }
 
         /**
@@ -186,14 +177,7 @@ class StreamSpliterators {
 
         @Override
         public Spliterator<P_OUT> trySplit() {
-            if (isParallel && !finished) {
-                init();
-
-                Spliterator<P_IN> split = spliterator.trySplit();
-                return (split == null) ? null : wrap(split);
-            }
-            else
-                return null;
+            return null;
         }
 
         /**
@@ -270,20 +254,18 @@ class StreamSpliterators {
             extends AbstractWrappingSpliterator<P_IN, P_OUT, SpinedBuffer<P_OUT>> {
 
         WrappingSpliterator(PipelineHelper<P_OUT> ph,
-                            Supplier<Spliterator<P_IN>> supplier,
-                            boolean parallel) {
-            super(ph, supplier, parallel);
+                            Supplier<Spliterator<P_IN>> supplier) {
+            super(ph, supplier);
         }
 
         WrappingSpliterator(PipelineHelper<P_OUT> ph,
-                            Spliterator<P_IN> spliterator,
-                            boolean parallel) {
-            super(ph, spliterator, parallel);
+                            Spliterator<P_IN> spliterator) {
+            super(ph, spliterator);
         }
 
         @Override
         WrappingSpliterator<P_IN, P_OUT> wrap(Spliterator<P_IN> s) {
-            return new WrappingSpliterator<>(ph, s, isParallel);
+            return new WrappingSpliterator<>(ph, s);
         }
 
         @Override
@@ -323,20 +305,18 @@ class StreamSpliterators {
             implements Spliterator.OfInt {
 
         IntWrappingSpliterator(PipelineHelper<Integer> ph,
-                               Supplier<Spliterator<P_IN>> supplier,
-                               boolean parallel) {
-            super(ph, supplier, parallel);
+                               Supplier<Spliterator<P_IN>> supplier) {
+            super(ph, supplier);
         }
 
         IntWrappingSpliterator(PipelineHelper<Integer> ph,
-                               Spliterator<P_IN> spliterator,
-                               boolean parallel) {
-            super(ph, spliterator, parallel);
+                               Spliterator<P_IN> spliterator) {
+            super(ph, spliterator);
         }
 
         @Override
         AbstractWrappingSpliterator<P_IN, Integer, ?> wrap(Spliterator<P_IN> s) {
-            return new IntWrappingSpliterator<>(ph, s, isParallel);
+            return new IntWrappingSpliterator<>(ph, s);
         }
 
         @Override
@@ -381,20 +361,18 @@ class StreamSpliterators {
             implements Spliterator.OfLong {
 
         LongWrappingSpliterator(PipelineHelper<Long> ph,
-                                Supplier<Spliterator<P_IN>> supplier,
-                                boolean parallel) {
-            super(ph, supplier, parallel);
+                                Supplier<Spliterator<P_IN>> supplier) {
+            super(ph, supplier);
         }
 
         LongWrappingSpliterator(PipelineHelper<Long> ph,
-                                Spliterator<P_IN> spliterator,
-                                boolean parallel) {
-            super(ph, spliterator, parallel);
+                                Spliterator<P_IN> spliterator) {
+            super(ph, spliterator);
         }
 
         @Override
         AbstractWrappingSpliterator<P_IN, Long, ?> wrap(Spliterator<P_IN> s) {
-            return new LongWrappingSpliterator<>(ph, s, isParallel);
+            return new LongWrappingSpliterator<>(ph, s);
         }
 
         @Override
@@ -439,20 +417,18 @@ class StreamSpliterators {
             implements Spliterator.OfDouble {
 
         DoubleWrappingSpliterator(PipelineHelper<Double> ph,
-                                  Supplier<Spliterator<P_IN>> supplier,
-                                  boolean parallel) {
-            super(ph, supplier, parallel);
+                                  Supplier<Spliterator<P_IN>> supplier) {
+            super(ph, supplier);
         }
 
         DoubleWrappingSpliterator(PipelineHelper<Double> ph,
-                                  Spliterator<P_IN> spliterator,
-                                  boolean parallel) {
-            super(ph, spliterator, parallel);
+                                  Spliterator<P_IN> spliterator) {
+            super(ph, spliterator);
         }
 
         @Override
         AbstractWrappingSpliterator<P_IN, Double, ?> wrap(Spliterator<P_IN> s) {
-            return new DoubleWrappingSpliterator<>(ph, s, isParallel);
+            return new DoubleWrappingSpliterator<>(ph, s);
         }
 
         @Override

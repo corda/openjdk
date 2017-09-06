@@ -99,13 +99,6 @@ public interface Path
     extends Comparable<Path>, Iterable<Path>, Watchable
 {
     /**
-     * Returns the file system that created this object.
-     *
-     * @return  the file system that created this object
-     */
-    FileSystem getFileSystem();
-
-    /**
      * Tells whether or not this path is absolute.
      *
      * <p> An absolute path is complete in that it doesn't need to be combined
@@ -532,52 +525,6 @@ public interface Path
      *          system property {@code user.dir}
      */
     Path toAbsolutePath();
-
-    /**
-     * Returns the <em>real</em> path of an existing file.
-     *
-     * <p> The precise definition of this method is implementation dependent but
-     * in general it derives from this path, an {@link #isAbsolute absolute}
-     * path that locates the {@link Files#isSameFile same} file as this path, but
-     * with name elements that represent the actual name of the directories
-     * and the file. For example, where filename comparisons on a file system
-     * are case insensitive then the name elements represent the names in their
-     * actual case. Additionally, the resulting path has redundant name
-     * elements removed.
-     *
-     * <p> If this path is relative then its absolute path is first obtained,
-     * as if by invoking the {@link #toAbsolutePath toAbsolutePath} method.
-     *
-     * <p> The {@code options} array may be used to indicate how symbolic links
-     * are handled. By default, symbolic links are resolved to their final
-     * target. If the option {@link LinkOption#NOFOLLOW_LINKS NOFOLLOW_LINKS} is
-     * present then this method does not resolve symbolic links.
-     *
-     * Some implementations allow special names such as "{@code ..}" to refer to
-     * the parent directory. When deriving the <em>real path</em>, and a
-     * "{@code ..}" (or equivalent) is preceded by a non-"{@code ..}" name then
-     * an implementation will typically cause both names to be removed. When
-     * not resolving symbolic links and the preceding name is a symbolic link
-     * then the names are only removed if it guaranteed that the resulting path
-     * will locate the same file as this path.
-     *
-     * @param   options
-     *          options indicating how symbolic links are handled
-     *
-     * @return  an absolute path represent the <em>real</em> path of the file
-     *          located by this object
-     *
-     * @throws  IOException
-     *          if the file does not exist or an I/O error occurs
-     * @throws  SecurityException
-     *          In the case of the default provider, and a security manager
-     *          is installed, its {@link SecurityManager#checkRead(String) checkRead}
-     *          method is invoked to check read access to the file, and where
-     *          this path is not absolute, its {@link SecurityManager#checkPropertyAccess(String)
-     *          checkPropertyAccess} method is invoked to check access to the
-     *          system property {@code user.dir}
-     */
-    Path toRealPath(LinkOption... options) throws IOException;
 
     /**
      * Returns a {@link File} object representing this path. Where this {@code

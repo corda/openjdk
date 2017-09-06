@@ -36,7 +36,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.AllPermission;
 import java.nio.channels.Channel;
-import java.nio.channels.spi.SelectorProvider;
 import sun.nio.ch.Interruptible;
 import sun.reflect.CallerSensitive;
 import sun.reflect.Reflection;
@@ -74,149 +73,9 @@ public final class System {
     private System() {
     }
 
-    /**
-     * The "standard" input stream. This stream is already
-     * open and ready to supply input data. Typically this stream
-     * corresponds to keyboard input or another input source specified by
-     * the host environment or user.
-     */
-    public final static InputStream in = null;
-
-    /**
-     * The "standard" output stream. This stream is already
-     * open and ready to accept output data. Typically this stream
-     * corresponds to display output or another output destination
-     * specified by the host environment or user.
-     * <p>
-     * For simple stand-alone Java applications, a typical way to write
-     * a line of output data is:
-     * <blockquote><pre>
-     *     System.out.println(data)
-     * </pre></blockquote>
-     * <p>
-     * See the <code>println</code> methods in class <code>PrintStream</code>.
-     *
-     * @see     java.io.PrintStream#println()
-     * @see     java.io.PrintStream#println(boolean)
-     * @see     java.io.PrintStream#println(char)
-     * @see     java.io.PrintStream#println(char[])
-     * @see     java.io.PrintStream#println(double)
-     * @see     java.io.PrintStream#println(float)
-     * @see     java.io.PrintStream#println(int)
-     * @see     java.io.PrintStream#println(long)
-     * @see     java.io.PrintStream#println(java.lang.Object)
-     * @see     java.io.PrintStream#println(java.lang.String)
-     */
-    public final static PrintStream out = null;
-
-    /**
-     * The "standard" error output stream. This stream is already
-     * open and ready to accept output data.
-     * <p>
-     * Typically this stream corresponds to display output or another
-     * output destination specified by the host environment or user. By
-     * convention, this output stream is used to display error messages
-     * or other information that should come to the immediate attention
-     * of a user even if the principal output stream, the value of the
-     * variable <code>out</code>, has been redirected to a file or other
-     * destination that is typically not continuously monitored.
-     */
-    public final static PrintStream err = null;
-
     /* The security manager for the system.
      */
     private static volatile SecurityManager security = null;
-
-    /**
-     * Reassigns the "standard" input stream.
-     *
-     * <p>First, if there is a security manager, its <code>checkPermission</code>
-     * method is called with a <code>RuntimePermission("setIO")</code> permission
-     *  to see if it's ok to reassign the "standard" input stream.
-     * <p>
-     *
-     * @param in the new standard input stream.
-     *
-     * @throws SecurityException
-     *        if a security manager exists and its
-     *        <code>checkPermission</code> method doesn't allow
-     *        reassigning of the standard input stream.
-     *
-     * @see SecurityManager#checkPermission
-     * @see java.lang.RuntimePermission
-     *
-     * @since   JDK1.1
-     */
-    public static void setIn(InputStream in) {
-        checkIO();
-        setIn0(in);
-    }
-
-    /**
-     * Reassigns the "standard" output stream.
-     *
-     * <p>First, if there is a security manager, its <code>checkPermission</code>
-     * method is called with a <code>RuntimePermission("setIO")</code> permission
-     *  to see if it's ok to reassign the "standard" output stream.
-     *
-     * @param out the new standard output stream
-     *
-     * @throws SecurityException
-     *        if a security manager exists and its
-     *        <code>checkPermission</code> method doesn't allow
-     *        reassigning of the standard output stream.
-     *
-     * @see SecurityManager#checkPermission
-     * @see java.lang.RuntimePermission
-     *
-     * @since   JDK1.1
-     */
-    public static void setOut(PrintStream out) {
-        checkIO();
-        setOut0(out);
-    }
-
-    /**
-     * Reassigns the "standard" error output stream.
-     *
-     * <p>First, if there is a security manager, its <code>checkPermission</code>
-     * method is called with a <code>RuntimePermission("setIO")</code> permission
-     *  to see if it's ok to reassign the "standard" error output stream.
-     *
-     * @param err the new standard error output stream.
-     *
-     * @throws SecurityException
-     *        if a security manager exists and its
-     *        <code>checkPermission</code> method doesn't allow
-     *        reassigning of the standard error output stream.
-     *
-     * @see SecurityManager#checkPermission
-     * @see java.lang.RuntimePermission
-     *
-     * @since   JDK1.1
-     */
-    public static void setErr(PrintStream err) {
-        checkIO();
-        setErr0(err);
-    }
-
-    private static volatile Console cons = null;
-    /**
-     * Returns the unique {@link java.io.Console Console} object associated
-     * with the current Java virtual machine, if any.
-     *
-     * @return  The system console, if any, otherwise <tt>null</tt>.
-     *
-     * @since   1.6
-     */
-     public static Console console() {
-         if (cons == null) {
-             synchronized (System.class) {
-                 cons = sun.misc.SharedSecrets.getJavaIOAccess().console();
-             }
-         }
-         return cons;
-     }
 
     /**
      * Returns the channel inherited from the entity that created this
@@ -244,17 +103,12 @@ public final class System {
      * @since 1.5
      */
     public static Channel inheritedChannel() throws IOException {
-        return SelectorProvider.provider().inheritedChannel();
+        throw new UnsupportedOperationException("No inherited channel support");
     }
 
-    private static void checkIO() {
-        SecurityManager sm = getSecurityManager();
-        if (sm != null) {
-            sm.checkPermission(new RuntimePermission("setIO"));
-        }
-    }
+    public final static PrintStream out = null;
+    public final static PrintStream err = null;
 
-    private static native void setIn0(InputStream in);
     private static native void setOut0(PrintStream out);
     private static native void setErr0(PrintStream err);
 
@@ -789,111 +643,6 @@ public final class System {
     }
 
     /**
-     * Gets the value of the specified environment variable. An
-     * environment variable is a system-dependent external named
-     * value.
-     *
-     * <p>If a security manager exists, its
-     * {@link SecurityManager#checkPermission checkPermission}
-     * method is called with a
-     * <code>{@link RuntimePermission}("getenv."+name)</code>
-     * permission.  This may result in a {@link SecurityException}
-     * being thrown.  If no exception is thrown the value of the
-     * variable <code>name</code> is returned.
-     *
-     * <p><a name="EnvironmentVSSystemProperties"><i>System
-     * properties</i> and <i>environment variables</i></a> are both
-     * conceptually mappings between names and values.  Both
-     * mechanisms can be used to pass user-defined information to a
-     * Java process.  Environment variables have a more global effect,
-     * because they are visible to all descendants of the process
-     * which defines them, not just the immediate Java subprocess.
-     * They can have subtly different semantics, such as case
-     * insensitivity, on different operating systems.  For these
-     * reasons, environment variables are more likely to have
-     * unintended side effects.  It is best to use system properties
-     * where possible.  Environment variables should be used when a
-     * global effect is desired, or when an external system interface
-     * requires an environment variable (such as <code>PATH</code>).
-     *
-     * <p>On UNIX systems the alphabetic case of <code>name</code> is
-     * typically significant, while on Microsoft Windows systems it is
-     * typically not.  For example, the expression
-     * <code>System.getenv("FOO").equals(System.getenv("foo"))</code>
-     * is likely to be true on Microsoft Windows.
-     *
-     * @param  name the name of the environment variable
-     * @return the string value of the variable, or <code>null</code>
-     *         if the variable is not defined in the system environment
-     * @throws NullPointerException if <code>name</code> is <code>null</code>
-     * @throws SecurityException
-     *         if a security manager exists and its
-     *         {@link SecurityManager#checkPermission checkPermission}
-     *         method doesn't allow access to the environment variable
-     *         <code>name</code>
-     * @see    #getenv()
-     * @see    ProcessBuilder#environment()
-     */
-    public static String getenv(String name) {
-        SecurityManager sm = getSecurityManager();
-        if (sm != null) {
-            sm.checkPermission(new RuntimePermission("getenv."+name));
-        }
-
-        return ProcessEnvironment.getenv(name);
-    }
-
-
-    /**
-     * Returns an unmodifiable string map view of the current system environment.
-     * The environment is a system-dependent mapping from names to
-     * values which is passed from parent to child processes.
-     *
-     * <p>If the system does not support environment variables, an
-     * empty map is returned.
-     *
-     * <p>The returned map will never contain null keys or values.
-     * Attempting to query the presence of a null key or value will
-     * throw a {@link NullPointerException}.  Attempting to query
-     * the presence of a key or value which is not of type
-     * {@link String} will throw a {@link ClassCastException}.
-     *
-     * <p>The returned map and its collection views may not obey the
-     * general contract of the {@link Object#equals} and
-     * {@link Object#hashCode} methods.
-     *
-     * <p>The returned map is typically case-sensitive on all platforms.
-     *
-     * <p>If a security manager exists, its
-     * {@link SecurityManager#checkPermission checkPermission}
-     * method is called with a
-     * <code>{@link RuntimePermission}("getenv.*")</code>
-     * permission.  This may result in a {@link SecurityException} being
-     * thrown.
-     *
-     * <p>When passing information to a Java subprocess,
-     * <a href=#EnvironmentVSSystemProperties>system properties</a>
-     * are generally preferred over environment variables.
-     *
-     * @return the environment as a map of variable names to values
-     * @throws SecurityException
-     *         if a security manager exists and its
-     *         {@link SecurityManager#checkPermission checkPermission}
-     *         method doesn't allow access to the process environment
-     * @see    #getenv(String)
-     * @see    ProcessBuilder#environment()
-     * @since  1.5
-     */
-    public static java.util.Map<String,String> getenv() {
-        SecurityManager sm = getSecurityManager();
-        if (sm != null) {
-            sm.checkPermission(new RuntimePermission("getenv.*"));
-        }
-
-        return ProcessEnvironment.getenv();
-    }
-
-    /**
      * Terminates the currently running Java Virtual Machine. The
      * argument serves as a status code; by convention, a nonzero status
      * code indicates abnormal termination.
@@ -914,7 +663,7 @@ public final class System {
      * @see        java.lang.Runtime#exit(int)
      */
     public static void exit(int status) {
-        Runtime.getRuntime().exit(status);
+        throw new UnsupportedOperationException("System.exit() disallowed");
     }
 
     /**
@@ -937,58 +686,6 @@ public final class System {
      */
     public static void gc() {
         Runtime.getRuntime().gc();
-    }
-
-    /**
-     * Runs the finalization methods of any objects pending finalization.
-     * <p>
-     * Calling this method suggests that the Java Virtual Machine expend
-     * effort toward running the <code>finalize</code> methods of objects
-     * that have been found to be discarded but whose <code>finalize</code>
-     * methods have not yet been run. When control returns from the
-     * method call, the Java Virtual Machine has made a best effort to
-     * complete all outstanding finalizations.
-     * <p>
-     * The call <code>System.runFinalization()</code> is effectively
-     * equivalent to the call:
-     * <blockquote><pre>
-     * Runtime.getRuntime().runFinalization()
-     * </pre></blockquote>
-     *
-     * @see     java.lang.Runtime#runFinalization()
-     */
-    public static void runFinalization() {
-        Runtime.getRuntime().runFinalization();
-    }
-
-    /**
-     * Enable or disable finalization on exit; doing so specifies that the
-     * finalizers of all objects that have finalizers that have not yet been
-     * automatically invoked are to be run before the Java runtime exits.
-     * By default, finalization on exit is disabled.
-     *
-     * <p>If there is a security manager,
-     * its <code>checkExit</code> method is first called
-     * with 0 as its argument to ensure the exit is allowed.
-     * This could result in a SecurityException.
-     *
-     * @deprecated  This method is inherently unsafe.  It may result in
-     *      finalizers being called on live objects while other threads are
-     *      concurrently manipulating those objects, resulting in erratic
-     *      behavior or deadlock.
-     * @param value indicating enabling or disabling of finalization
-     * @throws  SecurityException
-     *        if a security manager exists and its <code>checkExit</code>
-     *        method doesn't allow the exit.
-     *
-     * @see     java.lang.Runtime#exit(int)
-     * @see     java.lang.Runtime#gc()
-     * @see     java.lang.SecurityManager#checkExit(int)
-     * @since   JDK1.1
-     */
-    @Deprecated
-    public static void runFinalizersOnExit(boolean value) {
-        Runtime.runFinalizersOnExit(value);
     }
 
     /**
@@ -1094,7 +791,6 @@ public final class System {
         return new PrintStream(new BufferedOutputStream(fos, 128), true);
     }
 
-
     /**
      * Initialize the system class.  Called after thread initialization.
      */
@@ -1131,10 +827,8 @@ public final class System {
         lineSeparator = props.getProperty("line.separator");
         sun.misc.Version.init();
 
-        FileInputStream fdIn = new FileInputStream(FileDescriptor.in);
         FileOutputStream fdOut = new FileOutputStream(FileDescriptor.out);
         FileOutputStream fdErr = new FileOutputStream(FileDescriptor.err);
-        setIn0(new BufferedInputStream(fdIn));
         setOut0(newPrintStream(fdOut, props.getProperty("sun.stdout.encoding")));
         setErr0(newPrintStream(fdErr, props.getProperty("sun.stderr.encoding")));
 

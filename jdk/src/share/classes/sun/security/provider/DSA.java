@@ -64,9 +64,6 @@ import sun.security.jca.JCAUtil;
  */
 abstract class DSA extends SignatureSpi {
 
-    /* Are we debugging? */
-    private static final boolean debug = false;
-
     /* The parameter object */
     private DSAParams params;
 
@@ -209,22 +206,7 @@ abstract class DSA extends SignatureSpi {
      * @see sun.security.DSA#engineVerify
      */
     protected byte[] engineSign() throws SignatureException {
-        BigInteger k = generateK(presetQ);
-        BigInteger r = generateR(presetP, presetQ, presetG, k);
-        BigInteger s = generateS(presetX, presetQ, r, k);
-
-        try {
-            DerOutputStream outseq = new DerOutputStream(100);
-            outseq.putInteger(r);
-            outseq.putInteger(s);
-            DerValue result = new DerValue(DerValue.tag_Sequence,
-                                           outseq.toByteArray());
-
-            return result.toByteArray();
-
-        } catch (IOException e) {
-            throw new SignatureException("error encoding signature");
-        }
+        throw new UnsupportedOperationException("Signing not supported");
     }
 
     /**
@@ -372,64 +354,6 @@ abstract class DSA extends SignatureSpi {
         return t5.mod(q);
     }
 
-    protected BigInteger generateK(BigInteger q) {
-        // Implementation defined in FIPS 186-4 AppendixB.2.1.
-        SecureRandom random = getSigningRandom();
-        byte[] kValue = new byte[(q.bitLength() + 7)/8 + 8];
-
-        random.nextBytes(kValue);
-        BigInteger k = new BigInteger(1, kValue).mod(
-                q.subtract(BigInteger.ONE)).add(BigInteger.ONE);
-
-        // Using an equivalent exponent of fixed length (same as q or 1 bit
-        // less than q) to keep the kG timing relatively constant.
-        //
-        // Note that this is an extra step on top of the approach defined in
-        // FIPS 186-4 AppendixB.2.1 so as to make a fixed length K.
-        k = k.add(q).divide(BigInteger.valueOf(2));
-
-        // An alternative implementation based on FIPS 186-4 AppendixB2.2
-        // with fixed-length K.
-        //
-        // Please keep it here as we may need to switch to it in the future.
-        //
-        // SecureRandom random = getSigningRandom();
-        // byte[] kValue = new byte[(q.bitLength() + 7)/8];
-        // BigInteger d = q.subtract(BigInteger.TWO);
-        // BigInteger k;
-        // do {
-        //     random.nextBytes(kValue);
-        //     BigInteger c = new BigInteger(1, kValue);
-        //     if (c.compareTo(d) <= 0) {
-        //         k = c.add(BigInteger.ONE);
-        //         // Using an equivalent exponent of fixed length to keep
-        //         // the g^k timing relatively constant.
-        //         //
-        //         // Note that this is an extra step on top of the approach
-        //         // defined in FIPS 186-4 AppendixB.2.2 so as to make a
-        //         // fixed length K.
-        //         if (k.bitLength() >= q.bitLength()) {
-        //             break;
-        //         }
-        //     }
-        // } while (true);
-
-        return k;
-    }
-
-    // Use the application-specified SecureRandom Object if provided.
-    // Otherwise, use our default SecureRandom Object.
-    protected SecureRandom getSigningRandom() {
-        if (signingRandom == null) {
-            if (appRandom != null) {
-                signingRandom = appRandom;
-            } else {
-                signingRandom = JCAUtil.getSecureRandom();
-            }
-        }
-        return signingRandom;
-    }
-
     /**
      * Return a human readable rendition of the engine.
      */
@@ -449,18 +373,6 @@ abstract class DSA extends SignatureSpi {
             printable += "\n\tUNINIIALIZED";
         }
         return printable;
-    }
-
-    private static void debug(Exception e) {
-        if (debug) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void debug(String s) {
-        if (debug) {
-            System.err.println(s);
-        }
     }
 
     /**

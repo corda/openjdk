@@ -26,7 +26,6 @@
 package javax.xml.bind;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.attachment.AttachmentUnmarshaller;
 import javax.xml.validation.Schema;
 import java.io.Reader;
 
@@ -1048,19 +1047,11 @@ public interface Unmarshaller {
     public <A extends XmlAdapter> A getAdapter( Class<A> type );
 
     /**
-     * <p>Associate a context that resolves cid's, content-id URIs, to
-     * binary data passed as attachments.</p>
-     * <p/>
-     * <p>Unmarshal time validation, enabled via {@link #setSchema(Schema)},
-     * must be supported even when unmarshaller is performing XOP processing.
-     * </p>
-     *
-     * @throws IllegalStateException if attempt to concurrently call this
-     *                               method during a unmarshal operation.
+     * @exclude Not supported.
      */
-    void setAttachmentUnmarshaller(AttachmentUnmarshaller au);
+    void setAttachmentUnmarshaller(Object au);
 
-    AttachmentUnmarshaller getAttachmentUnmarshaller();
+    Object getAttachmentUnmarshaller();
 
     /**
      * <p/>

@@ -1307,29 +1307,6 @@ public final class Pattern
     }
 
     /**
-     * Recompile the Pattern instance from a stream.  The original pattern
-     * string is read in and the object tree is recompiled from it.
-     */
-    private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
-
-        // Read in all fields
-        s.defaultReadObject();
-
-        // Initialize counts
-        capturingGroupCount = 1;
-        localCount = 0;
-
-        // if length > 0, the Pattern is lazily compiled
-        compiled = false;
-        if (pattern.length() == 0) {
-            root = new Start(lastAccept);
-            matchRoot = lastAccept;
-            compiled = true;
-        }
-    }
-
-    /**
      * This private constructor is used to create all Patterns. The pattern
      * string and match flags are all that is needed to completely describe
      * a Pattern. An empty pattern string results in an object tree with
@@ -1738,33 +1715,18 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
     private static void printObjectTree(Node node) {
         while(node != null) {
             if (node instanceof Prolog) {
-                System.out.println(node);
                 printObjectTree(((Prolog)node).loop);
-                System.out.println("**** end contents prolog loop");
             } else if (node instanceof Loop) {
-                System.out.println(node);
                 printObjectTree(((Loop)node).body);
-                System.out.println("**** end contents Loop body");
             } else if (node instanceof Curly) {
-                System.out.println(node);
                 printObjectTree(((Curly)node).atom);
-                System.out.println("**** end contents Curly body");
             } else if (node instanceof GroupCurly) {
-                System.out.println(node);
                 printObjectTree(((GroupCurly)node).atom);
-                System.out.println("**** end contents GroupCurly body");
             } else if (node instanceof GroupTail) {
-                System.out.println(node);
-                System.out.println("Tail next is "+node.next);
                 return;
-            } else {
-                System.out.println(node);
             }
             node = node.next;
-            if (node != null)
-                System.out.println("->next:");
             if (node == Pattern.accept) {
-                System.out.println("Accept Node");
                 node = null;
             }
        }
@@ -5853,6 +5815,6 @@ NEXT:       while (i <= last) {
             }
         }
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(
-                new MatcherIterator(), Spliterator.ORDERED | Spliterator.NONNULL), false);
+                new MatcherIterator(), Spliterator.ORDERED | Spliterator.NONNULL));
     }
 }

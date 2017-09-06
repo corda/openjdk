@@ -3737,39 +3737,6 @@ public class BigDecimal extends Number implements Comparable<BigDecimal> {
     }
 
     /**
-     * Reconstitute the {@code BigDecimal} instance from a stream (that is,
-     * deserialize it).
-     *
-     * @param s the stream being read.
-     */
-    private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
-        // Read in all fields
-        s.defaultReadObject();
-        // validate possibly bad fields
-        if (intVal == null) {
-            String message = "BigDecimal: null intVal in stream";
-            throw new java.io.StreamCorruptedException(message);
-        // [all values of scale are now allowed]
-        }
-        UnsafeHolder.setIntCompactVolatile(this, compactValFor(intVal));
-    }
-
-   /**
-    * Serialize this {@code BigDecimal} to the stream in question
-    *
-    * @param s the stream to serialize to.
-    */
-   private void writeObject(java.io.ObjectOutputStream s)
-       throws java.io.IOException {
-       // Must inflate to maintain compatible serial form.
-       if (this.intVal == null)
-           UnsafeHolder.setIntValVolatile(this, BigInteger.valueOf(this.intCompact));
-       // Could reset intVal back to null if it has to be set.
-       s.defaultWriteObject();
-   }
-
-    /**
      * Returns the length of the absolute value of a {@code long}, in decimal
      * digits.
      *
@@ -3876,18 +3843,6 @@ public class BigDecimal extends Number implements Comparable<BigDecimal> {
         return (s == i) ? i : (s < 0 ? Integer.MIN_VALUE : Integer.MAX_VALUE);
     }
 
-    /*
-     * Internal printing routine
-     */
-    private static void print(String name, BigDecimal bd) {
-        System.err.format("%s:\tintCompact %d\tintVal %d\tscale %d\tprecision %d%n",
-                          name,
-                          bd.intCompact,
-                          bd.intVal,
-                          bd.scale,
-                          bd.precision);
-    }
-
     /**
      * Check internal invariants of this BigDecimal.  These invariants
      * include:
@@ -3910,26 +3865,22 @@ public class BigDecimal extends Number implements Comparable<BigDecimal> {
     private BigDecimal audit() {
         if (intCompact == INFLATED) {
             if (intVal == null) {
-                print("audit", this);
                 throw new AssertionError("null intVal");
             }
             // Check precision
             if (precision > 0 && precision != bigDigitLength(intVal)) {
-                print("audit", this);
                 throw new AssertionError("precision mismatch");
             }
         } else {
             if (intVal != null) {
                 long val = intVal.longValue();
                 if (val != intCompact) {
-                    print("audit", this);
                     throw new AssertionError("Inconsistent state, intCompact=" +
                                              intCompact + "\t intVal=" + val);
                 }
             }
             // Check precision
             if (precision > 0 && precision != longDigitLength(intCompact)) {
-                print("audit", this);
                 throw new AssertionError("precision mismatch");
             }
         }

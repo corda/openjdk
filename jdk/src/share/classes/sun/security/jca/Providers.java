@@ -219,9 +219,6 @@ public class Providers {
      */
 
     public static synchronized ProviderList beginThreadProviderList(ProviderList list) {
-        if (ProviderList.debug != null) {
-            ProviderList.debug.println("ThreadLocal providers: " + list);
-        }
         ProviderList oldList = threadLists.get();
         threadListsUsed++;
         threadLists.set(list);
@@ -230,15 +227,8 @@ public class Providers {
 
     public static synchronized void endThreadProviderList(ProviderList list) {
         if (list == null) {
-            if (ProviderList.debug != null) {
-                ProviderList.debug.println("Disabling ThreadLocal providers");
-            }
             threadLists.remove();
         } else {
-            if (ProviderList.debug != null) {
-                ProviderList.debug.println
-                    ("Restoring previous ThreadLocal providers: " + list);
-            }
             threadLists.set(list);
         }
         threadListsUsed--;

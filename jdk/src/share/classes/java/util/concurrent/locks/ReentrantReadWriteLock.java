@@ -650,16 +650,6 @@ public class ReentrantReadWriteLock
             return count;
         }
 
-        /**
-         * Reconstitutes the instance from a stream (that is, deserializes it).
-         */
-        private void readObject(java.io.ObjectInputStream s)
-            throws java.io.IOException, ClassNotFoundException {
-            s.defaultReadObject();
-            readHolds = new ThreadLocalHoldCounter();
-            setState(0); // reset to unlocked state
-        }
-
         final int getCount() { return getState(); }
     }
 

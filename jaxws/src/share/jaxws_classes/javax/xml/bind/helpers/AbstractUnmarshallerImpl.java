@@ -37,7 +37,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.attachment.AttachmentUnmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLEventReader;
@@ -417,11 +416,11 @@ public abstract class AbstractUnmarshallerImpl implements Unmarshaller
         throw new UnsupportedOperationException();
     }
 
-    public void setAttachmentUnmarshaller(AttachmentUnmarshaller au) {
+    public void setAttachmentUnmarshaller(Object au) {
         throw new UnsupportedOperationException();
     }
 
-    public AttachmentUnmarshaller getAttachmentUnmarshaller() {
+    public Object getAttachmentUnmarshaller() {
         throw new UnsupportedOperationException();
     }
 

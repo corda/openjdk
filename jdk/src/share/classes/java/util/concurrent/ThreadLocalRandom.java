@@ -35,7 +35,6 @@
 
 package java.util.concurrent;
 
-import java.io.ObjectStreamField;
 import java.util.Random;
 import java.util.Spliterator;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -133,22 +132,7 @@ public class ThreadLocalRandom extends Random {
     /**
      * The next seed for default constructors.
      */
-    private static final AtomicLong seeder = new AtomicLong(initialSeed());
-
-    private static long initialSeed() {
-        String pp = java.security.AccessController.doPrivileged(
-                new sun.security.action.GetPropertyAction(
-                        "java.util.secureRandomSeed"));
-        if (pp != null && pp.equalsIgnoreCase("true")) {
-            byte[] seedBytes = java.security.SecureRandom.getSeed(8);
-            long s = (long)(seedBytes[0]) & 0xffL;
-            for (int i = 1; i < 8; ++i)
-                s = (s << 8) | ((long)(seedBytes[i]) & 0xffL);
-            return s;
-        }
-        return (mix64(System.currentTimeMillis()) ^
-                mix64(System.nanoTime()));
-    }
+    private static final AtomicLong seeder = new AtomicLong(8270523877573429709L);
 
     /**
      * The seed increment
@@ -533,8 +517,7 @@ public class ThreadLocalRandom extends Random {
             throw new IllegalArgumentException(BadSize);
         return StreamSupport.intStream
             (new RandomIntsSpliterator
-             (0L, streamSize, Integer.MAX_VALUE, 0),
-             false);
+             (0L, streamSize, Integer.MAX_VALUE, 0));
     }
 
     /**
@@ -550,8 +533,7 @@ public class ThreadLocalRandom extends Random {
     public IntStream ints() {
         return StreamSupport.intStream
             (new RandomIntsSpliterator
-             (0L, Long.MAX_VALUE, Integer.MAX_VALUE, 0),
-             false);
+             (0L, Long.MAX_VALUE, Integer.MAX_VALUE, 0));
     }
 
     /**
@@ -577,8 +559,7 @@ public class ThreadLocalRandom extends Random {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.intStream
             (new RandomIntsSpliterator
-             (0L, streamSize, randomNumberOrigin, randomNumberBound),
-             false);
+             (0L, streamSize, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -602,8 +583,7 @@ public class ThreadLocalRandom extends Random {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.intStream
             (new RandomIntsSpliterator
-             (0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound),
-             false);
+             (0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -621,8 +601,7 @@ public class ThreadLocalRandom extends Random {
             throw new IllegalArgumentException(BadSize);
         return StreamSupport.longStream
             (new RandomLongsSpliterator
-             (0L, streamSize, Long.MAX_VALUE, 0L),
-             false);
+             (0L, streamSize, Long.MAX_VALUE, 0L));
     }
 
     /**
@@ -638,8 +617,7 @@ public class ThreadLocalRandom extends Random {
     public LongStream longs() {
         return StreamSupport.longStream
             (new RandomLongsSpliterator
-             (0L, Long.MAX_VALUE, Long.MAX_VALUE, 0L),
-             false);
+             (0L, Long.MAX_VALUE, Long.MAX_VALUE, 0L));
     }
 
     /**
@@ -665,8 +643,7 @@ public class ThreadLocalRandom extends Random {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.longStream
             (new RandomLongsSpliterator
-             (0L, streamSize, randomNumberOrigin, randomNumberBound),
-             false);
+             (0L, streamSize, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -690,8 +667,7 @@ public class ThreadLocalRandom extends Random {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.longStream
             (new RandomLongsSpliterator
-             (0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound),
-             false);
+             (0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -710,8 +686,7 @@ public class ThreadLocalRandom extends Random {
             throw new IllegalArgumentException(BadSize);
         return StreamSupport.doubleStream
             (new RandomDoublesSpliterator
-             (0L, streamSize, Double.MAX_VALUE, 0.0),
-             false);
+             (0L, streamSize, Double.MAX_VALUE, 0.0));
     }
 
     /**
@@ -728,8 +703,7 @@ public class ThreadLocalRandom extends Random {
     public DoubleStream doubles() {
         return StreamSupport.doubleStream
             (new RandomDoublesSpliterator
-             (0L, Long.MAX_VALUE, Double.MAX_VALUE, 0.0),
-             false);
+             (0L, Long.MAX_VALUE, Double.MAX_VALUE, 0.0));
     }
 
     /**
@@ -756,8 +730,7 @@ public class ThreadLocalRandom extends Random {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.doubleStream
             (new RandomDoublesSpliterator
-             (0L, streamSize, randomNumberOrigin, randomNumberBound),
-             false);
+             (0L, streamSize, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -781,8 +754,7 @@ public class ThreadLocalRandom extends Random {
             throw new IllegalArgumentException(BadRange);
         return StreamSupport.doubleStream
             (new RandomDoublesSpliterator
-             (0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound),
-             false);
+             (0L, Long.MAX_VALUE, randomNumberOrigin, randomNumberBound));
     }
 
     /**
@@ -1017,31 +989,6 @@ public class ThreadLocalRandom extends Random {
     // Serialization support
 
     private static final long serialVersionUID = -5851777807851030925L;
-
-    /**
-     * @serialField rnd long
-     *              seed for random computations
-     * @serialField initialized boolean
-     *              always true
-     */
-    private static final ObjectStreamField[] serialPersistentFields = {
-            new ObjectStreamField("rnd", long.class),
-            new ObjectStreamField("initialized", boolean.class),
-    };
-
-    /**
-     * Saves the {@code ThreadLocalRandom} to a stream (that is, serializes it).
-     * @param s the stream
-     * @throws java.io.IOException if an I/O error occurs
-     */
-    private void writeObject(java.io.ObjectOutputStream s)
-        throws java.io.IOException {
-
-        java.io.ObjectOutputStream.PutField fields = s.putFields();
-        fields.put("rnd", UNSAFE.getLong(Thread.currentThread(), SEED));
-        fields.put("initialized", true);
-        s.writeFields();
-    }
 
     /**
      * Returns the {@link #current() current} thread's {@code ThreadLocalRandom}.

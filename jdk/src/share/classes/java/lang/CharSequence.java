@@ -156,8 +156,7 @@ public interface CharSequence {
                         new CharIterator(),
                         length(),
                         Spliterator.ORDERED),
-                Spliterator.SUBSIZED | Spliterator.SIZED | Spliterator.ORDERED,
-                false);
+                Spliterator.SUBSIZED | Spliterator.SIZED | Spliterator.ORDERED);
     }
 
     /**
@@ -228,7 +227,6 @@ public interface CharSequence {
                 Spliterators.spliteratorUnknownSize(
                         new CodePointIterator(),
                         Spliterator.ORDERED),
-                Spliterator.ORDERED,
-                false);
+                Spliterator.ORDERED);
     }
 }

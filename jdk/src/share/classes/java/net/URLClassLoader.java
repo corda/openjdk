@@ -441,7 +441,6 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
      * used.
      */
     private Class<?> defineClass(String name, Resource res) throws IOException {
-        long t0 = System.nanoTime();
         int i = name.lastIndexOf('.');
         URL url = res.getCodeSourceURL();
         if (i != -1) {
@@ -456,14 +455,12 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
             // Use (direct) ByteBuffer:
             CodeSigner[] signers = res.getCodeSigners();
             CodeSource cs = new CodeSource(url, signers);
-            sun.misc.PerfCounter.getReadClassBytesTime().addElapsedTimeFrom(t0);
             return defineClass(name, bb, cs);
         } else {
             byte[] b = res.getBytes();
             // must read certificates AFTER reading bytes.
             CodeSigner[] signers = res.getCodeSigners();
             CodeSource cs = new CodeSource(url, signers);
-            sun.misc.PerfCounter.getReadClassBytesTime().addElapsedTimeFrom(t0);
             return defineClass(name, b, 0, b.length, cs);
         }
     }
@@ -693,8 +690,7 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
             }
             String host = locUrl.getHost();
             if (host != null && (host.length() > 0))
-                p = new SocketPermission(host,
-                                         SecurityConstants.SOCKET_CONNECT_ACCEPT_ACTION);
+                throw new UnsupportedOperationException("Networking unavailable");
         }
 
         // make sure the person that created this class loader

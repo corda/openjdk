@@ -25,7 +25,6 @@
 package java.util.stream;
 
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,7 +34,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
@@ -973,7 +971,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
      * @return an empty sequential stream
      */
     public static<T> Stream<T> empty() {
-        return StreamSupport.stream(Spliterators.<T>emptySpliterator(), false);
+        return StreamSupport.stream(Spliterators.<T>emptySpliterator());
     }
 
     /**
@@ -984,7 +982,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
      * @return a singleton sequential stream
      */
     public static<T> Stream<T> of(T t) {
-        return StreamSupport.stream(new Streams.StreamBuilderImpl<>(t), false);
+        return StreamSupport.stream(new Streams.StreamBuilderImpl<>(t));
     }
 
     /**
@@ -1035,7 +1033,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
         };
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(
                 iterator,
-                Spliterator.ORDERED | Spliterator.IMMUTABLE), false);
+                Spliterator.ORDERED | Spliterator.IMMUTABLE));
     }
 
     /**
@@ -1050,7 +1048,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
     public static<T> Stream<T> generate(Supplier<T> s) {
         Objects.requireNonNull(s);
         return StreamSupport.stream(
-                new StreamSpliterators.InfiniteSupplyingSpliterator.OfRef<>(Long.MAX_VALUE, s), false);
+                new StreamSpliterators.InfiniteSupplyingSpliterator.OfRef<>(Long.MAX_VALUE, s));
     }
 
     /**
@@ -1078,7 +1076,7 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
         @SuppressWarnings("unchecked")
         Spliterator<T> split = new Streams.ConcatSpliterator.OfRef<>(
                 (Spliterator<T>) a.spliterator(), (Spliterator<T>) b.spliterator());
-        Stream<T> stream = StreamSupport.stream(split, a.isParallel() || b.isParallel());
+        Stream<T> stream = StreamSupport.stream(split);
         return stream.onClose(Streams.composedClose(a, b));
     }
 

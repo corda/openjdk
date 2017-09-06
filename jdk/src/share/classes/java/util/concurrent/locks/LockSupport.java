@@ -372,24 +372,6 @@ public class LockSupport {
         UNSAFE.park(true, deadline);
     }
 
-    /**
-     * Returns the pseudo-randomly initialized or updated secondary seed.
-     * Copied from ThreadLocalRandom due to package access restrictions.
-     */
-    static final int nextSecondarySeed() {
-        int r;
-        Thread t = Thread.currentThread();
-        if ((r = UNSAFE.getInt(t, SECONDARY)) != 0) {
-            r ^= r << 13;   // xorshift
-            r ^= r >>> 17;
-            r ^= r << 5;
-        }
-        else if ((r = java.util.concurrent.ThreadLocalRandom.current().nextInt()) == 0)
-            r = 1; // avoid zero
-        UNSAFE.putInt(t, SECONDARY, r);
-        return r;
-    }
-
     // Hotspot implementation via intrinsics API
     private static final sun.misc.Unsafe UNSAFE;
     private static final long parkBlockerOffset;

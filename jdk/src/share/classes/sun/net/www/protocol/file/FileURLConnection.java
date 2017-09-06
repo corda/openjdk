@@ -32,8 +32,8 @@
 package sun.net.www.protocol.file;
 
 import java.net.URL;
-import java.net.FileNameMap;
 import java.io.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import java.text.Collator;
 import java.security.Permission;
 import sun.net.*;
@@ -52,7 +52,6 @@ public class FileURLConnection extends URLConnection {
     static String TEXT_PLAIN = "text/plain";
     static String LAST_MODIFIED = "last-modified";
 
-    String contentType;
     InputStream is;
 
     File file;
@@ -109,11 +108,6 @@ public class FileURLConnection extends URLConnection {
             lastModified = file.lastModified();
 
             if (!isDirectory) {
-                FileNameMap map = java.net.URLConnection.getFileNameMap();
-                contentType = map.getContentTypeFor(filename);
-                if (contentType != null) {
-                    properties.add(CONTENT_TYPE, contentType);
-                }
                 properties.add(CONTENT_LENGTH, String.valueOf(length));
 
                 /*
@@ -182,8 +176,6 @@ public class FileURLConnection extends URLConnection {
 
         if (is == null) {
             if (isDirectory) {
-                FileNameMap map = java.net.URLConnection.getFileNameMap();
-
                 StringBuffer buf = new StringBuffer();
 
                 if (files == null) {
@@ -198,7 +190,7 @@ public class FileURLConnection extends URLConnection {
                     buf.append("\n");
                 }
                 // Put it into a (default) locale-specific byte-stream.
-                is = new ByteArrayInputStream(buf.toString().getBytes());
+                is = new ByteArrayInputStream(buf.toString().getBytes(UTF_8));
             } else {
                 throw new FileNotFoundException(filename);
             }

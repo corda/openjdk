@@ -54,14 +54,10 @@ public class SubjectDomainCombiner implements java.security.DomainCombiner {
     private Set<Principal> principalSet;
     private Principal[] principals;
 
-    private static final sun.security.util.Debug debug =
-        sun.security.util.Debug.getInstance("combiner",
-                                        "\t[SubjectDomainCombiner]");
-
     @SuppressWarnings("deprecation")
     // Note: check only at classloading time, not dynamically during combine()
     private static final boolean useJavaxPolicy =
-        javax.security.auth.Policy.isCustomPolicySet(debug);
+        javax.security.auth.Policy.isCustomPolicySet();
 
     // Relevant only when useJavaxPolicy is true
     private static final boolean allowCaching =
@@ -161,22 +157,6 @@ public class SubjectDomainCombiner implements java.security.DomainCombiner {
      */
     public ProtectionDomain[] combine(ProtectionDomain[] currentDomains,
                                 ProtectionDomain[] assignedDomains) {
-        if (debug != null) {
-            if (subject == null) {
-                debug.println("null subject");
-            } else {
-                final Subject s = subject;
-                AccessController.doPrivileged
-                    (new java.security.PrivilegedAction<Void>() {
-                    public Void run() {
-                        debug.println(s.toString());
-                        return null;
-                    }
-                });
-            }
-            printInputDomains(currentDomains, assignedDomains);
-        }
-
         if (currentDomains == null || currentDomains.length == 0) {
             // No need to optimize assignedDomains because it should
             // have been previously optimized (when it was set).
@@ -196,10 +176,6 @@ public class SubjectDomainCombiner implements java.security.DomainCombiner {
         // have been previously optimized (when it was set).
 
         currentDomains = optimize(currentDomains);
-        if (debug != null) {
-            debug.println("after optimize");
-            printInputDomains(currentDomains, assignedDomains);
-        }
 
         if (currentDomains == null && assignedDomains == null) {
             return null;
@@ -231,10 +207,6 @@ public class SubjectDomainCombiner implements java.security.DomainCombiner {
                 principals = principalSet.toArray
                         (new Principal[principalSet.size()]);
                 cachedPDs.clear();
-
-                if (debug != null) {
-                    debug.println("Subject mutated - clearing cache");
-                }
             }
 
             ProtectionDomain subjectPd;
@@ -262,14 +234,6 @@ public class SubjectDomainCombiner implements java.security.DomainCombiner {
             }
         }
 
-        if (debug != null) {
-            debug.println("updated current: ");
-            for (int i = 0; i < cLen; i++) {
-                debug.println("\tupdated[" + i + "] = " +
-                                printDomain(newDomains[i]));
-            }
-        }
-
         // now add on the assigned domains
         if (aLen > 0) {
             System.arraycopy(assignedDomains, 0, newDomains, cLen, aLen);
@@ -281,18 +245,6 @@ public class SubjectDomainCombiner implements java.security.DomainCombiner {
         }
 
         // if aLen == 0 || allNew, no need to further optimize newDomains
-
-        if (debug != null) {
-            if (newDomains == null || newDomains.length == 0) {
-                debug.println("returning null");
-            } else {
-                debug.println("combinedDomains: ");
-                for (int i = 0; i < newDomains.length; i++) {
-                    debug.println("newDomain " + i + ": " +
-                                  printDomain(newDomains[i]));
-                }
-            }
-        }
 
         // return the new ProtectionDomains
         if (newDomains == null || newDomains.length == 0) {
@@ -341,10 +293,6 @@ public class SubjectDomainCombiner implements java.security.DomainCombiner {
                 principals = principalSet.toArray
                         (new Principal[principalSet.size()]);
                 cachedPDs.clear();
-
-                if (debug != null) {
-                    debug.println("Subject mutated - clearing cache");
-                }
             }
 
             for (int i = 0; i < cLen; i++) {
@@ -400,9 +348,6 @@ public class SubjectDomainCombiner implements java.security.DomainCombiner {
                                 Permission newPerm = e.nextElement();
                                 if (!perms.implies(newPerm)) {
                                     perms.add(newPerm);
-                                    if (debug != null)
-                                        debug.println (
-                                            "Adding perm " + newPerm + "\n");
                                 }
                             }
                         }
@@ -416,28 +361,9 @@ public class SubjectDomainCombiner implements java.security.DomainCombiner {
             }
         }
 
-        if (debug != null) {
-            debug.println("updated current: ");
-            for (int i = 0; i < cLen; i++) {
-                debug.println("\tupdated[" + i + "] = " + newDomains[i]);
-            }
-        }
-
         // now add on the assigned domains
         if (aLen > 0) {
             System.arraycopy(assignedDomains, 0, newDomains, cLen, aLen);
-        }
-
-        if (debug != null) {
-            if (newDomains == null || newDomains.length == 0) {
-                debug.println("returning null");
-            } else {
-                debug.println("combinedDomains: ");
-                for (int i = 0; i < newDomains.length; i++) {
-                    debug.println("newDomain " + i + ": " +
-                        newDomains[i].toString());
-                }
-            }
         }
 
         // return the new ProtectionDomains
@@ -500,38 +426,6 @@ public class SubjectDomainCombiner implements java.security.DomainCombiner {
 
         // cache by default
         return true;
-    }
-
-    private static void printInputDomains(ProtectionDomain[] currentDomains,
-                                ProtectionDomain[] assignedDomains) {
-        if (currentDomains == null || currentDomains.length == 0) {
-            debug.println("currentDomains null or 0 length");
-        } else {
-            for (int i = 0; currentDomains != null &&
-                        i < currentDomains.length; i++) {
-                if (currentDomains[i] == null) {
-                    debug.println("currentDomain " + i + ": SystemDomain");
-                } else {
-                    debug.println("currentDomain " + i + ": " +
-                                printDomain(currentDomains[i]));
-                }
-            }
-        }
-
-        if (assignedDomains == null || assignedDomains.length == 0) {
-            debug.println("assignedDomains null or 0 length");
-        } else {
-            debug.println("assignedDomains = ");
-            for (int i = 0; assignedDomains != null &&
-                        i < assignedDomains.length; i++) {
-                if (assignedDomains[i] == null) {
-                    debug.println("assignedDomain " + i + ": SystemDomain");
-                } else {
-                    debug.println("assignedDomain " + i + ": " +
-                                printDomain(assignedDomains[i]));
-                }
-            }
-        }
     }
 
     private static String printDomain(final ProtectionDomain pd) {

@@ -76,7 +76,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.chrono.ChronoLocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -163,55 +162,6 @@ public final class LocalDateTime
      * The time part.
      */
     private final LocalTime time;
-
-    //-----------------------------------------------------------------------
-    /**
-     * Obtains the current date-time from the system clock in the default time-zone.
-     * <p>
-     * This will query the {@link Clock#systemDefaultZone() system clock} in the default
-     * time-zone to obtain the current date-time.
-     * <p>
-     * Using this method will prevent the ability to use an alternate clock for testing
-     * because the clock is hard-coded.
-     *
-     * @return the current date-time using the system clock and default time-zone, not null
-     */
-    public static LocalDateTime now() {
-        return now(Clock.systemDefaultZone());
-    }
-
-    /**
-     * Obtains the current date-time from the system clock in the specified time-zone.
-     * <p>
-     * This will query the {@link Clock#system(ZoneId) system clock} to obtain the current date-time.
-     * Specifying the time-zone avoids dependence on the default time-zone.
-     * <p>
-     * Using this method will prevent the ability to use an alternate clock for testing
-     * because the clock is hard-coded.
-     *
-     * @param zone  the zone ID to use, not null
-     * @return the current date-time using the system clock, not null
-     */
-    public static LocalDateTime now(ZoneId zone) {
-        return now(Clock.system(zone));
-    }
-
-    /**
-     * Obtains the current date-time from the specified clock.
-     * <p>
-     * This will query the specified clock to obtain the current date-time.
-     * Using this method allows the use of an alternate clock for testing.
-     * The alternate clock may be introduced using {@link Clock dependency injection}.
-     *
-     * @param clock  the clock to use, not null
-     * @return the current date-time, not null
-     */
-    public static LocalDateTime now(Clock clock) {
-        Objects.requireNonNull(clock, "clock");
-        final Instant now = clock.instant();  // called once
-        ZoneOffset offset = clock.getZone().getRules().getOffset(now);
-        return ofEpochSecond(now.getEpochSecond(), now.getNano(), offset);
-    }
 
     //-----------------------------------------------------------------------
     /**
@@ -1987,16 +1937,6 @@ public final class LocalDateTime
      */
     private Object writeReplace() {
         return new Ser(Ser.LOCAL_DATE_TIME_TYPE, this);
-    }
-
-    /**
-     * Defend against malicious streams.
-     *
-     * @param s the stream to read
-     * @throws InvalidObjectException always
-     */
-    private void readObject(ObjectInputStream s) throws InvalidObjectException {
-        throw new InvalidObjectException("Deserialization via serialization delegate");
     }
 
     void writeExternal(DataOutput out) throws IOException {

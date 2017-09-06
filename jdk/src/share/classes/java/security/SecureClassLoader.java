@@ -29,8 +29,6 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.net.URL;
 
-import sun.security.util.Debug;
-
 /**
  * This class extends ClassLoader with additional support for defining
  * classes with an associated code source and permissions which are
@@ -51,8 +49,6 @@ public class SecureClassLoader extends ClassLoader {
     // @GuardedBy("pdcache")
     private final HashMap<CodeSource, ProtectionDomain> pdcache =
                         new HashMap<>(11);
-
-    private static final Debug debug = Debug.getInstance("scl");
 
     static {
         ClassLoader.registerAsParallelCapable();
@@ -206,10 +202,6 @@ public class SecureClassLoader extends ClassLoader {
                 PermissionCollection perms = getPermissions(cs);
                 pd = new ProtectionDomain(cs, perms, this, null);
                 pdcache.put(cs, pd);
-                if (debug != null) {
-                    debug.println(" getPermissions "+ pd);
-                    debug.println("");
-                }
             }
         }
         return pd;

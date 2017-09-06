@@ -72,7 +72,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeFormatter;
@@ -194,58 +193,6 @@ public final class OffsetDateTime
      * The offset from UTC/Greenwich.
      */
     private final ZoneOffset offset;
-
-    //-----------------------------------------------------------------------
-    /**
-     * Obtains the current date-time from the system clock in the default time-zone.
-     * <p>
-     * This will query the {@link Clock#systemDefaultZone() system clock} in the default
-     * time-zone to obtain the current date-time.
-     * The offset will be calculated from the time-zone in the clock.
-     * <p>
-     * Using this method will prevent the ability to use an alternate clock for testing
-     * because the clock is hard-coded.
-     *
-     * @return the current date-time using the system clock, not null
-     */
-    public static OffsetDateTime now() {
-        return now(Clock.systemDefaultZone());
-    }
-
-    /**
-     * Obtains the current date-time from the system clock in the specified time-zone.
-     * <p>
-     * This will query the {@link Clock#system(ZoneId) system clock} to obtain the current date-time.
-     * Specifying the time-zone avoids dependence on the default time-zone.
-     * The offset will be calculated from the specified time-zone.
-     * <p>
-     * Using this method will prevent the ability to use an alternate clock for testing
-     * because the clock is hard-coded.
-     *
-     * @param zone  the zone ID to use, not null
-     * @return the current date-time using the system clock, not null
-     */
-    public static OffsetDateTime now(ZoneId zone) {
-        return now(Clock.system(zone));
-    }
-
-    /**
-     * Obtains the current date-time from the specified clock.
-     * <p>
-     * This will query the specified clock to obtain the current date-time.
-     * The offset will be calculated from the time-zone in the clock.
-     * <p>
-     * Using this method allows the use of an alternate clock for testing.
-     * The alternate clock may be introduced using {@link Clock dependency injection}.
-     *
-     * @param clock  the clock to use, not null
-     * @return the current date-time, not null
-     */
-    public static OffsetDateTime now(Clock clock) {
-        Objects.requireNonNull(clock, "clock");
-        final Instant now = clock.instant();  // called once
-        return ofInstant(now, clock.getZone().getRules().getOffset(now));
-    }
 
     //-----------------------------------------------------------------------
     /**
@@ -1927,16 +1874,6 @@ public final class OffsetDateTime
      */
     private Object writeReplace() {
         return new Ser(Ser.OFFSET_DATE_TIME_TYPE, this);
-    }
-
-    /**
-     * Defend against malicious streams.
-     *
-     * @param s the stream to read
-     * @throws InvalidObjectException always
-     */
-    private void readObject(ObjectInputStream s) throws InvalidObjectException {
-        throw new InvalidObjectException("Deserialization via serialization delegate");
     }
 
     void writeExternal(ObjectOutput out) throws IOException {

@@ -26,6 +26,7 @@
 package sun.security.util;
 
 import java.io.IOException;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import java.util.Base64;
 
 /**
@@ -42,7 +43,7 @@ public class Pem {
      * @throws java.io.IOException if input is invalid
      */
     public static byte[] decode(String input) throws IOException {
-        byte[] src = input.replaceAll("\\s+", "").getBytes();
+        byte[] src = input.replaceAll("\\s+", "").getBytes(UTF_8);
         try {
             return Base64.getDecoder().decode(src);
         } catch (IllegalArgumentException e) {

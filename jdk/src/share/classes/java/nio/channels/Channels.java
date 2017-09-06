@@ -26,7 +26,6 @@
 package java.nio.channels;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -37,7 +36,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.UnsupportedCharsetException;
-import java.nio.channels.spi.AbstractInterruptibleChannel;
 import java.util.concurrent.ExecutionException;
 import sun.nio.ch.ChannelInputStream;
 import sun.nio.cs.StreamDecoder;
@@ -90,16 +88,7 @@ public final class Channels {
     private static void writeFully(WritableByteChannel ch, ByteBuffer bb)
         throws IOException
     {
-        if (ch instanceof SelectableChannel) {
-            SelectableChannel sc = (SelectableChannel)ch;
-            synchronized (sc.blockingLock()) {
-                if (!sc.isBlocking())
-                    throw new IllegalBlockingModeException();
-                writeFullyImpl(ch, bb);
-            }
-        } else {
-            writeFullyImpl(ch, bb);
-        }
+        writeFullyImpl(ch, bb);
     }
 
     // -- Byte streams from channels --
@@ -327,150 +316,6 @@ public final class Channels {
             }
         };
     }
-
-
-    // -- Channels from streams --
-
-    /**
-     * Constructs a channel that reads bytes from the given stream.
-     *
-     * <p> The resulting channel will not be buffered; it will simply redirect
-     * its I/O operations to the given stream.  Closing the channel will in
-     * turn cause the stream to be closed.  </p>
-     *
-     * @param  in
-     *         The stream from which bytes are to be read
-     *
-     * @return  A new readable byte channel
-     */
-    public static ReadableByteChannel newChannel(final InputStream in) {
-        checkNotNull(in, "in");
-
-        if (in instanceof FileInputStream &&
-            FileInputStream.class.equals(in.getClass())) {
-            return ((FileInputStream)in).getChannel();
-        }
-
-        return new ReadableByteChannelImpl(in);
-    }
-
-    private static class ReadableByteChannelImpl
-        extends AbstractInterruptibleChannel    // Not really interruptible
-        implements ReadableByteChannel
-    {
-        InputStream in;
-        private static final int TRANSFER_SIZE = 8192;
-        private byte buf[] = new byte[0];
-        private boolean open = true;
-        private Object readLock = new Object();
-
-        ReadableByteChannelImpl(InputStream in) {
-            this.in = in;
-        }
-
-        public int read(ByteBuffer dst) throws IOException {
-            int len = dst.remaining();
-            int totalRead = 0;
-            int bytesRead = 0;
-            synchronized (readLock) {
-                while (totalRead < len) {
-                    int bytesToRead = Math.min((len - totalRead),
-                                               TRANSFER_SIZE);
-                    if (buf.length < bytesToRead)
-                        buf = new byte[bytesToRead];
-                    if ((totalRead > 0) && !(in.available() > 0))
-                        break; // block at most once
-                    try {
-                        begin();
-                        bytesRead = in.read(buf, 0, bytesToRead);
-                    } finally {
-                        end(bytesRead > 0);
-                    }
-                    if (bytesRead < 0)
-                        break;
-                    else
-                        totalRead += bytesRead;
-                    dst.put(buf, 0, bytesRead);
-                }
-                if ((bytesRead < 0) && (totalRead == 0))
-                    return -1;
-
-                return totalRead;
-            }
-        }
-
-        protected void implCloseChannel() throws IOException {
-            in.close();
-            open = false;
-        }
-    }
-
-
-    /**
-     * Constructs a channel that writes bytes to the given stream.
-     *
-     * <p> The resulting channel will not be buffered; it will simply redirect
-     * its I/O operations to the given stream.  Closing the channel will in
-     * turn cause the stream to be closed.  </p>
-     *
-     * @param  out
-     *         The stream to which bytes are to be written
-     *
-     * @return  A new writable byte channel
-     */
-    public static WritableByteChannel newChannel(final OutputStream out) {
-        checkNotNull(out, "out");
-
-        if (out instanceof FileOutputStream &&
-            FileOutputStream.class.equals(out.getClass())) {
-                return ((FileOutputStream)out).getChannel();
-        }
-
-        return new WritableByteChannelImpl(out);
-    }
-
-    private static class WritableByteChannelImpl
-        extends AbstractInterruptibleChannel    // Not really interruptible
-        implements WritableByteChannel
-    {
-        OutputStream out;
-        private static final int TRANSFER_SIZE = 8192;
-        private byte buf[] = new byte[0];
-        private boolean open = true;
-        private Object writeLock = new Object();
-
-        WritableByteChannelImpl(OutputStream out) {
-            this.out = out;
-        }
-
-        public int write(ByteBuffer src) throws IOException {
-            int len = src.remaining();
-            int totalWritten = 0;
-            synchronized (writeLock) {
-                while (totalWritten < len) {
-                    int bytesToWrite = Math.min((len - totalWritten),
-                                                TRANSFER_SIZE);
-                    if (buf.length < bytesToWrite)
-                        buf = new byte[bytesToWrite];
-                    src.get(buf, 0, bytesToWrite);
-                    try {
-                        begin();
-                        out.write(buf, 0, bytesToWrite);
-                    } finally {
-                        end(bytesToWrite > 0);
-                    }
-                    totalWritten += bytesToWrite;
-                }
-                return totalWritten;
-            }
-        }
-
-        protected void implCloseChannel() throws IOException {
-            out.close();
-            open = false;
-        }
-    }
-
 
     // -- Character streams from channels --
 

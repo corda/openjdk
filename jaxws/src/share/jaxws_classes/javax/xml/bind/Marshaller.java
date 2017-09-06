@@ -27,7 +27,6 @@ package javax.xml.bind;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.validation.Schema;
 import java.io.File;
 
@@ -703,17 +702,11 @@ public interface Marshaller {
 
 
     /**
-     * <p>Associate a context that enables binary data within an XML document
-     * to be transmitted as XML-binary optimized attachment.
-     * The attachment is referenced from the XML document content model
-     * by content-id URIs(cid) references stored within the xml document.
-     *
-     * @throws IllegalStateException if attempt to concurrently call this
-     *                               method during a marshal operation.
+     * @exclude Not supported.
      */
-    void setAttachmentMarshaller(AttachmentMarshaller am);
+    void setAttachmentMarshaller(Object am);
 
-    AttachmentMarshaller getAttachmentMarshaller();
+    Object getAttachmentMarshaller();
 
     /**
      * Specify the JAXP 1.3 {@link javax.xml.validation.Schema Schema}

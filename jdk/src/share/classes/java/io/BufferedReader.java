@@ -382,8 +382,6 @@ public class BufferedReader extends Reader {
      *             stream has been reached
      *
      * @exception  IOException  If an I/O error occurs
-     *
-     * @see java.nio.file.Files#readAllLines
      */
     public String readLine() throws IOException {
         return readLine(false);
@@ -588,6 +586,6 @@ public class BufferedReader extends Reader {
             }
         };
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(
-                iter, Spliterator.ORDERED | Spliterator.NONNULL), false);
+                iter, Spliterator.ORDERED | Spliterator.NONNULL));
     }
 }

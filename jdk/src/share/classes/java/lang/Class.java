@@ -41,7 +41,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.AnnotatedType;
 import java.lang.ref.SoftReference;
 import java.io.InputStream;
-import java.io.ObjectStreamField;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -3158,27 +3157,6 @@ public final class Class<T> implements java.io.Serializable,
 
     /** use serialVersionUID from JDK 1.1 for interoperability */
     private static final long serialVersionUID = 3206093459760846163L;
-
-
-    /**
-     * Class Class is special cased within the Serialization Stream Protocol.
-     *
-     * A Class instance is written initially into an ObjectOutputStream in the
-     * following format:
-     * <pre>
-     *      {@code TC_CLASS} ClassDescriptor
-     *      A ClassDescriptor is a special cased serialization of
-     *      a {@code java.io.ObjectStreamClass} instance.
-     * </pre>
-     * A new handle is generated for the initial time the class descriptor
-     * is written into the stream. Future references to the class descriptor
-     * are written as references to the initial class descriptor instance.
-     *
-     * @see java.io.ObjectStreamClass
-     */
-    private static final ObjectStreamField[] serialPersistentFields =
-        new ObjectStreamField[0];
-
 
     /**
      * Returns the assertion status that would be assigned to this

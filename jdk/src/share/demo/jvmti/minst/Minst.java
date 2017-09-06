@@ -67,8 +67,6 @@ public class Minst {
                     className = location.getClassName();
                     methodName = location.getMethodName();
                 }
-                System.out.println("Reached method entry: " +
-                     className + "." + methodName + "()");
                 engaged++;
             }
         }

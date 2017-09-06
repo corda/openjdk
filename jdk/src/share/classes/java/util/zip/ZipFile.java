@@ -215,10 +215,7 @@ class ZipFile implements ZipConstants, Closeable {
         if (charset == null)
             throw new NullPointerException("charset is null");
         this.zc = ZipCoder.get(charset);
-        long t0 = System.nanoTime();
         jzfile = open(name, mode, file.lastModified(), usemmap);
-        sun.misc.PerfCounter.getZipFileOpenTime().addElapsedTimeFrom(t0);
-        sun.misc.PerfCounter.getZipFileCount().increment();
         this.name = name;
         this.total = getTotal(jzfile);
         this.locsig = startsWithLOC(jzfile);
@@ -550,7 +547,7 @@ class ZipFile implements ZipConstants, Closeable {
         return StreamSupport.stream(Spliterators.spliterator(
                 new ZipEntryIterator(), size(),
                 Spliterator.ORDERED | Spliterator.DISTINCT |
-                        Spliterator.IMMUTABLE | Spliterator.NONNULL), false);
+                        Spliterator.IMMUTABLE | Spliterator.NONNULL));
     }
 
     private ZipEntry getZipEntry(String name, long jzentry) {

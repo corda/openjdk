@@ -25,7 +25,6 @@
 package java.util.stream;
 
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,7 +35,6 @@ import java.util.OptionalLong;
 import java.util.PrimitiveIterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.LongBinaryOperator;
@@ -667,9 +665,6 @@ public interface LongStream extends BaseStream<Long, LongStream> {
     LongStream sequential();
 
     @Override
-    LongStream parallel();
-
-    @Override
     PrimitiveIterator.OfLong iterator();
 
     @Override
@@ -692,7 +687,7 @@ public interface LongStream extends BaseStream<Long, LongStream> {
      * @return an empty sequential stream
      */
     public static LongStream empty() {
-        return StreamSupport.longStream(Spliterators.emptyLongSpliterator(), false);
+        return StreamSupport.longStream(Spliterators.emptyLongSpliterator());
     }
 
     /**
@@ -702,7 +697,7 @@ public interface LongStream extends BaseStream<Long, LongStream> {
      * @return a singleton sequential stream
      */
     public static LongStream of(long t) {
-        return StreamSupport.longStream(new Streams.LongStreamBuilderImpl(t), false);
+        return StreamSupport.longStream(new Streams.LongStreamBuilderImpl(t));
     }
 
     /**
@@ -750,7 +745,7 @@ public interface LongStream extends BaseStream<Long, LongStream> {
         };
         return StreamSupport.longStream(Spliterators.spliteratorUnknownSize(
                 iterator,
-                Spliterator.ORDERED | Spliterator.IMMUTABLE | Spliterator.NONNULL), false);
+                Spliterator.ORDERED | Spliterator.IMMUTABLE | Spliterator.NONNULL));
     }
 
     /**
@@ -764,7 +759,7 @@ public interface LongStream extends BaseStream<Long, LongStream> {
     public static LongStream generate(LongSupplier s) {
         Objects.requireNonNull(s);
         return StreamSupport.longStream(
-                new StreamSpliterators.InfiniteSupplyingSpliterator.OfLong(Long.MAX_VALUE, s), false);
+                new StreamSpliterators.InfiniteSupplyingSpliterator.OfLong(Long.MAX_VALUE, s));
     }
 
     /**
@@ -796,7 +791,7 @@ public interface LongStream extends BaseStream<Long, LongStream> {
             return concat(range(startInclusive, m), range(m, endExclusive));
         } else {
             return StreamSupport.longStream(
-                    new Streams.RangeLongSpliterator(startInclusive, endExclusive, false), false);
+                    new Streams.RangeLongSpliterator(startInclusive, endExclusive, false));
         }
     }
 
@@ -830,7 +825,7 @@ public interface LongStream extends BaseStream<Long, LongStream> {
             return concat(range(startInclusive, m), rangeClosed(m, endInclusive));
         } else {
             return StreamSupport.longStream(
-                    new Streams.RangeLongSpliterator(startInclusive, endInclusive, true), false);
+                    new Streams.RangeLongSpliterator(startInclusive, endInclusive, true));
         }
     }
 
@@ -857,7 +852,7 @@ public interface LongStream extends BaseStream<Long, LongStream> {
 
         Spliterator.OfLong split = new Streams.ConcatSpliterator.OfLong(
                 a.spliterator(), b.spliterator());
-        LongStream stream = StreamSupport.longStream(split, a.isParallel() || b.isParallel());
+        LongStream stream = StreamSupport.longStream(split);
         return stream.onClose(Streams.composedClose(a, b));
     }
 

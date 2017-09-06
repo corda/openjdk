@@ -31,7 +31,6 @@ import java.security.*;
 import java.security.Provider.Service;
 import java.security.spec.*;
 
-import sun.security.util.Debug;
 import sun.security.jca.*;
 import sun.security.jca.GetInstance.Instance;
 
@@ -74,14 +73,6 @@ import sun.security.jca.GetInstance.Instance;
  */
 
 public class KeyAgreement {
-
-    private static final Debug debug =
-                        Debug.getInstance("jca", "KeyAgreement");
-
-    private static final Debug pdebug =
-                        Debug.getInstance("provider", "Provider");
-    private static final boolean skipDebug =
-        Debug.isOn("engine=") && !Debug.isOn("keyagreement");
 
     // The provider
     private Provider provider;
@@ -288,18 +279,6 @@ public class KeyAgreement {
             if (spi != null) {
                 return;
             }
-            if (debug != null) {
-                int w = --warnCount;
-                if (w >= 0) {
-                    debug.println("KeyAgreement.init() not first method "
-                        + "called, disabling delayed provider selection");
-                    if (w == 0) {
-                        debug.println("Further warnings of this type will "
-                            + "be suppressed");
-                    }
-                    new Exception("Call trace").printStackTrace();
-                }
-            }
             Exception lastException = null;
             while ((firstService != null) || serviceIterator.hasNext()) {
                 Service s;
@@ -473,11 +452,6 @@ public class KeyAgreement {
                 throw new InvalidKeyException(e);
             }
         }
-
-        if (!skipDebug && pdebug != null) {
-            pdebug.println("KeyAgreement." + algorithm + " algorithm from: " +
-                this.provider.getName());
-        }
     }
 
     /**
@@ -533,11 +507,6 @@ public class KeyAgreement {
             spi.engineInit(key, params, random);
         } else {
             chooseProvider(I_PARAMS, key, params, random);
-        }
-
-        if (!skipDebug && pdebug != null) {
-            pdebug.println("KeyAgreement." + algorithm + " algorithm from: " +
-                this.provider.getName());
         }
     }
 

@@ -303,13 +303,6 @@ class MemoryCache<K,V> extends Cache<K,V> {
                 cacheMap.put(key, currentEntry);
             }
         }
-        if (DEBUG) {
-            int endSize = cacheMap.size();
-            if (startSize != endSize) {
-                System.out.println("*** Expunged " + (startSize - endSize)
-                        + " entries, " + endSize + " entries left");
-            }
-        }
     }
 
     /**
@@ -328,12 +321,6 @@ class MemoryCache<K,V> extends Cache<K,V> {
             if (entry.isValid(time) == false) {
                 t.remove();
                 cnt++;
-            }
-        }
-        if (DEBUG) {
-            if (cnt != 0) {
-                System.out.println("Removed " + cnt
-                        + " expired entries, remaining " + cacheMap.size());
             }
         }
     }
@@ -372,10 +359,6 @@ class MemoryCache<K,V> extends Cache<K,V> {
             if (cacheMap.size() > maxSize) { // still too large?
                 Iterator<CacheEntry<K,V>> t = cacheMap.values().iterator();
                 CacheEntry<K,V> lruEntry = t.next();
-                if (DEBUG) {
-                    System.out.println("** Overflow removal "
-                        + lruEntry.getKey() + " | " + lruEntry.getValue());
-                }
                 t.remove();
                 lruEntry.invalidate();
             }
@@ -390,9 +373,6 @@ class MemoryCache<K,V> extends Cache<K,V> {
         }
         long time = (lifetime == 0) ? 0 : System.currentTimeMillis();
         if (entry.isValid(time) == false) {
-            if (DEBUG) {
-                System.out.println("Ignoring expired entry");
-            }
             cacheMap.remove(key);
             return null;
         }
@@ -413,29 +393,17 @@ class MemoryCache<K,V> extends Cache<K,V> {
             Iterator<CacheEntry<K,V>> t = cacheMap.values().iterator();
             for (int i = cacheMap.size() - size; i > 0; i--) {
                 CacheEntry<K,V> lruEntry = t.next();
-                if (DEBUG) {
-                    System.out.println("** capacity reset removal "
-                        + lruEntry.getKey() + " | " + lruEntry.getValue());
-                }
                 t.remove();
                 lruEntry.invalidate();
             }
         }
 
         maxSize = size > 0 ? size : 0;
-
-        if (DEBUG) {
-            System.out.println("** capacity reset to " + size);
-        }
     }
 
     public synchronized void setTimeout(int timeout) {
         emptyQueue();
         lifetime = timeout > 0 ? timeout * 1000L : 0L;
-
-        if (DEBUG) {
-            System.out.println("** lifetime reset to " + timeout);
-        }
     }
 
     // it is a heavyweight method.

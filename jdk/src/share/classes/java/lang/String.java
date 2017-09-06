@@ -25,7 +25,6 @@
 
 package java.lang;
 
-import java.io.ObjectStreamField;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -118,16 +117,6 @@ public final class String
 
     /** use serialVersionUID from JDK 1.0.2 for interoperability */
     private static final long serialVersionUID = -6849794470754667710L;
-
-    /**
-     * Class String is special cased within the Serialization Stream Protocol.
-     *
-     * A String instance is written into an ObjectOutputStream according to
-     * <a href="{@docRoot}/../platform/serialization/spec/output.html">
-     * Object Serialization Specification, Section 6.2, "Stream Elements"</a>
-     */
-    private static final ObjectStreamField[] serialPersistentFields =
-        new ObjectStreamField[0];
 
     /**
      * Initializes a newly created {@code String} object so that it represents
@@ -546,26 +535,6 @@ public final class String
     }
 
     /**
-     * Constructs a new {@code String} by decoding the specified array of bytes
-     * using the platform's default charset.  The length of the new {@code
-     * String} is a function of the charset, and hence may not be equal to the
-     * length of the byte array.
-     *
-     * <p> The behavior of this constructor when the given bytes are not valid
-     * in the default charset is unspecified.  The {@link
-     * java.nio.charset.CharsetDecoder} class should be used when more control
-     * over the decoding process is required.
-     *
-     * @param  bytes
-     *         The bytes to be decoded into characters
-     *
-     * @since  JDK1.1
-     */
-    public String(byte bytes[]) {
-        this(bytes, 0, bytes.length);
-    }
-
-    /**
      * Allocates a new string that contains the sequence of characters
      * currently contained in the string buffer argument. The contents of the
      * string buffer are copied; subsequent modification of the string buffer
@@ -938,23 +907,6 @@ public final class String
     public byte[] getBytes(Charset charset) {
         if (charset == null) throw new NullPointerException();
         return StringCoding.encode(charset, value, 0, value.length);
-    }
-
-    /**
-     * Encodes this {@code String} into a sequence of bytes using the
-     * platform's default charset, storing the result into a new byte array.
-     *
-     * <p> The behavior of this method when this string cannot be encoded in
-     * the default charset is unspecified.  The {@link
-     * java.nio.charset.CharsetEncoder} class should be used when more control
-     * over the encoding process is required.
-     *
-     * @return  The resultant byte array
-     *
-     * @since      JDK1.1
-     */
-    public byte[] getBytes() {
-        return StringCoding.encode(value, 0, value.length);
     }
 
     /**

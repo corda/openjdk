@@ -235,73 +235,6 @@ public class Executors {
     }
 
     /**
-     * Creates a single-threaded executor that can schedule commands
-     * to run after a given delay, or to execute periodically.
-     * (Note however that if this single
-     * thread terminates due to a failure during execution prior to
-     * shutdown, a new one will take its place if needed to execute
-     * subsequent tasks.)  Tasks are guaranteed to execute
-     * sequentially, and no more than one task will be active at any
-     * given time. Unlike the otherwise equivalent
-     * {@code newScheduledThreadPool(1)} the returned executor is
-     * guaranteed not to be reconfigurable to use additional threads.
-     * @return the newly created scheduled executor
-     */
-    public static ScheduledExecutorService newSingleThreadScheduledExecutor() {
-        return new DelegatedScheduledExecutorService
-            (new ScheduledThreadPoolExecutor(1));
-    }
-
-    /**
-     * Creates a single-threaded executor that can schedule commands
-     * to run after a given delay, or to execute periodically.  (Note
-     * however that if this single thread terminates due to a failure
-     * during execution prior to shutdown, a new one will take its
-     * place if needed to execute subsequent tasks.)  Tasks are
-     * guaranteed to execute sequentially, and no more than one task
-     * will be active at any given time. Unlike the otherwise
-     * equivalent {@code newScheduledThreadPool(1, threadFactory)}
-     * the returned executor is guaranteed not to be reconfigurable to
-     * use additional threads.
-     * @param threadFactory the factory to use when creating new
-     * threads
-     * @return a newly created scheduled executor
-     * @throws NullPointerException if threadFactory is null
-     */
-    public static ScheduledExecutorService newSingleThreadScheduledExecutor(ThreadFactory threadFactory) {
-        return new DelegatedScheduledExecutorService
-            (new ScheduledThreadPoolExecutor(1, threadFactory));
-    }
-
-    /**
-     * Creates a thread pool that can schedule commands to run after a
-     * given delay, or to execute periodically.
-     * @param corePoolSize the number of threads to keep in the pool,
-     * even if they are idle
-     * @return a newly created scheduled thread pool
-     * @throws IllegalArgumentException if {@code corePoolSize < 0}
-     */
-    public static ScheduledExecutorService newScheduledThreadPool(int corePoolSize) {
-        return new ScheduledThreadPoolExecutor(corePoolSize);
-    }
-
-    /**
-     * Creates a thread pool that can schedule commands to run after a
-     * given delay, or to execute periodically.
-     * @param corePoolSize the number of threads to keep in the pool,
-     * even if they are idle
-     * @param threadFactory the factory to use when the executor
-     * creates a new thread
-     * @return a newly created scheduled thread pool
-     * @throws IllegalArgumentException if {@code corePoolSize < 0}
-     * @throws NullPointerException if threadFactory is null
-     */
-    public static ScheduledExecutorService newScheduledThreadPool(
-            int corePoolSize, ThreadFactory threadFactory) {
-        return new ScheduledThreadPoolExecutor(corePoolSize, threadFactory);
-    }
-
-    /**
      * Returns an object that delegates all defined {@link
      * ExecutorService} methods to the given executor, but not any
      * other methods that might otherwise be accessible using
@@ -315,22 +248,6 @@ public class Executors {
         if (executor == null)
             throw new NullPointerException();
         return new DelegatedExecutorService(executor);
-    }
-
-    /**
-     * Returns an object that delegates all defined {@link
-     * ScheduledExecutorService} methods to the given executor, but
-     * not any other methods that might otherwise be accessible using
-     * casts. This provides a way to safely "freeze" configuration and
-     * disallow tuning of a given concrete implementation.
-     * @param executor the underlying implementation
-     * @return a {@code ScheduledExecutorService} instance
-     * @throws NullPointerException if executor null
-     */
-    public static ScheduledExecutorService unconfigurableScheduledExecutorService(ScheduledExecutorService executor) {
-        if (executor == null)
-            throw new NullPointerException();
-        return new DelegatedScheduledExecutorService(executor);
     }
 
     /**
@@ -710,32 +627,6 @@ public class Executors {
         }
         protected void finalize() {
             super.shutdown();
-        }
-    }
-
-    /**
-     * A wrapper class that exposes only the ScheduledExecutorService
-     * methods of a ScheduledExecutorService implementation.
-     */
-    static class DelegatedScheduledExecutorService
-            extends DelegatedExecutorService
-            implements ScheduledExecutorService {
-        private final ScheduledExecutorService e;
-        DelegatedScheduledExecutorService(ScheduledExecutorService executor) {
-            super(executor);
-            e = executor;
-        }
-        public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
-            return e.schedule(command, delay, unit);
-        }
-        public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
-            return e.schedule(callable, delay, unit);
-        }
-        public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
-            return e.scheduleAtFixedRate(command, initialDelay, period, unit);
-        }
-        public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
-            return e.scheduleWithFixedDelay(command, initialDelay, delay, unit);
         }
     }
 

@@ -36,7 +36,6 @@ import java.security.Provider.Service;
 
 import sun.security.jca.*;
 import sun.security.jca.GetInstance.Instance;
-import sun.security.util.Debug;
 
 /**
  * This class instantiates implementations of JCE engine classes from
@@ -66,33 +65,12 @@ final class JceSecurity {
     private final static Map<Provider, Object> verifyingProviders =
             new IdentityHashMap<>();
 
-    private static final boolean isRestricted;
-
-    private static final Debug debug =
-                        Debug.getInstance("jca", "Cipher");
+    private static final boolean isRestricted = true;
 
     /*
      * Don't let anyone instantiate this.
      */
     private JceSecurity() {
-    }
-
-    static {
-        try {
-            AccessController.doPrivileged(
-                new PrivilegedExceptionAction<Object>() {
-                    public Object run() throws Exception {
-                        setupJurisdictionPolicies();
-                        return null;
-                    }
-                });
-
-            isRestricted = defaultPolicy.implies(
-                CryptoAllPermission.INSTANCE) ? false : true;
-        } catch (Exception e) {
-            throw new SecurityException(
-                    "Can not initialize cryptographic mechanism", e);
-        }
     }
 
     static Instance getInstance(String type, Class<?> clazz, String algorithm,
@@ -263,7 +241,7 @@ final class JceSecurity {
      * If none of the above 2 conditions are met, the JDK will default
      * to using the limited crypto policy files found in the
      * jre/lib/security/policy/limited/ directory
-     */
+     *
     private static void setupJurisdictionPolicies() throws Exception {
         // Sanity check the crypto.policy Security property.  Single
         // directory entry, no pseudo-directories (".", "..", leading/trailing
@@ -287,10 +265,6 @@ final class JceSecurity {
             // populate with java.home
             cpPath = Paths.get(javaHomeProperty, "lib", "security",
                     "policy", cryptoPolicyProperty);
-        }
-
-        if (debug != null) {
-            debug.println("crypto policy directory: " + cpPath);
         }
 
         File exportJar = new File(cpPath.toFile(),"US_export_policy.jar");
@@ -340,6 +314,7 @@ final class JceSecurity {
             exemptPolicy = exemptExport.getMinimum(exemptImport);
         }
     }
+     */
 
     /**
      * Load the policies from the specified file. Also checks that the

@@ -34,6 +34,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import sun.nio.cs.Surrogate;
 
 abstract class ISO2022
@@ -449,7 +450,7 @@ abstract class ISO2022
                 if (!SODesDefined) {
                     newSODesDefined = true;
                     ebyte[0] = ISO_ESC;
-                    tmpByte = SODesig.getBytes();
+                    tmpByte = SODesig.getBytes(UTF_8);
                     System.arraycopy(tmpByte,0,ebyte,1,tmpByte.length);
                     index = tmpByte.length+1;
                 }
@@ -465,7 +466,7 @@ abstract class ISO2022
                         if (!SS2DesDefined) {
                             newSS2DesDefined = true;
                             ebyte[0] = ISO_ESC;
-                            tmpByte = SS2Desig.getBytes();
+                            tmpByte = SS2Desig.getBytes(UTF_8);
                             System.arraycopy(tmpByte, 0, ebyte, 1, tmpByte.length);
                             index = tmpByte.length+1;
                         }
@@ -477,7 +478,7 @@ abstract class ISO2022
                         if(!SS3DesDefined){
                             newSS3DesDefined = true;
                             ebyte[0] = ISO_ESC;
-                            tmpByte = SS3Desig.getBytes();
+                            tmpByte = SS3Desig.getBytes(UTF_8);
                             System.arraycopy(tmpByte, 0, ebyte, 1, tmpByte.length);
                             index = tmpByte.length+1;
                         }

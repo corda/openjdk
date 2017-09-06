@@ -68,7 +68,6 @@ public class SignatureParser {
     private int index = 0; // index into the input
     // used to mark end of input
     private static final char EOI = ':';
-    private static final boolean DEBUG = false;
 
     // private constructor - enforces use of static factory
     private SignatureParser(){}
@@ -151,7 +150,6 @@ public class SignatureParser {
      * class signature
      */
     public ClassSignature parseClassSig(String s) {
-        if (DEBUG) System.out.println("Parsing class sig:" + s);
         input = s.toCharArray();
         return parseClassSignature();
     }
@@ -166,7 +164,6 @@ public class SignatureParser {
      * method signature
      */
     public MethodTypeSignature parseMethodSig(String s) {
-        if (DEBUG) System.out.println("Parsing method sig:" + s);
         input = s.toCharArray();
         return parseMethodTypeSignature();
     }
@@ -183,7 +180,6 @@ public class SignatureParser {
      * type signature
      */
     public TypeSignature parseTypeSig(String s) {
-        if (DEBUG) System.out.println("Parsing type sig:" + s);
         input = s.toCharArray();
         return parseTypeSignature();
     }
@@ -342,7 +338,6 @@ public class SignatureParser {
         case ';':
             return SimpleClassTypeSignature.make(id, false, new TypeArgument[0]); // all done!
         case '<':
-            if (DEBUG) System.out.println("\t remainder: " + remainder());
             return SimpleClassTypeSignature.make(id, false, parseTypeArguments());
         default:
             throw error("expected '<' or ';' but got " + current());

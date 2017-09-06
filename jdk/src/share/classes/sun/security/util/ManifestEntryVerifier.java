@@ -42,8 +42,6 @@ import sun.security.jca.Providers;
 
 public class ManifestEntryVerifier {
 
-    private static final Debug debug = Debug.getInstance("jar");
-
     /**
      * Holder class to lazily load Sun provider. NOTE: if
      * Providers.getSunProvider returned a cached provider, we could avoid the
@@ -205,14 +203,6 @@ public class ManifestEntryVerifier {
             MessageDigest digest  = digests.get(i);
             byte [] manHash = manifestHashes.get(i);
             byte [] theHash = digest.digest();
-
-            if (debug != null) {
-                debug.println("Manifest Entry: " +
-                                   name + " digest=" + digest.getAlgorithm());
-                debug.println("  manifest " + toHex(manHash));
-                debug.println("  computed " + toHex(theHash));
-                debug.println();
-            }
 
             if (!MessageDigest.isEqual(theHash, manHash))
                 throw new SecurityException(digest.getAlgorithm()+

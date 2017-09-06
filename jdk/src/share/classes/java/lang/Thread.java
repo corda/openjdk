@@ -133,7 +133,6 @@ import sun.security.util.SecurityConstants;
  * @exclude Not deterministic.
  * @author  unascribed
  * @see     Runnable
- * @see     Runtime#exit(int)
  * @see     #run()
  * @see     #stop()
  * @since   JDK1.0

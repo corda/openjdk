@@ -27,7 +27,6 @@ package java.security;
 
 import java.util.ArrayList;
 import java.util.List;
-import sun.security.util.Debug;
 import sun.security.util.SecurityConstants;
 
 
@@ -96,22 +95,6 @@ public final class AccessControlContext {
     // is constrained by limited privilege scope?
     private boolean isLimited;
     private ProtectionDomain limitedContext[];
-
-    private static boolean debugInit = false;
-    private static Debug debug = null;
-
-    static Debug getDebug()
-    {
-        if (debugInit)
-            return debug;
-        else {
-            if (Policy.isSet()) {
-                debug = Debug.getInstance("access");
-                debugInit = true;
-            }
-            return debug;
-        }
-    }
 
     /**
      * Create an AccessControlContext with the given array of ProtectionDomains.
@@ -391,43 +374,8 @@ public final class AccessControlContext {
     public void checkPermission(Permission perm)
         throws AccessControlException
     {
-        boolean dumpDebug = false;
-
         if (perm == null) {
             throw new NullPointerException("permission can't be null");
-        }
-        if (getDebug() != null) {
-            // If "codebase" is not specified, we dump the info by default.
-            dumpDebug = !Debug.isOn("codebase=");
-            if (!dumpDebug) {
-                // If "codebase" is specified, only dump if the specified code
-                // value is in the stack.
-                for (int i = 0; context != null && i < context.length; i++) {
-                    if (context[i].getCodeSource() != null &&
-                        context[i].getCodeSource().getLocation() != null &&
-                        Debug.isOn("codebase=" + context[i].getCodeSource().getLocation().toString())) {
-                        dumpDebug = true;
-                        break;
-                    }
-                }
-            }
-
-            dumpDebug &= !Debug.isOn("permission=") ||
-                Debug.isOn("permission=" + perm.getClass().getCanonicalName());
-
-            if (dumpDebug && Debug.isOn("stack")) {
-                Thread.dumpStack();
-            }
-
-            if (dumpDebug && Debug.isOn("domain")) {
-                if (context == null) {
-                    debug.println("domain (context is null)");
-                } else {
-                    for (int i=0; i< context.length; i++) {
-                        debug.println("domain "+i+" "+context[i]);
-                    }
-                }
-            }
         }
 
         /*
@@ -448,36 +396,11 @@ public final class AccessControlContext {
 
         for (int i=0; i< context.length; i++) {
             if (context[i] != null &&  !context[i].implies(perm)) {
-                if (dumpDebug) {
-                    debug.println("access denied " + perm);
-                }
-
-                if (Debug.isOn("failure") && debug != null) {
-                    // Want to make sure this is always displayed for failure,
-                    // but do not want to display again if already displayed
-                    // above.
-                    if (!dumpDebug) {
-                        debug.println("access denied " + perm);
-                    }
-                    Thread.dumpStack();
-                    final ProtectionDomain pd = context[i];
-                    final Debug db = debug;
-                    AccessController.doPrivileged (new PrivilegedAction<Void>() {
-                        public Void run() {
-                            db.println("domain that failed "+pd);
-                            return null;
-                        }
-                    });
-                }
                 throw new AccessControlException("access denied "+perm, perm);
             }
         }
 
         // allow if all of them allowed access
-        if (dumpDebug) {
-            debug.println("access allowed "+perm);
-        }
-
         checkPermission2(perm);
     }
 
@@ -598,9 +521,6 @@ public final class AccessControlContext {
 
         if (acc != null && acc.combiner != null) {
             // let the assigned acc's combiner do its thing
-            if (getDebug() != null) {
-                debug.println("AccessControlContext invoking the Combiner");
-            }
 
             // No need to clone current and assigned.context
             // combine() will not update them

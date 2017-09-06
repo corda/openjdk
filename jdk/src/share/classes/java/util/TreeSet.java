@@ -483,57 +483,6 @@ public class TreeSet<E> extends AbstractSet<E>
     }
 
     /**
-     * Save the state of the {@code TreeSet} instance to a stream (that is,
-     * serialize it).
-     *
-     * @serialData Emits the comparator used to order this set, or
-     *             {@code null} if it obeys its elements' natural ordering
-     *             (Object), followed by the size of the set (the number of
-     *             elements it contains) (int), followed by all of its
-     *             elements (each an Object) in order (as determined by the
-     *             set's Comparator, or by the elements' natural ordering if
-     *             the set has no Comparator).
-     */
-    private void writeObject(java.io.ObjectOutputStream s)
-        throws java.io.IOException {
-        // Write out any hidden stuff
-        s.defaultWriteObject();
-
-        // Write out Comparator
-        s.writeObject(m.comparator());
-
-        // Write out size
-        s.writeInt(m.size());
-
-        // Write out all elements in the proper order.
-        for (E e : m.keySet())
-            s.writeObject(e);
-    }
-
-    /**
-     * Reconstitute the {@code TreeSet} instance from a stream (that is,
-     * deserialize it).
-     */
-    private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
-        // Read in any hidden stuff
-        s.defaultReadObject();
-
-        // Read in Comparator
-        @SuppressWarnings("unchecked")
-            Comparator<? super E> c = (Comparator<? super E>) s.readObject();
-
-        // Create backing TreeMap
-        TreeMap<E,Object> tm = new TreeMap<>(c);
-        m = tm;
-
-        // Read in size
-        int size = s.readInt();
-
-        tm.readTreeSet(size, s, PRESENT);
-    }
-
-    /**
      * Creates a <em><a href="Spliterator.html#binding">late-binding</a></em>
      * and <em>fail-fast</em> {@link Spliterator} over the elements in this
      * set.

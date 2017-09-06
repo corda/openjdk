@@ -25,7 +25,6 @@
 
 package sun.security.util;
 
-import java.net.SocketPermission;
 import java.net.NetPermission;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -219,8 +218,4 @@ public final class SecurityConstants {
     // java.security.Policy, java.security.ProtectionDomain
     public static final SecurityPermission GET_POLICY_PERMISSION =
         new SecurityPermission ("getPolicy");
-
-    // java.lang.SecurityManager
-    public static final SocketPermission LOCAL_LISTEN_PERMISSION =
-        new SocketPermission("localhost:0", SOCKET_LISTEN_ACTION);
 }

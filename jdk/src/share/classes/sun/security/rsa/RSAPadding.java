@@ -34,8 +34,6 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.spec.PSource;
 import javax.crypto.spec.OAEPParameterSpec;
 
-import sun.security.jca.JCAUtil;
-
 /**
  * RSA padding and unpadding.
  *
@@ -244,28 +242,14 @@ public final class RSAPadding {
      */
     public byte[] pad(byte[] data, int ofs, int len)
             throws BadPaddingException {
-        return pad(RSACore.convert(data, ofs, len));
+        throw new UnsupportedOperationException("Encryption is unsupported");
     }
 
     /**
      * Pad the data and return the padded block.
      */
     public byte[] pad(byte[] data) throws BadPaddingException {
-        if (data.length > maxDataSize) {
-            throw new BadPaddingException("Data must be shorter than "
-                + (maxDataSize + 1) + " bytes");
-        }
-        switch (type) {
-        case PAD_NONE:
-            return data;
-        case PAD_BLOCKTYPE_1:
-        case PAD_BLOCKTYPE_2:
-            return padV15(data);
-        case PAD_OAEP_MGF1:
-            return padOAEP(data);
-        default:
-            throw new AssertionError();
-        }
+        throw new UnsupportedOperationException("Encryption is unsupported");
     }
 
     /**
@@ -294,46 +278,6 @@ public final class RSAPadding {
         default:
             throw new AssertionError();
         }
-    }
-
-    /**
-     * PKCS#1 v1.5 padding (blocktype 1 and 2).
-     */
-    private byte[] padV15(byte[] data) throws BadPaddingException {
-        byte[] padded = new byte[paddedSize];
-        System.arraycopy(data, 0, padded, paddedSize - data.length,
-            data.length);
-        int psSize = paddedSize - 3 - data.length;
-        int k = 0;
-        padded[k++] = 0;
-        padded[k++] = (byte)type;
-        if (type == PAD_BLOCKTYPE_1) {
-            // blocktype 1: all padding bytes are 0xff
-            while (psSize-- > 0) {
-                padded[k++] = (byte)0xff;
-            }
-        } else {
-            // blocktype 2: padding bytes are random non-zero bytes
-            if (random == null) {
-                random = JCAUtil.getSecureRandom();
-            }
-            // generate non-zero padding bytes
-            // use a buffer to reduce calls to SecureRandom
-            byte[] r = new byte[64];
-            int i = -1;
-            while (psSize-- > 0) {
-                int b;
-                do {
-                    if (i < 0) {
-                        random.nextBytes(r);
-                        i = r.length - 1;
-                    }
-                    b = r[i--] & 0xff;
-                } while (b == 0);
-                padded[k++] = (byte)b;
-            }
-        }
-        return padded;
     }
 
     /**
@@ -384,57 +328,6 @@ public final class RSAPadding {
         } else {
             return data;
         }
-    }
-
-    /**
-     * PKCS#1 v2.0 OAEP padding (MGF1).
-     * Paragraph references refer to PKCS#1 v2.1 (June 14, 2002)
-     */
-    private byte[] padOAEP(byte[] M) throws BadPaddingException {
-        if (random == null) {
-            random = JCAUtil.getSecureRandom();
-        }
-        int hLen = lHash.length;
-
-        // 2.d: generate a random octet string seed of length hLen
-        // if necessary
-        byte[] seed = new byte[hLen];
-        random.nextBytes(seed);
-
-        // buffer for encoded message EM
-        byte[] EM = new byte[paddedSize];
-
-        // start and length of seed (as index into EM)
-        int seedStart = 1;
-        int seedLen = hLen;
-
-        // copy seed into EM
-        System.arraycopy(seed, 0, EM, seedStart, seedLen);
-
-        // start and length of data block DB in EM
-        // we place it inside of EM to reduce copying
-        int dbStart = hLen + 1;
-        int dbLen = EM.length - dbStart;
-
-        // start of message M in EM
-        int mStart = paddedSize - M.length;
-
-        // build DB
-        // 2.b: Concatenate lHash, PS, a single octet with hexadecimal value
-        // 0x01, and the message M to form a data block DB of length
-        // k - hLen -1 octets as DB = lHash || PS || 0x01 || M
-        // (note that PS is all zeros)
-        System.arraycopy(lHash, 0, EM, dbStart, hLen);
-        EM[mStart - 1] = 1;
-        System.arraycopy(M, 0, EM, mStart, M.length);
-
-        // produce maskedDB
-        mgf1(EM, seedStart, seedLen, EM, dbStart, dbLen);
-
-        // produce maskSeed
-        mgf1(EM, dbStart, dbLen, EM, seedStart, seedLen);
-
-        return EM;
     }
 
     /**

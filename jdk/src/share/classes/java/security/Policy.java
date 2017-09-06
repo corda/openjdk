@@ -30,7 +30,6 @@ import java.util.Enumeration;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import sun.security.jca.GetInstance;
-import sun.security.util.Debug;
 import sun.security.util.SecurityConstants;
 
 
@@ -109,8 +108,6 @@ public abstract class Policy {
     private static AtomicReference<PolicyInfo> policy =
         new AtomicReference<>(new PolicyInfo(null, false));
 
-    private static final Debug debug = Debug.getInstance("policy");
-
     // Cache mapping ProtectionDomain.Key to PermissionCollection
     private WeakHashMap<ProtectionDomain.Key, PermissionCollection> pdMapping;
 
@@ -162,86 +159,7 @@ public abstract class Policy {
      */
     static Policy getPolicyNoCheck()
     {
-        PolicyInfo pi = policy.get();
-        // Use double-check idiom to avoid locking if system-wide policy is
-        // already initialized
-        if (pi.initialized == false || pi.policy == null) {
-            synchronized (Policy.class) {
-                PolicyInfo pinfo = policy.get();
-                if (pinfo.policy == null) {
-                    String policy_class = AccessController.doPrivileged(
-                        new PrivilegedAction<String>() {
-                        public String run() {
-                            return Security.getProperty("policy.provider");
-                        }
-                    });
-                    if (policy_class == null) {
-                        policy_class = "sun.security.provider.PolicyFile";
-                    }
-
-                    try {
-                        pinfo = new PolicyInfo(
-                            (Policy) Class.forName(policy_class).newInstance(),
-                            true);
-                    } catch (Exception e) {
-                        /*
-                         * The policy_class seems to be an extension
-                         * so we have to bootstrap loading it via a policy
-                         * provider that is on the bootclasspath.
-                         * If it loads then shift gears to using the configured
-                         * provider.
-                         */
-
-                        // install the bootstrap provider to avoid recursion
-                        Policy polFile = new sun.security.provider.PolicyFile();
-                        pinfo = new PolicyInfo(polFile, false);
-                        policy.set(pinfo);
-
-                        final String pc = policy_class;
-                        Policy pol = AccessController.doPrivileged(
-                            new PrivilegedAction<Policy>() {
-                            public Policy run() {
-                                try {
-                                    ClassLoader cl =
-                                            ClassLoader.getSystemClassLoader();
-                                    // we want the extension loader
-                                    ClassLoader extcl = null;
-                                    while (cl != null) {
-                                        extcl = cl;
-                                        cl = cl.getParent();
-                                    }
-                                    return (extcl != null ? (Policy)Class.forName(
-                                            pc, true, extcl).newInstance() : null);
-                                } catch (Exception e) {
-                                    if (debug != null) {
-                                        debug.println("policy provider " +
-                                                    pc +
-                                                    " not available");
-                                        e.printStackTrace();
-                                    }
-                                    return null;
-                                }
-                            }
-                        });
-                        /*
-                         * if it loaded install it as the policy provider. Otherwise
-                         * continue to use the system default implementation
-                         */
-                        if (pol != null) {
-                            pinfo = new PolicyInfo(pol, true);
-                        } else {
-                            if (debug != null) {
-                                debug.println("using sun.security.provider.PolicyFile");
-                            }
-                            pinfo = new PolicyInfo(polFile, true);
-                        }
-                    }
-                    policy.set(pinfo);
-                }
-                return pinfo.policy;
-            }
-        }
-        return pi.policy;
+        throw new UnsupportedOperationException("Policy file disabled");
     }
 
     /**

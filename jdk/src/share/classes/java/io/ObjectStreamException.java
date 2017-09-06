@@ -28,6 +28,7 @@ package java.io;
 /**
  * Superclass of all exceptions specific to Object Stream classes.
  *
+ * @exclude Not supported.
  * @author  unascribed
  * @since   JDK1.1
  */

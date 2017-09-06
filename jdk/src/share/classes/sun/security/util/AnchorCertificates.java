@@ -44,7 +44,6 @@ import sun.security.x509.X509CertImpl;
  */
 public class AnchorCertificates {
 
-    private static final Debug debug = Debug.getInstance("certpath");
     private static final String HASH = "SHA-256";
     private static Set<String> certs = Collections.emptySet();
 
@@ -73,9 +72,6 @@ public class AnchorCertificates {
                         }
                     }
                 } catch (Exception e) {
-                    if (debug != null) {
-                        debug.println("Error parsing cacerts");
-                    }
                     e.printStackTrace();
                 }
                 return null;
@@ -92,10 +88,6 @@ public class AnchorCertificates {
     public static boolean contains(X509Certificate cert) {
         String key = X509CertImpl.getFingerprint(HASH, cert);
         boolean result = certs.contains(key);
-        if (result && debug != null) {
-            debug.println("AnchorCertificate.contains: matched " +
-                    cert.getSubjectDN());
-        }
         return result;
     }
 

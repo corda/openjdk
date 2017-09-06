@@ -1533,20 +1533,7 @@ public abstract class ResourceBundle {
      * including the leaf, have expired.
      */
     private static boolean hasValidParentChain(ResourceBundle bundle) {
-        long now = System.currentTimeMillis();
-        while (bundle != null) {
-            if (bundle.expired) {
-                return false;
-            }
-            CacheKey key = bundle.cacheKey;
-            if (key != null) {
-                long expirationTime = key.expirationTime;
-                if (expirationTime >= 0 && expirationTime <= now) {
-                    return false;
-                }
-            }
-            bundle = bundle.parent;
-        }
+        // We cannot expire bundles without knowing the current time.
         return true;
     }
 
