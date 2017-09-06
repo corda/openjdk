@@ -112,6 +112,7 @@
  * Where the specific error cannot be detected then the more general {@code
  * IOException} is thrown.
  *
+ * @exclude File handling is not deterministic.
  * @since 1.7
  */
 package java.nio.file;

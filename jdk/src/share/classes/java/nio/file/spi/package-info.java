@@ -33,6 +33,7 @@
  * or method in any class or interface in this package will cause a {@link
  * java.lang.NullPointerException NullPointerException} to be thrown.
  *
+ * @exclude File handling is not deterministic.
  * @since 1.7
  */
 

@@ -38,6 +38,7 @@ import java.util.List;
  * <p>
  * Applications should not create their own file descriptors.
  *
+ * @exclude File handling is not deterministic.
  * @author  Pavani Diwanji
  * @see     java.io.FileInputStream
  * @see     java.io.FileOutputStream
