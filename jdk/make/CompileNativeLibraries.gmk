@@ -81,7 +81,7 @@ include lib/NioLibraries.gmk
 
 include lib/SecurityLibraries.gmk
 
-include lib/ServiceabilityLibraries.gmk
+#include lib/ServiceabilityLibraries.gmk
 
 # Include the corresponding custom file, if present. 
 -include $(CUSTOM_MAKE_DIR)/CompileNativeLibraries.gmk
