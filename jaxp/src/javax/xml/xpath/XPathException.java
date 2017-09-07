@@ -27,9 +27,6 @@ package javax.xml.xpath;
 
 import java.io.PrintWriter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamField;
 import java.io.InvalidClassException;
 
 /**
@@ -40,10 +37,6 @@ import java.io.InvalidClassException;
  * @since 1.5
  */
 public class XPathException extends Exception {
-
-    private static final ObjectStreamField[] serialPersistentFields = {
-        new ObjectStreamField( "cause", Throwable.class )
-    };
 
     /**
      * <p>Stream Unique Identifier.</p>
@@ -96,46 +89,6 @@ public class XPathException extends Exception {
      */
     public Throwable getCause() {
         return super.getCause();
-    }
-
-    /**
-     * Writes "cause" field to the stream.
-     * The cause is got from the parent class.
-     *
-     * @param out stream used for serialization.
-     * @throws IOException thrown by <code>ObjectOutputStream</code>
-     *
-     */
-    private void writeObject(ObjectOutputStream out)
-            throws IOException
-    {
-        ObjectOutputStream.PutField fields = out.putFields();
-        fields.put("cause", (Throwable) super.getCause());
-        out.writeFields();
-    }
-
-    /**
-     * Reads the "cause" field from the stream.
-     * And initializes the "cause" if it wasn't
-     * done before.
-     *
-     * @param in stream used for deserialization
-     * @throws IOException thrown by <code>ObjectInputStream</code>
-     * @throws ClassNotFoundException  thrown by <code>ObjectInputStream</code>
-     */
-    private void readObject(ObjectInputStream in)
-            throws IOException, ClassNotFoundException
-    {
-        ObjectInputStream.GetField fields = in.readFields();
-        Throwable scause = (Throwable) fields.get("cause", null);
-
-        if (super.getCause() == null && scause != null) {
-            try {
-                super.initCause(scause);
-            } catch(IllegalStateException e) {
-                throw new InvalidClassException("Inconsistent state: two causes");
-            }
-        }
     }
 
     /**

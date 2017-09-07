@@ -511,16 +511,6 @@ import org.xml.sax.helpers.DefaultHandler;
         return schema;
     }
 
-    @Override
-    public AttachmentUnmarshaller getAttachmentUnmarshaller() {
-        return attachmentUnmarshaller;
-    }
-
-    @Override
-    public void setAttachmentUnmarshaller(AttachmentUnmarshaller au) {
-        this.attachmentUnmarshaller = au;
-    }
-
     /**
      * @deprecated since 2.0
      */

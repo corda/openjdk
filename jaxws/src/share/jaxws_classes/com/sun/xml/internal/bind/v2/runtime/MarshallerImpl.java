@@ -43,7 +43,6 @@ import javax.xml.bind.PropertyException;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.bind.helpers.AbstractMarshallerImpl;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
@@ -567,16 +566,6 @@ public /*to make unit tests happy*/ final class MarshallerImpl extends AbstractM
             return serializer.getAdapter(type);
         else
             return null;
-    }
-
-    @Override
-    public void setAttachmentMarshaller(AttachmentMarshaller am) {
-        serializer.attachmentMarshaller = am;
-    }
-
-    @Override
-    public AttachmentMarshaller getAttachmentMarshaller() {
-        return serializer.attachmentMarshaller;
     }
 
     @Override
