@@ -60,11 +60,10 @@ abstract class IntPipeline<E_IN>
      * @param source {@code Supplier<Spliterator>} describing the stream source
      * @param sourceFlags The source flags for the stream source, described in
      *        {@link StreamOpFlag}
-     * @param parallel {@code true} if the pipeline is parallel
      */
     IntPipeline(Supplier<? extends Spliterator<Integer>> source,
-                int sourceFlags, boolean parallel) {
-        super(source, sourceFlags, parallel);
+                int sourceFlags) {
+        super(source, sourceFlags);
     }
 
     /**
@@ -73,11 +72,10 @@ abstract class IntPipeline<E_IN>
      * @param source {@code Spliterator} describing the stream source
      * @param sourceFlags The source flags for the stream source, described in
      *        {@link StreamOpFlag}
-     * @param parallel {@code true} if the pipeline is parallel
      */
     IntPipeline(Spliterator<Integer> source,
-                int sourceFlags, boolean parallel) {
-        super(source, sourceFlags, parallel);
+                int sourceFlags) {
+        super(source, sourceFlags);
     }
 
     /**
@@ -144,9 +142,8 @@ abstract class IntPipeline<E_IN>
 
     @Override
     final <P_IN> Spliterator<Integer> wrap(PipelineHelper<Integer> ph,
-                                           Supplier<Spliterator<P_IN>> supplier,
-                                           boolean isParallel) {
-        return new StreamSpliterators.IntWrappingSpliterator<>(ph, supplier, isParallel);
+                                           Supplier<Spliterator<P_IN>> supplier) {
+        return new StreamSpliterators.IntWrappingSpliterator<>(ph, supplier);
     }
 
     @Override
@@ -519,11 +516,10 @@ abstract class IntPipeline<E_IN>
          *               source
          * @param sourceFlags the source flags for the stream source, described
          *                    in {@link StreamOpFlag}
-         * @param parallel {@code true} if the pipeline is parallel
          */
         Head(Supplier<? extends Spliterator<Integer>> source,
-             int sourceFlags, boolean parallel) {
-            super(source, sourceFlags, parallel);
+             int sourceFlags) {
+            super(source, sourceFlags);
         }
 
         /**
@@ -532,11 +528,10 @@ abstract class IntPipeline<E_IN>
          * @param source {@code Spliterator} describing the stream source
          * @param sourceFlags the source flags for the stream source, described
          *                    in {@link StreamOpFlag}
-         * @param parallel {@code true} if the pipeline is parallel
          */
         Head(Spliterator<Integer> source,
-             int sourceFlags, boolean parallel) {
-            super(source, sourceFlags, parallel);
+             int sourceFlags) {
+            super(source, sourceFlags);
         }
 
         @Override
@@ -553,22 +548,12 @@ abstract class IntPipeline<E_IN>
 
         @Override
         public void forEach(IntConsumer action) {
-            if (!isParallel()) {
-                adapt(sourceStageSpliterator()).forEachRemaining(action);
-            }
-            else {
-                super.forEach(action);
-            }
+            adapt(sourceStageSpliterator()).forEachRemaining(action);
         }
 
         @Override
         public void forEachOrdered(IntConsumer action) {
-            if (!isParallel()) {
-                adapt(sourceStageSpliterator()).forEachRemaining(action);
-            }
-            else {
-                super.forEachOrdered(action);
-            }
+            adapt(sourceStageSpliterator()).forEachRemaining(action);
         }
     }
 
@@ -624,10 +609,5 @@ abstract class IntPipeline<E_IN>
         final boolean opIsStateful() {
             return true;
         }
-
-        @Override
-        abstract <P_IN> Node<Integer> opEvaluateParallel(PipelineHelper<Integer> helper,
-                                                         Spliterator<P_IN> spliterator,
-                                                         IntFunction<Integer[]> generator);
     }
 }
