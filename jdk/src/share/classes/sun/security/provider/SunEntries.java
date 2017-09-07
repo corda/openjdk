@@ -196,12 +196,6 @@ final class SunEntries {
                 "SHA-512");
 
         /*
-         * Algorithm Parameter Generator engines
-         */
-        map.put("AlgorithmParameterGenerator.DSA",
-            "sun.security.provider.DSAParameterGenerator");
-
-        /*
          * Algorithm Parameter engines
          */
         map.put("AlgorithmParameters.DSA",

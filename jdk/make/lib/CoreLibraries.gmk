@@ -301,46 +301,6 @@ BUILD_LIBRARIES += $(BUILD_LIBZIP)
 
 ##########################################################################################
 
-$(eval $(call SetupNativeCompilation,BUILD_LIBUNPACK, \
-    LIBRARY := unpack, \
-    OUTPUT_DIR := $(INSTALL_LIBRARIES_HERE), \
-    SRC := $(JDK_TOPDIR)/src/share/native/com/sun/java/util/jar/pack, \
-    EXCLUDE_FILES := main.cpp, \
-    LANG := C++, \
-    OPTIMIZATION := LOW, \
-    CFLAGS := $(CXXFLAGS_JDKLIB) \
-        -DNO_ZLIB -DUNPACK_JNI -DFULL, \
-    CFLAGS_release := -DPRODUCT, \
-    MAPFILE := $(JDK_TOPDIR)/make/mapfiles/libunpack/mapfile-vers, \
-    LDFLAGS := $(LDFLAGS_JDKLIB) $(LDFLAGS_CXX_JDK) \
-        $(call SET_SHARED_LIBRARY_ORIGIN), \
-    LDFLAGS_windows := -map:$(JDK_OUTPUTDIR)/objs/unpack.map -debug \
-        jvm.lib $(WIN_JAVA_LIB), \
-    LDFLAGS_SUFFIX_posix := -ljvm $(LIBCXX) -ljava -lc, \
-    OBJECT_DIR := $(JDK_OUTPUTDIR)/objs/libunpack, \
-    VERSIONINFO_RESOURCE := $(JDK_TOPDIR)/src/windows/resource/version.rc, \
-    RC_FLAGS := $(RC_FLAGS) \
-        -D "JDK_FNAME=unpack.dll" \
-        -D "JDK_INTERNAL_NAME=unpack" \
-        -D "JDK_FTYPE=0x2L", \
-    DEBUG_SYMBOLS := $(DEBUG_ALL_BINARIES)))
-
-$(BUILD_LIBUNPACK): $(BUILD_LIBJAVA)
-
-BUILD_LIBRARIES += $(BUILD_LIBUNPACK)
-
-ifeq ($(OPENJDK_TARGET_OS), windows)
-  $(INSTALL_LIBRARIES_HERE)/$(LIBRARY_PREFIX)unpack.map: $(BUILD_LIBUNPACK)
-	$(ECHO) Copying $(@F)
-	$(CP) $(patsubst %$(SHARED_LIBRARY_SUFFIX), %.map, $<) $@
-
-  $(INSTALL_LIBRARIES_HERE)/$(LIBRARY_PREFIX)unpack.pdb: $(BUILD_LIBUNPACK)
-	$(ECHO) Copying $(@F)
-	$(CP) $(patsubst %$(SHARED_LIBRARY_SUFFIX), %.pdb, $<) $@
-endif
-
-##########################################################################################
-
 BUILD_LIBJLI_SRC_DIRS := $(JDK_TOPDIR)/src/share/bin $(JDK_TOPDIR)/src/$(OPENJDK_TARGET_OS_API_DIR)/bin
 LIBJLI_CFLAGS := $(CFLAGS_JDKLIB) $(foreach dir, $(BUILD_LIBJLI_SRC_DIRS), -I$(dir))
 

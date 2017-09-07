@@ -50,15 +50,6 @@ import sun.security.jca.JCAUtil;
  */
 public final class RSACore {
 
-    // globally enable/disable use of blinding
-    private final static boolean ENABLE_BLINDING = true;
-
-    // cache for blinding parameters. Map<BigInteger, BlindingParameters>
-    // use a weak hashmap so that cached values are automatically cleared
-    // when the modulus is GC'ed
-    private final static Map<BigInteger, BlindingParameters>
-                blindingCache = new WeakHashMap<>();
-
     private RSACore() {
         // empty
     }
@@ -142,17 +133,7 @@ public final class RSACore {
             throws BadPaddingException {
 
         BigInteger c = parseMsg(msg, n);
-        BlindingRandomPair brp = null;
-        BigInteger m;
-        if (ENABLE_BLINDING) {
-            brp = getBlindingRandomPair(null, exp, n);
-            c = c.multiply(brp.u).mod(n);
-            m = c.modPow(exp, n);
-            m = m.multiply(brp.v).mod(n);
-        } else {
-            m = c.modPow(exp, n);
-        }
-
+        BigInteger m = c.modPow(exp, n);
         return toByteArray(m, getByteLength(n));
     }
 
@@ -173,12 +154,6 @@ public final class RSACore {
         BigInteger e = key.getPublicExponent();
         BigInteger d = key.getPrivateExponent();
 
-        BlindingRandomPair brp;
-        if (ENABLE_BLINDING) {
-            brp = getBlindingRandomPair(e, d, n);
-            c = c.multiply(brp.u).mod(n);
-        }
-
         // m1 = c ^ dP mod p
         BigInteger m1 = c.modPow(dP, p);
         // m2 = c ^ dQ mod q
@@ -194,9 +169,6 @@ public final class RSACore {
         // m = m2 + q * h
         BigInteger m = h.multiply(q).add(m2);
 
-        if (ENABLE_BLINDING) {
-            m = m.multiply(brp.v).mod(n);
-        }
         if (verify && !c0.equals(m.modPow(e, n))) {
             throw new BadPaddingException("RSA private key operation failed");
         }
@@ -319,138 +291,6 @@ public final class RSACore {
             this.u = u;
             this.v = v;
         }
-    }
-
-    /**
-     * Set of blinding parameters for a given RSA key.
-     *
-     * The RSA modulus is usually unique, so we index by modulus in
-     * {@code blindingCache}.  However, to protect against the unlikely
-     * case of two keys sharing the same modulus, we also store the public
-     * or the private exponent.  This means we cannot cache blinding
-     * parameters for multiple keys that share the same modulus, but
-     * since sharing moduli is fundamentally broken and insecure, this
-     * does not matter.
-     */
-    private final static class BlindingParameters {
-        private final static BigInteger BIG_TWO = BigInteger.valueOf(2L);
-
-        // RSA public exponent
-        private final BigInteger e;
-
-        // hash code of RSA private exponent
-        private final BigInteger d;
-
-        // r ^ e mod n (CRT), or r mod n (Non-CRT)
-        private BigInteger u;
-
-        // r ^ (-1) mod n (CRT) , or ((r ^ (-1)) ^ d) mod n (Non-CRT)
-        private BigInteger v;
-
-        // e: the public exponent
-        // d: the private exponent
-        // n: the modulus
-        BlindingParameters(BigInteger e, BigInteger d, BigInteger n) {
-            this.u = null;
-            this.v = null;
-            this.e = e;
-            this.d = d;
-
-            int len = n.bitLength();
-            SecureRandom random = JCAUtil.getSecureRandom();
-            u = new BigInteger(len, random).mod(n);
-            // Although the possibility is very much limited that u is zero
-            // or is not relatively prime to n, we still want to be careful
-            // about the special value.
-            //
-            // Secure random generation is expensive, try to use BigInteger.ONE
-            // this time if this new generated random number is zero or is not
-            // relatively prime to n.  Next time, new generated secure random
-            // number will be used instead.
-            if (u.equals(BigInteger.ZERO)) {
-                u = BigInteger.ONE;     // use 1 this time
-            }
-
-            try {
-                // The call to BigInteger.modInverse() checks that u is
-                // relatively prime to n.  Otherwise, ArithmeticException is
-                // thrown.
-                v = u.modInverse(n);
-            } catch (ArithmeticException ae) {
-                // if u is not relatively prime to n, use 1 this time
-                u = BigInteger.ONE;
-                v = BigInteger.ONE;
-            }
-
-            if (e != null) {
-                u = u.modPow(e, n);   // e: the public exponent
-                                      // u: random ^ e
-                                      // v: random ^ (-1)
-            } else {
-                v = v.modPow(d, n);   // d: the private exponent
-                                      // u: random
-                                      // v: random ^ (-d)
-            }
-        }
-
-        // return null if need to reset the parameters
-        BlindingRandomPair getBlindingRandomPair(
-                BigInteger e, BigInteger d, BigInteger n) {
-
-            if ((this.e != null && this.e.equals(e)) ||
-                (this.d != null && this.d.equals(d))) {
-
-                BlindingRandomPair brp = null;
-                synchronized (this) {
-                    if (!u.equals(BigInteger.ZERO) &&
-                        !v.equals(BigInteger.ZERO)) {
-
-                        brp = new BlindingRandomPair(u, v);
-                        if (u.compareTo(BigInteger.ONE) <= 0 ||
-                            v.compareTo(BigInteger.ONE) <= 0) {
-
-                            // need to reset the random pair next time
-                            u = BigInteger.ZERO;
-                            v = BigInteger.ZERO;
-                        } else {
-                            u = u.modPow(BIG_TWO, n);
-                            v = v.modPow(BIG_TWO, n);
-                        }
-                    } // Otherwise, need to reset the random pair.
-                }
-                return brp;
-            }
-
-            return null;
-        }
-    }
-
-    private static BlindingRandomPair getBlindingRandomPair(
-            BigInteger e, BigInteger d, BigInteger n) {
-
-        BlindingParameters bps = null;
-        synchronized (blindingCache) {
-            bps = blindingCache.get(n);
-        }
-
-        if (bps == null) {
-            bps = new BlindingParameters(e, d, n);
-            synchronized (blindingCache) {
-                blindingCache.putIfAbsent(n, bps);
-            }
-        }
-
-        BlindingRandomPair brp = bps.getBlindingRandomPair(e, d, n);
-        if (brp == null) {
-            // need to reset the blinding parameters
-            bps = new BlindingParameters(e, d, n);
-            synchronized (blindingCache) {
-                blindingCache.replace(n, bps);
-            }
-            brp = bps.getBlindingRandomPair(e, d, n);
-        }
-
-        return brp;
     }
 
 }

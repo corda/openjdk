@@ -134,16 +134,6 @@ public final class SplittableRandom {
      * mixer with good (but less than cryptographically secure)
      * avalanching.
      *
-     * The default (no-argument) constructor, in essence, invokes
-     * split() for a common "defaultGen" SplittableRandom.  Unlike
-     * other cases, this split must be performed in a thread-safe
-     * manner, so we use an AtomicLong to represent the seed rather
-     * than use an explicit SplittableRandom. To bootstrap the
-     * defaultGen, we start off using a seed based on current time
-     * unless the java.util.secureRandomSeed property is set. This
-     * serves as a slimmed-down (and insecure) variant of SecureRandom
-     * that also avoids stalls that may occur when using /dev/random.
-     *
      * It is a relatively simple matter to apply the basic design here
      * to use 128 bit seeds. However, emulating 128bit arithmetic and
      * carrying around twice the state add more overhead than appears
@@ -217,26 +207,6 @@ public final class SplittableRandom {
      */
     private long nextSeed() {
         return seed += gamma;
-    }
-
-    /**
-     * The seed generator for default constructors.
-     */
-    private static final AtomicLong defaultGen = new AtomicLong(initialSeed());
-
-    private static long initialSeed() {
-        String pp = java.security.AccessController.doPrivileged(
-                new sun.security.action.GetPropertyAction(
-                        "java.util.secureRandomSeed"));
-        if (pp != null && pp.equalsIgnoreCase("true")) {
-            byte[] seedBytes = java.security.SecureRandom.getSeed(8);
-            long s = (long)(seedBytes[0]) & 0xffL;
-            for (int i = 1; i < 8; ++i)
-                s = (s << 8) | ((long)(seedBytes[i]) & 0xffL);
-            return s;
-        }
-        return (mix64(System.currentTimeMillis()) ^
-                mix64(System.nanoTime()));
     }
 
     // IllegalArgumentException messages
@@ -364,18 +334,6 @@ public final class SplittableRandom {
      */
     public SplittableRandom(long seed) {
         this(seed, GOLDEN_GAMMA);
-    }
-
-    /**
-     * Creates a new SplittableRandom instance that is likely to
-     * generate sequences of values that are statistically independent
-     * of those of any other instances in the current program; and
-     * may, and typically does, vary across program invocations.
-     */
-    public SplittableRandom() { // emulate defaultGen.split()
-        long s = defaultGen.getAndAdd(2 * GOLDEN_GAMMA);
-        this.seed = mix64(s);
-        this.gamma = mixGamma(s + GOLDEN_GAMMA);
     }
 
     /**
