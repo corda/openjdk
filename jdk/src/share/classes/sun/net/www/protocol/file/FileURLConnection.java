@@ -32,7 +32,6 @@
 package sun.net.www.protocol.file;
 
 import java.net.URL;
-import java.net.FileNameMap;
 import java.io.*;
 import java.text.Collator;
 import java.security.Permission;
@@ -52,7 +51,6 @@ public class FileURLConnection extends URLConnection {
     static String TEXT_PLAIN = "text/plain";
     static String LAST_MODIFIED = "last-modified";
 
-    String contentType;
     InputStream is;
 
     File file;
@@ -109,11 +107,6 @@ public class FileURLConnection extends URLConnection {
             lastModified = file.lastModified();
 
             if (!isDirectory) {
-                FileNameMap map = java.net.URLConnection.getFileNameMap();
-                contentType = map.getContentTypeFor(filename);
-                if (contentType != null) {
-                    properties.add(CONTENT_TYPE, contentType);
-                }
                 properties.add(CONTENT_LENGTH, String.valueOf(length));
 
                 /*
@@ -182,8 +175,6 @@ public class FileURLConnection extends URLConnection {
 
         if (is == null) {
             if (isDirectory) {
-                FileNameMap map = java.net.URLConnection.getFileNameMap();
-
                 StringBuffer buf = new StringBuffer();
 
                 if (files == null) {

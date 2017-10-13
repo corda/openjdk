@@ -850,18 +850,6 @@ abstract class DomainKeyStore extends KeyStoreSpi {
                 KeyStore.ProtectionParameter keystoreProtection = null;
                 if (passwords.containsKey(keystoreName)) {
                     keystoreProtection = passwords.get(keystoreName);
-
-                } else if (properties.containsKey(KEYSTORE_PASSWORD_ENV)) {
-                    String env = properties.get(KEYSTORE_PASSWORD_ENV);
-                    String pwd = System.getenv(env);
-                    if (pwd != null) {
-                        keystoreProtection =
-                            new KeyStore.PasswordProtection(pwd.toCharArray());
-                    } else {
-                        throw new IOException(
-                            "Error processing keystore property: " +
-                                "keystorePasswordEnv=\"" + env + "\"");
-                    }
                 } else {
                     keystoreProtection = new KeyStore.PasswordProtection(null);
                 }
