@@ -260,7 +260,6 @@ PROFILE_3_LIBRARIES := \
     jaas_nt \
     java_crw_demo \
     jsdt \
-    management \
     npt \
     sctp
 
@@ -287,17 +286,11 @@ else
 endif
 
 PROFILE_3_JRE_LIB_FILES += \
-    jvm.hprof.txt \
-    management-agent.jar \
-    management/jmxremote.access \
-    management/jmxremote.password.template \
-    management/management.properties \
-    management/snmp.acl.template
+    jvm.hprof.txt
 
 PROFILE_3_JRE_OTHER_FILES :=
 
-PROFILE_3_JRE_JAR_FILES := \
-    management-agent.jar
+PROFILE_3_JRE_JAR_FILES :=
 
 
 FULL_JRE_BIN_FILES := \
@@ -349,9 +342,6 @@ FULL_JRE_LIB_FILES += \
     cmm/PYCC.pf \
     cmm/sRGB.pf \
     ext/cldrdata.jar \
-    ext/dnsns.jar \
-    ext/nashorn.jar \
-    ext/zipfs.jar \
     flavormap.properties \
     fontconfig.RedHat.5.bfc \
     fontconfig.RedHat.5.properties.src \
@@ -420,8 +410,5 @@ FULL_JRE_OTHER_FILES := \
 FULL_JRE_JAR_FILES := \
     charsets.jar \
     ext/cldrdata.jar \
-    ext/dnsns.jar \
-    ext/nashorn.jar \
-    ext/zipfs.jar \
     jfr.jar
 

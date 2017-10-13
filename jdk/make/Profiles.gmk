@@ -83,12 +83,7 @@ FULL_JRE_JARS := \
 
 ALL_JARS := $(FULL_JRE_JARS) \
     $(IMAGES_OUTPUTDIR)/lib/rt.jar \
-    $(IMAGES_OUTPUTDIR)/lib/resources.jar \
-    $(IMAGES_OUTPUTDIR)/lib/jconsole.jar \
-    $(IMAGES_OUTPUTDIR)/lib/dt.jar \
-    $(IMAGES_OUTPUTDIR)/lib/tools.jar \
-    $(IMAGES_OUTPUTDIR)/lib/ct.sym \
-    $(IMAGES_OUTPUTDIR)/src.zip
+    $(IMAGES_OUTPUTDIR)/lib/resources.jar
 
 ifeq ($(INCLUDE_SA), true)
   ALL_JARS += $(IMAGES_OUTPUTDIR)/lib/sa-jdi.jar
