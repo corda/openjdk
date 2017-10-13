@@ -1753,6 +1753,7 @@ class Thread implements Runnable {
      * @see #setDefaultUncaughtExceptionHandler
      * @see #setUncaughtExceptionHandler
      * @see ThreadGroup#uncaughtException
+     * @exclude Not deterministic
      * @since 1.5
      */
     @FunctionalInterface

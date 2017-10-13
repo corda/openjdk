@@ -42,6 +42,7 @@ import java.lang.ref.*;
  *
  * @author  Josh Bloch and Doug Lea
  * @see     ThreadLocal
+ * @exclude Not deterministic.
  * @since   1.2
  */
 
