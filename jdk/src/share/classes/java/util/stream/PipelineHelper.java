@@ -39,10 +39,10 @@ import java.util.function.IntFunction;
  * incorporate information about the terminal (or stateful) operation which
  * follows the last intermediate operation described by this
  * {@code PipelineHelper}. The {@code PipelineHelper} is passed to the
- * {@link TerminalOp#evaluateParallel(PipelineHelper, java.util.Spliterator)},
- * {@link TerminalOp#evaluateSequential(PipelineHelper, java.util.Spliterator)},
- * and {@link AbstractPipeline#opEvaluateParallel(PipelineHelper, java.util.Spliterator,
- * java.util.function.IntFunction)}, methods, which can use the
+ * {@link TerminalOp#evaluateParallel(PipelineHelper, java.util.Spliterator)}
+ * and
+ * {@link TerminalOp#evaluateSequential(PipelineHelper, java.util.Spliterator)}
+ * methods, which can use the
  * {@code PipelineHelper} to access information about the pipeline such as
  * head shape, stream flags, and size, and use the helper methods
  * such as {@link #wrapAndCopyInto(Sink, Spliterator)},

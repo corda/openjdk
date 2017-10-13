@@ -63,8 +63,8 @@ abstract class DoublePipeline<E_IN>
      * {@link StreamOpFlag}
      */
     DoublePipeline(Supplier<? extends Spliterator<Double>> source,
-                   int sourceFlags, boolean parallel) {
-        super(source, sourceFlags, parallel);
+                   int sourceFlags) {
+        super(source, sourceFlags);
     }
 
     /**
@@ -75,8 +75,8 @@ abstract class DoublePipeline<E_IN>
      * {@link StreamOpFlag}
      */
     DoublePipeline(Spliterator<Double> source,
-                   int sourceFlags, boolean parallel) {
-        super(source, sourceFlags, parallel);
+                   int sourceFlags) {
+        super(source, sourceFlags);
     }
 
     /**
@@ -141,9 +141,8 @@ abstract class DoublePipeline<E_IN>
 
     @Override
     final <P_IN> Spliterator<Double> wrap(PipelineHelper<Double> ph,
-                                          Supplier<Spliterator<P_IN>> supplier,
-                                          boolean isParallel) {
-        return new StreamSpliterators.DoubleWrappingSpliterator<>(ph, supplier, isParallel);
+                                          Supplier<Spliterator<P_IN>> supplier) {
+        return new StreamSpliterators.DoubleWrappingSpliterator<>(ph, supplier);
     }
 
     @Override
@@ -522,11 +521,10 @@ abstract class DoublePipeline<E_IN>
          *               source
          * @param sourceFlags the source flags for the stream source, described
          *                    in {@link StreamOpFlag}
-         * @param parallel {@code true} if the pipeline is parallel
          */
         Head(Supplier<? extends Spliterator<Double>> source,
-             int sourceFlags, boolean parallel) {
-            super(source, sourceFlags, parallel);
+             int sourceFlags) {
+            super(source, sourceFlags);
         }
 
         /**
@@ -535,11 +533,10 @@ abstract class DoublePipeline<E_IN>
          * @param source {@code Spliterator} describing the stream source
          * @param sourceFlags the source flags for the stream source, described
          *                    in {@link StreamOpFlag}
-         * @param parallel {@code true} if the pipeline is parallel
          */
         Head(Spliterator<Double> source,
-             int sourceFlags, boolean parallel) {
-            super(source, sourceFlags, parallel);
+             int sourceFlags) {
+            super(source, sourceFlags);
         }
 
         @Override
@@ -556,22 +553,12 @@ abstract class DoublePipeline<E_IN>
 
         @Override
         public void forEach(DoubleConsumer consumer) {
-            if (!isParallel()) {
-                adapt(sourceStageSpliterator()).forEachRemaining(consumer);
-            }
-            else {
-                super.forEach(consumer);
-            }
+            adapt(sourceStageSpliterator()).forEachRemaining(consumer);
         }
 
         @Override
         public void forEachOrdered(DoubleConsumer consumer) {
-            if (!isParallel()) {
-                adapt(sourceStageSpliterator()).forEachRemaining(consumer);
-            }
-            else {
-                super.forEachOrdered(consumer);
-            }
+            adapt(sourceStageSpliterator()).forEachRemaining(consumer);
         }
 
     }
@@ -630,10 +617,5 @@ abstract class DoublePipeline<E_IN>
         final boolean opIsStateful() {
             return true;
         }
-
-        @Override
-        abstract <P_IN> Node<Double> opEvaluateParallel(PipelineHelper<Double> helper,
-                                                        Spliterator<P_IN> spliterator,
-                                                        IntFunction<Double[]> generator);
     }
 }

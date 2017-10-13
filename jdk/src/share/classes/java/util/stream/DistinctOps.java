@@ -65,57 +65,6 @@ final class DistinctOps {
             }
 
             @Override
-            <P_IN> Node<T> opEvaluateParallel(PipelineHelper<T> helper,
-                                              Spliterator<P_IN> spliterator,
-                                              IntFunction<T[]> generator) {
-                if (StreamOpFlag.DISTINCT.isKnown(helper.getStreamAndOpFlags())) {
-                    // No-op
-                    return helper.evaluate(spliterator, false, generator);
-                }
-                else if (StreamOpFlag.ORDERED.isKnown(helper.getStreamAndOpFlags())) {
-                    return reduce(helper, spliterator);
-                }
-                else {
-                    // Holder of null state since ConcurrentHashMap does not support null values
-                    AtomicBoolean seenNull = new AtomicBoolean(false);
-                    ConcurrentHashMap<T, Boolean> map = new ConcurrentHashMap<>();
-                    TerminalOp<T, Void> forEachOp = ForEachOps.makeRef(t -> {
-                        if (t == null)
-                            seenNull.set(true);
-                        else
-                            map.putIfAbsent(t, Boolean.TRUE);
-                    }, false);
-                    forEachOp.evaluateParallel(helper, spliterator);
-
-                    // If null has been seen then copy the key set into a HashSet that supports null values
-                    // and add null
-                    Set<T> keys = map.keySet();
-                    if (seenNull.get()) {
-                        // TODO Implement a more efficient set-union view, rather than copying
-                        keys = new HashSet<>(keys);
-                        keys.add(null);
-                    }
-                    return Nodes.node(keys);
-                }
-            }
-
-            @Override
-            <P_IN> Spliterator<T> opEvaluateParallelLazy(PipelineHelper<T> helper, Spliterator<P_IN> spliterator) {
-                if (StreamOpFlag.DISTINCT.isKnown(helper.getStreamAndOpFlags())) {
-                    // No-op
-                    return helper.wrapSpliterator(spliterator);
-                }
-                else if (StreamOpFlag.ORDERED.isKnown(helper.getStreamAndOpFlags())) {
-                    // Not lazy, barrier required to preserve order
-                    return reduce(helper, spliterator).spliterator();
-                }
-                else {
-                    // Lazy
-                    return new StreamSpliterators.DistinctSpliterator<>(helper.wrapSpliterator(spliterator));
-                }
-            }
-
-            @Override
             Sink<T> opWrapSink(int flags, Sink<T> sink) {
                 Objects.requireNonNull(sink);
 

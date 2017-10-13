@@ -64,11 +64,10 @@ abstract class ReferencePipeline<P_IN, P_OUT>
      * @param source {@code Supplier<Spliterator>} describing the stream source
      * @param sourceFlags the source flags for the stream source, described in
      *        {@link StreamOpFlag}
-     * @param parallel {@code true} if the pipeline is parallel
      */
     ReferencePipeline(Supplier<? extends Spliterator<?>> source,
-                      int sourceFlags, boolean parallel) {
-        super(source, sourceFlags, parallel);
+                      int sourceFlags) {
+        super(source, sourceFlags);
     }
 
     /**
@@ -77,11 +76,10 @@ abstract class ReferencePipeline<P_IN, P_OUT>
      * @param source {@code Spliterator} describing the stream source
      * @param sourceFlags The source flags for the stream source, described in
      *        {@link StreamOpFlag}
-     * @param parallel {@code true} if the pipeline is parallel
      */
     ReferencePipeline(Spliterator<?> source,
-                      int sourceFlags, boolean parallel) {
-        super(source, sourceFlags, parallel);
+                      int sourceFlags) {
+        super(source, sourceFlags);
     }
 
     /**
@@ -111,9 +109,8 @@ abstract class ReferencePipeline<P_IN, P_OUT>
 
     @Override
     final <P_IN> Spliterator<P_OUT> wrap(PipelineHelper<P_OUT> ph,
-                                     Supplier<Spliterator<P_IN>> supplier,
-                                     boolean isParallel) {
-        return new StreamSpliterators.WrappingSpliterator<>(ph, supplier, isParallel);
+                                     Supplier<Spliterator<P_IN>> supplier) {
+        return new StreamSpliterators.WrappingSpliterator<>(ph, supplier);
     }
 
     @Override
@@ -487,17 +484,7 @@ abstract class ReferencePipeline<P_IN, P_OUT>
     @Override
     @SuppressWarnings("unchecked")
     public final <R, A> R collect(Collector<? super P_OUT, A, R> collector) {
-        A container;
-        if (isParallel()
-                && (collector.characteristics().contains(Collector.Characteristics.CONCURRENT))
-                && (!isOrdered() || collector.characteristics().contains(Collector.Characteristics.UNORDERED))) {
-            container = collector.supplier().get();
-            BiConsumer<A, ? super P_OUT> accumulator = collector.accumulator();
-            forEach(u -> accumulator.accept(container, u));
-        }
-        else {
-            container = evaluate(ReduceOps.makeRef(collector));
-        }
+        A container = evaluate(ReduceOps.makeRef(collector));
         return collector.characteristics().contains(Collector.Characteristics.IDENTITY_FINISH)
                ? (R) container
                : collector.finisher().apply(container);
@@ -546,8 +533,8 @@ abstract class ReferencePipeline<P_IN, P_OUT>
          *                    in {@link StreamOpFlag}
          */
         Head(Supplier<? extends Spliterator<?>> source,
-             int sourceFlags, boolean parallel) {
-            super(source, sourceFlags, parallel);
+             int sourceFlags) {
+            super(source, sourceFlags);
         }
 
         /**
@@ -558,8 +545,8 @@ abstract class ReferencePipeline<P_IN, P_OUT>
          *                    in {@link StreamOpFlag}
          */
         Head(Spliterator<?> source,
-             int sourceFlags, boolean parallel) {
-            super(source, sourceFlags, parallel);
+             int sourceFlags) {
+            super(source, sourceFlags);
         }
 
         @Override
@@ -576,22 +563,12 @@ abstract class ReferencePipeline<P_IN, P_OUT>
 
         @Override
         public void forEach(Consumer<? super E_OUT> action) {
-            if (!isParallel()) {
-                sourceStageSpliterator().forEachRemaining(action);
-            }
-            else {
-                super.forEach(action);
-            }
+            sourceStageSpliterator().forEachRemaining(action);
         }
 
         @Override
         public void forEachOrdered(Consumer<? super E_OUT> action) {
-            if (!isParallel()) {
-                sourceStageSpliterator().forEachRemaining(action);
-            }
-            else {
-                super.forEachOrdered(action);
-            }
+            sourceStageSpliterator().forEachRemaining(action);
         }
     }
 
@@ -652,10 +629,5 @@ abstract class ReferencePipeline<P_IN, P_OUT>
         final boolean opIsStateful() {
             return true;
         }
-
-        @Override
-        abstract <P_IN> Node<E_OUT> opEvaluateParallel(PipelineHelper<E_OUT> helper,
-                                                       Spliterator<P_IN> spliterator,
-                                                       IntFunction<E_OUT[]> generator);
     }
 }
