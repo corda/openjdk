@@ -980,49 +980,6 @@ SetExecname(char **argv)
     return exec_path;
 }
 
-/* --- Splash Screen shared library support --- */
-static const char* SPLASHSCREEN_SO = JNI_LIB_NAME("splashscreen");
-static void* hSplashLib = NULL;
-
-void* SplashProcAddress(const char* name) {
-    if (!hSplashLib) {
-        int ret;
-        char jrePath[MAXPATHLEN];
-        char splashPath[MAXPATHLEN];
-
-        if (!GetJREPath(jrePath, sizeof(jrePath), GetArch(), JNI_FALSE)) {
-            JLI_ReportErrorMessage(JRE_ERROR1);
-            return NULL;
-        }
-        ret = JLI_Snprintf(splashPath, sizeof(splashPath), "%s/lib/%s/%s",
-                     jrePath, GetArch(), SPLASHSCREEN_SO);
-
-        if (ret >= (int) sizeof(splashPath)) {
-            JLI_ReportErrorMessage(JRE_ERROR11);
-            return NULL;
-        }
-        if (ret < 0) {
-            JLI_ReportErrorMessage(JRE_ERROR13);
-            return NULL;
-        }
-        hSplashLib = dlopen(splashPath, RTLD_LAZY | RTLD_GLOBAL);
-        JLI_TraceLauncher("Info: loaded %s\n", splashPath);
-    }
-    if (hSplashLib) {
-        void* sym = dlsym(hSplashLib, name);
-        return sym;
-    } else {
-        return NULL;
-    }
-}
-
-void SplashFreeLibrary() {
-    if (hSplashLib) {
-        dlclose(hSplashLib);
-        hSplashLib = NULL;
-    }
-}
-
 /*
  * Block current thread and continue execution in a new thread
  */
@@ -1087,7 +1044,6 @@ JVMInit(InvocationFunctions* ifn, jlong threadStackSize,
         int argc, char **argv,
         int mode, char *what, int ret)
 {
-    ShowSplashScreen();
     return ContinueInNewThread(ifn, threadStackSize, argc, argv, mode, what, ret);
 }
 

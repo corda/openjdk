@@ -1106,40 +1106,6 @@ UnsetEnv(char *name)
     return (ret);
 }
 
-/* --- Splash Screen shared library support --- */
-
-static const char* SPLASHSCREEN_SO = "\\bin\\splashscreen.dll";
-
-static HMODULE hSplashLib = NULL;
-
-void* SplashProcAddress(const char* name) {
-    char libraryPath[MAXPATHLEN]; /* some extra space for JLI_StrCat'ing SPLASHSCREEN_SO */
-
-    if (!GetJREPath(libraryPath, MAXPATHLEN)) {
-        return NULL;
-    }
-    if (JLI_StrLen(libraryPath)+JLI_StrLen(SPLASHSCREEN_SO) >= MAXPATHLEN) {
-        return NULL;
-    }
-    JLI_StrCat(libraryPath, SPLASHSCREEN_SO);
-
-    if (!hSplashLib) {
-        hSplashLib = LoadLibrary(libraryPath);
-    }
-    if (hSplashLib) {
-        return GetProcAddress(hSplashLib, name);
-    } else {
-        return NULL;
-    }
-}
-
-void SplashFreeLibrary() {
-    if (hSplashLib) {
-        FreeLibrary(hSplashLib);
-        hSplashLib = NULL;
-    }
-}
-
 const char *
 jlong_format_specifier() {
     return "%I64d";
@@ -1382,7 +1348,6 @@ JVMInit(InvocationFunctions* ifn, jlong threadStackSize,
         int argc, char **argv,
         int mode, char *what, int ret)
 {
-    ShowSplashScreen();
     return ContinueInNewThread(ifn, threadStackSize, argc, argv, mode, what, ret);
 }
 

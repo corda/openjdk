@@ -597,8 +597,6 @@ JLI_ParseManifest(char *jarfile, manifest_info *info)
         else if (JLI_StrCaseCmp(name, "JRE-Restrict-Search") == 0) {
             if (JLI_StrCaseCmp(value, "true") == 0)
                 info->jre_restrict_search = 1;
-        } else if (JLI_StrCaseCmp(name, "Splashscreen-Image") == 0) {
-            info->splashscreen_image_file_name = value;
         }
     }
     close(fd);
