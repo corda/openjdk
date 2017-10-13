@@ -30,7 +30,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
@@ -477,11 +476,11 @@ public abstract class AbstractMarshallerImpl implements Marshaller
         throw new UnsupportedOperationException();
     }
 
-    public void setAttachmentMarshaller(AttachmentMarshaller am) {
+    public void setAttachmentMarshaller(Object am) {
         throw new UnsupportedOperationException();
     }
 
-    public AttachmentMarshaller getAttachmentMarshaller() {
+    public Object getAttachmentMarshaller() {
         throw new UnsupportedOperationException();
     }
 

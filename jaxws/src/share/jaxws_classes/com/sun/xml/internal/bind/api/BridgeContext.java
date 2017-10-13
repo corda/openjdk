@@ -26,8 +26,6 @@
 package com.sun.xml.internal.bind.api;
 
 import javax.xml.bind.ValidationEventHandler;
-import javax.xml.bind.attachment.AttachmentMarshaller;
-import javax.xml.bind.attachment.AttachmentUnmarshaller;
 
 /**
  * Holds thread specific state information for {@link Bridge}s,
@@ -67,32 +65,26 @@ public abstract class BridgeContext {
     public abstract void setErrorHandler(ValidationEventHandler handler);
 
     /**
-     * Sets the {@link AttachmentMarshaller}.
-     *
+     * @exclude Attachments not supported.
      * @since 2.0 EA1
      */
-    public abstract void setAttachmentMarshaller(AttachmentMarshaller m);
+    public abstract void setAttachmentMarshaller(Object m);
 
     /**
-     * Sets the {@link AttachmentUnmarshaller}.
-     *
+     * @exclude Attachments not supported.
      * @since 2.0 EA1
      */
-    public abstract void setAttachmentUnmarshaller(AttachmentUnmarshaller m);
+    public abstract void setAttachmentUnmarshaller(Object m);
 
     /**
-     * Gets the last {@link AttachmentMarshaller} set through
-     * {@link AttachmentMarshaller}.
-     *
+     * @exclude Attachments not supported.
      * @since 2.0 EA2
      */
-    public abstract AttachmentMarshaller getAttachmentMarshaller();
+    public abstract Object getAttachmentMarshaller();
 
     /**
-     * Gets the last {@link AttachmentUnmarshaller} set through
-     * {@link AttachmentUnmarshaller}.
-     *
+     * @exclude Attachments not supported.
      * @since 2.0 EA2
      */
-    public abstract AttachmentUnmarshaller getAttachmentUnmarshaller();
+    public abstract Object getAttachmentUnmarshaller();
 }
