@@ -28,6 +28,7 @@ package java.lang;
 import java.io.ObjectStreamField;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -521,7 +522,7 @@ public final class String
      * to the length of the subarray.
      *
      * <p> The behavior of this constructor when the given bytes are not valid
-     * in the default charset is unspecified.  The {@link
+     * in UTF-8 is unspecified.  The {@link
      * java.nio.charset.CharsetDecoder} class should be used when more control
      * over the decoding process is required.
      *
@@ -541,8 +542,7 @@ public final class String
      * @since  JDK1.1
      */
     public String(byte bytes[], int offset, int length) {
-        checkBounds(bytes, offset, length);
-        this.value = StringCoding.decode(bytes, offset, length);
+        this(bytes, offset, length, UTF_8);
     }
 
     /**
@@ -552,7 +552,7 @@ public final class String
      * length of the byte array.
      *
      * <p> The behavior of this constructor when the given bytes are not valid
-     * in the default charset is unspecified.  The {@link
+     * in UTF-8 is unspecified.  The {@link
      * java.nio.charset.CharsetDecoder} class should be used when more control
      * over the decoding process is required.
      *
@@ -562,7 +562,7 @@ public final class String
      * @since  JDK1.1
      */
     public String(byte bytes[]) {
-        this(bytes, 0, bytes.length);
+        this(bytes, 0, bytes.length, UTF_8);
     }
 
     /**
@@ -945,7 +945,7 @@ public final class String
      * platform's default charset, storing the result into a new byte array.
      *
      * <p> The behavior of this method when this string cannot be encoded in
-     * the default charset is unspecified.  The {@link
+     * UTF-8 is unspecified.  The {@link
      * java.nio.charset.CharsetEncoder} class should be used when more control
      * over the encoding process is required.
      *
@@ -954,7 +954,7 @@ public final class String
      * @since      JDK1.1
      */
     public byte[] getBytes() {
-        return StringCoding.encode(value, 0, value.length);
+        return getBytes(UTF_8);
     }
 
     /**
