@@ -132,8 +132,9 @@ public class ThreadLocalRandom extends Random {
 
     /**
      * The next seed for default constructors.
+     * Use "e" as a "Nothing up my sleeve" number.
      */
-    private static final AtomicLong seeder = new AtomicLong(8270523877573429709L);
+    private static final AtomicLong seeder = new AtomicLong(2718281828459045235L);
 
     /**
      * The seed increment

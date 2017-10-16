@@ -102,7 +102,7 @@ class Random implements java.io.Serializable {
      * requires that we always use the same seed.
      */
     public Random() {
-        this(8006694155008225895L);
+        this(3141592653589793238L); // Use Pi as a "Nothing up my sleeve" number.
     }
 
     /**
