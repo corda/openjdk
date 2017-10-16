@@ -187,26 +187,4 @@ class BitSieve {
             start += step;
         }
     }
-
-    /**
-     * Test probable primes in the sieve and return successful candidates.
-     */
-    BigInteger retrieve(BigInteger initValue, int certainty, java.util.Random random) {
-        // Examine the sieve one long at a time to find possible primes
-        int offset = 1;
-        for (int i=0; i<bits.length; i++) {
-            long nextLong = ~bits[i];
-            for (int j=0; j<64; j++) {
-                if ((nextLong & 1) == 1) {
-                    BigInteger candidate = initValue.add(
-                                           BigInteger.valueOf(offset));
-                    if (candidate.primeToCertainty(certainty, random))
-                        return candidate;
-                }
-                nextLong >>>= 1;
-                offset+=2;
-            }
-        }
-        return null;
-    }
 }

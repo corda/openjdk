@@ -98,27 +98,12 @@ class Random implements java.io.Serializable {
     static final String BadSize  = "size must be non-negative";
 
     /**
-     * Creates a new random number generator. This constructor sets
-     * the seed of the random number generator to a value very likely
-     * to be distinct from any other invocation of this constructor.
+     * Creates a new random number generator. Determinism
+     * requires that we always use the same seed.
      */
     public Random() {
-        this(seedUniquifier() ^ System.nanoTime());
+        this(3141592653589793238L); // Use Pi as a "Nothing up my sleeve" number.
     }
-
-    private static long seedUniquifier() {
-        // L'Ecuyer, "Tables of Linear Congruential Generators of
-        // Different Sizes and Good Lattice Structure", 1999
-        for (;;) {
-            long current = seedUniquifier.get();
-            long next = current * 181783497276652981L;
-            if (seedUniquifier.compareAndSet(current, next))
-                return next;
-        }
-    }
-
-    private static final AtomicLong seedUniquifier
-        = new AtomicLong(8682522807148012L);
 
     /**
      * Creates a new random number generator using a single {@code long} seed.

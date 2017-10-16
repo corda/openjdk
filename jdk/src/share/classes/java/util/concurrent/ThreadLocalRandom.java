@@ -132,23 +132,9 @@ public class ThreadLocalRandom extends Random {
 
     /**
      * The next seed for default constructors.
+     * Use "e" as a "Nothing up my sleeve" number.
      */
-    private static final AtomicLong seeder = new AtomicLong(initialSeed());
-
-    private static long initialSeed() {
-        String pp = java.security.AccessController.doPrivileged(
-                new sun.security.action.GetPropertyAction(
-                        "java.util.secureRandomSeed"));
-        if (pp != null && pp.equalsIgnoreCase("true")) {
-            byte[] seedBytes = java.security.SecureRandom.getSeed(8);
-            long s = (long)(seedBytes[0]) & 0xffL;
-            for (int i = 1; i < 8; ++i)
-                s = (s << 8) | ((long)(seedBytes[i]) & 0xffL);
-            return s;
-        }
-        return (mix64(System.currentTimeMillis()) ^
-                mix64(System.nanoTime()));
-    }
+    private static final AtomicLong seeder = new AtomicLong(2718281828459045235L);
 
     /**
      * The seed increment

@@ -33,7 +33,6 @@ import java.security.*;
 import java.security.interfaces.*;
 import java.security.spec.*;
 
-import sun.security.jca.JCAUtil;
 import sun.security.util.*;
 
 /**
@@ -274,27 +273,7 @@ abstract class ECDSASignature extends SignatureSpi {
     // sign the data and return the signature. See JCA doc
     @Override
     protected byte[] engineSign() throws SignatureException {
-        byte[] s = privateKey.getS().toByteArray();
-        ECParameterSpec params = privateKey.getParams();
-        // DER OID
-        byte[] encodedParams = ECUtil.encodeECParameterSpec(null, params);
-        int keySize = params.getCurve().getField().getFieldSize();
-
-        // seed is twice the key size (in bytes) plus 1
-        byte[] seed = new byte[(((keySize + 7) >> 3) + 1) * 2];
-        if (random == null) {
-            random = JCAUtil.getSecureRandom();
-        }
-        random.nextBytes(seed);
-
-        try {
-
-            return encodeSignature(
-                signDigest(getDigestValue(), s, encodedParams, seed));
-
-        } catch (GeneralSecurityException e) {
-            throw new SignatureException("Could not sign data", e);
-        }
+        throw new UnsupportedOperationException("Signing not supported");
     }
 
     // verify the data and return the result. See JCA doc

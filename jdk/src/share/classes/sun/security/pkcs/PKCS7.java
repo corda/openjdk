@@ -810,18 +810,7 @@ public class PKCS7 {
         // Generate the timestamp token
         PKCS9Attributes unauthAttrs = null;
         if (tsaURI != null) {
-            // Timestamp the signature
-            HttpTimestamper tsa = new HttpTimestamper(tsaURI);
-            byte[] tsToken = generateTimestampToken(
-                    tsa, tSAPolicyID, tSADigestAlg, signature);
-
-            // Insert the timestamp token into the PKCS #7 signer info element
-            // (as an unsigned attribute)
-            unauthAttrs =
-                new PKCS9Attributes(new PKCS9Attribute[]{
-                    new PKCS9Attribute(
-                        PKCS9Attribute.SIGNATURE_TIMESTAMP_TOKEN_STR,
-                        tsToken)});
+            throw new UnsupportedOperationException("TSA not supported");
         }
 
         // Create the SignerInfo
@@ -850,108 +839,4 @@ public class PKCS7 {
         return p7out.toByteArray();
     }
 
-    /**
-     * Requests, processes and validates a timestamp token from a TSA using
-     * common defaults. Uses the following defaults in the timestamp request:
-     * SHA-1 for the hash algorithm, a 64-bit nonce, and request certificate
-     * set to true.
-     *
-     * @param tsa the timestamping authority to use
-     * @param tSAPolicyID the TSAPolicyID of the Timestamping Authority as a
-     *         numerical object identifier; or null if we leave the TSA server
-     *         to choose one
-     * @param toBeTimestamped the token that is to be timestamped
-     * @return the encoded timestamp token
-     * @throws IOException The exception is thrown if an error occurs while
-     *                     communicating with the TSA, or a non-null
-     *                     TSAPolicyID is specified in the request but it
-     *                     does not match the one in the reply
-     * @throws CertificateException The exception is thrown if the TSA's
-     *                     certificate is not permitted for timestamping.
-     */
-    private static byte[] generateTimestampToken(Timestamper tsa,
-                                                 String tSAPolicyID,
-                                                 String tSADigestAlg,
-                                                 byte[] toBeTimestamped)
-        throws IOException, CertificateException
-    {
-        // Generate a timestamp
-        MessageDigest messageDigest = null;
-        TSRequest tsQuery = null;
-        try {
-            messageDigest = MessageDigest.getInstance(tSADigestAlg);
-            tsQuery = new TSRequest(tSAPolicyID, toBeTimestamped, messageDigest);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalArgumentException(e);
-        }
-
-        // Generate a nonce
-        BigInteger nonce = null;
-        if (SecureRandomHolder.RANDOM != null) {
-            nonce = new BigInteger(64, SecureRandomHolder.RANDOM);
-            tsQuery.setNonce(nonce);
-        }
-        tsQuery.requestCertificate(true);
-
-        TSResponse tsReply = tsa.generateTimestamp(tsQuery);
-        int status = tsReply.getStatusCode();
-        // Handle TSP error
-        if (status != 0 && status != 1) {
-            throw new IOException("Error generating timestamp: " +
-                tsReply.getStatusCodeAsText() + " " +
-                tsReply.getFailureCodeAsText());
-        }
-
-        if (tSAPolicyID != null &&
-                !tSAPolicyID.equals(tsReply.getTimestampToken().getPolicyID())) {
-            throw new IOException("TSAPolicyID changed in "
-                    + "timestamp token");
-        }
-        PKCS7 tsToken = tsReply.getToken();
-
-        TimestampToken tst = tsReply.getTimestampToken();
-        try {
-            if (!tst.getHashAlgorithm().equals(AlgorithmId.get(tSADigestAlg))) {
-                throw new IOException("Digest algorithm not " + tSADigestAlg + " in "
-                                      + "timestamp token");
-            }
-        } catch (NoSuchAlgorithmException nase) {
-            throw new IllegalArgumentException();   // should have been caught before
-        }
-        if (!MessageDigest.isEqual(tst.getHashedMessage(),
-                                   tsQuery.getHashedMessage())) {
-            throw new IOException("Digest octets changed in timestamp token");
-        }
-
-        BigInteger replyNonce = tst.getNonce();
-        if (replyNonce == null && nonce != null) {
-            throw new IOException("Nonce missing in timestamp token");
-        }
-        if (replyNonce != null && !replyNonce.equals(nonce)) {
-            throw new IOException("Nonce changed in timestamp token");
-        }
-
-        // Examine the TSA's certificate (if present)
-        for (SignerInfo si: tsToken.getSignerInfos()) {
-            X509Certificate cert = si.getCertificate(tsToken);
-            if (cert == null) {
-                // Error, we've already set tsRequestCertificate = true
-                throw new CertificateException(
-                "Certificate not included in timestamp token");
-            } else {
-                if (!cert.getCriticalExtensionOIDs().contains(
-                        EXTENDED_KEY_USAGE_OID)) {
-                    throw new CertificateException(
-                    "Certificate is not valid for timestamping");
-                }
-                List<String> keyPurposes = cert.getExtendedKeyUsage();
-                if (keyPurposes == null ||
-                        !keyPurposes.contains(KP_TIMESTAMPING_OID)) {
-                    throw new CertificateException(
-                    "Certificate is not valid for timestamping");
-                }
-            }
-        }
-        return tsReply.getEncodedToken();
-    }
 }
