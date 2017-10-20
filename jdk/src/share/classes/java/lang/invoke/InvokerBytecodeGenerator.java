@@ -96,9 +96,6 @@ class InvokerBytecodeGenerator {
             className = invokerName.substring(0, p);
             invokerName = invokerName.substring(p+1);
         }
-        if (DUMP_CLASS_FILES) {
-            className = makeDumpableClassName(className);
-        }
         this.className  = LF + "$" + className;
         this.sourceFile = "LambdaForm$" + className;
         this.lambdaForm = lambdaForm;
@@ -139,69 +136,6 @@ class InvokerBytecodeGenerator {
         }
     }
 
-
-    /** instance counters for dumped classes */
-    private final static HashMap<String,Integer> DUMP_CLASS_FILES_COUNTERS;
-    /** debugging flag for saving generated class files */
-    private final static File DUMP_CLASS_FILES_DIR;
-
-    static {
-        if (DUMP_CLASS_FILES) {
-            DUMP_CLASS_FILES_COUNTERS = new HashMap<>();
-            try {
-                File dumpDir = new File("DUMP_CLASS_FILES");
-                if (!dumpDir.exists()) {
-                    dumpDir.mkdirs();
-                }
-                DUMP_CLASS_FILES_DIR = dumpDir;
-                System.out.println("Dumping class files to "+DUMP_CLASS_FILES_DIR+"/...");
-            } catch (Exception e) {
-                throw newInternalError(e);
-            }
-        } else {
-            DUMP_CLASS_FILES_COUNTERS = null;
-            DUMP_CLASS_FILES_DIR = null;
-        }
-    }
-
-    static void maybeDump(final String className, final byte[] classFile) {
-        if (DUMP_CLASS_FILES) {
-            java.security.AccessController.doPrivileged(
-            new java.security.PrivilegedAction<Void>() {
-                public Void run() {
-                    try {
-                        String dumpName = className;
-                        //dumpName = dumpName.replace('/', '-');
-                        File dumpFile = new File(DUMP_CLASS_FILES_DIR, dumpName+".class");
-                        System.out.println("dump: " + dumpFile);
-                        dumpFile.getParentFile().mkdirs();
-                        FileOutputStream file = new FileOutputStream(dumpFile);
-                        file.write(classFile);
-                        file.close();
-                        return null;
-                    } catch (IOException ex) {
-                        throw newInternalError(ex);
-                    }
-                }
-            });
-        }
-
-    }
-
-    private static String makeDumpableClassName(String className) {
-        Integer ctr;
-        synchronized (DUMP_CLASS_FILES_COUNTERS) {
-            ctr = DUMP_CLASS_FILES_COUNTERS.get(className);
-            if (ctr == null)  ctr = 0;
-            DUMP_CLASS_FILES_COUNTERS.put(className, ctr+1);
-        }
-        String sfx = ctr.toString();
-        while (sfx.length() < 3)
-            sfx = "0"+sfx;
-        className += sfx;
-        return className;
-    }
-
     class CpPatch {
         final int index;
         final String placeholder;
@@ -222,7 +156,6 @@ class InvokerBytecodeGenerator {
 
     String constantPlaceholder(Object arg) {
         String cpPlaceholder = "CONSTANT_PLACEHOLDER_" + cph++;
-        if (DUMP_CLASS_FILES) cpPlaceholder += " <<" + debugString(arg) + ">>";  // debugging aid
         if (cpPatches.containsKey(cpPlaceholder)) {
             throw new InternalError("observed CP placeholder twice: " + cpPlaceholder);
         }
@@ -288,14 +221,11 @@ class InvokerBytecodeGenerator {
 
     private static MemberName resolveInvokerMember(Class<?> invokerClass, String name, MethodType type) {
         MemberName member = new MemberName(invokerClass, name, type, REF_invokeStatic);
-        //System.out.println("resolveInvokerMember => "+member);
-        //for (Method m : invokerClass.getDeclaredMethods())  System.out.println("  "+m);
         try {
             member = MEMBERNAME_FACTORY.resolveOrFail(REF_invokeStatic, member, HOST_CLASS, ReflectiveOperationException.class);
         } catch (ReflectiveOperationException e) {
             throw newInternalError(e);
         }
-        //System.out.println("resolveInvokerMember => "+member);
         return member;
     }
 
@@ -725,7 +655,7 @@ class InvokerBytecodeGenerator {
         bogusMethod(lambdaForm);
 
         final byte[] classFile = cw.toByteArray();
-        maybeDump(className, classFile);
+        //maybeDump(className, classFile);
         return classFile;
     }
 
@@ -1357,7 +1287,7 @@ class InvokerBytecodeGenerator {
         bogusMethod(invokerType);
 
         final byte[] classFile = cw.toByteArray();
-        maybeDump(className, classFile);
+        //maybeDump(className, classFile);
         return classFile;
     }
 
@@ -1425,7 +1355,7 @@ class InvokerBytecodeGenerator {
         bogusMethod(dstType);
 
         final byte[] classFile = cw.toByteArray();
-        maybeDump(className, classFile);
+        //maybeDump(className, classFile);
         return classFile;
     }
 
@@ -1434,15 +1364,5 @@ class InvokerBytecodeGenerator {
      * for debugging purposes.
      */
     private void bogusMethod(Object... os) {
-        if (DUMP_CLASS_FILES) {
-            mv = cw.visitMethod(Opcodes.ACC_STATIC, "dummy", "()V", null, null);
-            for (Object o : os) {
-                mv.visitLdcInsn(o.toString());
-                mv.visitInsn(Opcodes.POP);
-            }
-            mv.visitInsn(Opcodes.RETURN);
-            mv.visitMaxs(0, 0);
-            mv.visitEnd();
-        }
     }
 }

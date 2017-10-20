@@ -48,7 +48,6 @@ public class SharedSecrets {
     private static JavaLangRefAccess javaLangRefAccess;
     private static JavaIOAccess javaIOAccess;
     private static JavaNetAccess javaNetAccess;
-    private static JavaNetHttpCookieAccess javaNetHttpCookieAccess;
     private static JavaNioAccess javaNioAccess;
     private static JavaIOFileDescriptorAccess javaIOFileDescriptorAccess;
     private static JavaSecurityProtectionDomainAccess javaSecurityProtectionDomainAccess;
@@ -91,16 +90,6 @@ public class SharedSecrets {
 
     public static JavaNetAccess getJavaNetAccess() {
         return javaNetAccess;
-    }
-
-    public static void setJavaNetHttpCookieAccess(JavaNetHttpCookieAccess a) {
-        javaNetHttpCookieAccess = a;
-    }
-
-    public static JavaNetHttpCookieAccess getJavaNetHttpCookieAccess() {
-        if (javaNetHttpCookieAccess == null)
-            unsafe.ensureClassInitialized(java.net.HttpCookie.class);
-        return javaNetHttpCookieAccess;
     }
 
     public static void setJavaNioAccess(JavaNioAccess jna) {
