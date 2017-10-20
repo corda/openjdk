@@ -66,33 +66,15 @@ final class JceSecurity {
     private final static Map<Provider, Object> verifyingProviders =
             new IdentityHashMap<>();
 
-    private static final boolean isRestricted;
-
     private static final Debug debug =
                         Debug.getInstance("jca", "Cipher");
+
+    private static final boolean isRestricted = true;
 
     /*
      * Don't let anyone instantiate this.
      */
     private JceSecurity() {
-    }
-
-    static {
-        try {
-            AccessController.doPrivileged(
-                new PrivilegedExceptionAction<Object>() {
-                    public Object run() throws Exception {
-                        setupJurisdictionPolicies();
-                        return null;
-                    }
-                });
-
-            isRestricted = defaultPolicy.implies(
-                CryptoAllPermission.INSTANCE) ? false : true;
-        } catch (Exception e) {
-            throw new SecurityException(
-                    "Can not initialize cryptographic mechanism", e);
-        }
     }
 
     static Instance getInstance(String type, Class<?> clazz, String algorithm,
@@ -242,144 +224,6 @@ final class JceSecurity {
             }
             return (url == NULL_URL) ? null : url;
         }
-    }
-
-    /*
-     * This is called from within an doPrivileged block.
-     *
-     * Following logic is used to decide what policy files are selected.
-     *
-     * If the new Security property (crypto.policy) is set in the
-     * java.security file, or has been set dynamically using the
-     * Security.setProperty() call before the JCE framework has
-     * been initialized, that setting will be used.
-     * Remember - this property is not defined by default. A conscious
-     * user edit or an application call is required.
-     *
-     * Otherwise, if user has policy jar files installed in the legacy
-     * jre/lib/security/ directory, the JDK will honor whatever
-     * setting is set by those policy files. (legacy/current behavior)
-     *
-     * If none of the above 2 conditions are met, the JDK will default
-     * to using the limited crypto policy files found in the
-     * jre/lib/security/policy/limited/ directory
-     */
-    private static void setupJurisdictionPolicies() throws Exception {
-        // Sanity check the crypto.policy Security property.  Single
-        // directory entry, no pseudo-directories (".", "..", leading/trailing
-        // path separators). normalize()/getParent() will help later.
-        String javaHomeProperty = System.getProperty("java.home");
-        String cryptoPolicyProperty = Security.getProperty("crypto.policy");
-        Path cpPath = (cryptoPolicyProperty == null) ? null :
-                Paths.get(cryptoPolicyProperty);
-
-        if ((cpPath != null) && ((cpPath.getNameCount() != 1) ||
-                (cpPath.compareTo(cpPath.getFileName())) != 0)) {
-            throw new SecurityException(
-                    "Invalid policy directory name format: " +
-                            cryptoPolicyProperty);
-        }
-
-        if (cpPath == null) {
-            // Security property is not set, use default path
-            cpPath = Paths.get(javaHomeProperty, "lib", "security");
-        } else {
-            // populate with java.home
-            cpPath = Paths.get(javaHomeProperty, "lib", "security",
-                    "policy", cryptoPolicyProperty);
-        }
-
-        if (debug != null) {
-            debug.println("crypto policy directory: " + cpPath);
-        }
-
-        File exportJar = new File(cpPath.toFile(),"US_export_policy.jar");
-        File importJar = new File(cpPath.toFile(),"local_policy.jar");
-
-        if (cryptoPolicyProperty == null && (!exportJar.exists() ||
-                !importJar.exists())) {
-            // Compatibility set up. If crypto.policy is not defined.
-            // check to see if legacy jars exist in lib directory. If
-            // they don't exist, we default to limited policy mode.
-            cpPath = Paths.get(
-                    javaHomeProperty, "lib", "security", "policy", "limited");
-            // point to the new jar files in limited directory
-            exportJar = new File(cpPath.toFile(),"US_export_policy.jar");
-            importJar = new File(cpPath.toFile(),"local_policy.jar");
-        }
-
-        URL jceCipherURL = ClassLoader.getSystemResource
-                ("javax/crypto/Cipher.class");
-
-        if ((jceCipherURL == null) ||
-                !exportJar.exists() || !importJar.exists()) {
-            throw new SecurityException
-                                ("Cannot locate policy or framework files!");
-        }
-
-        // Read jurisdiction policies.
-        CryptoPermissions defaultExport = new CryptoPermissions();
-        CryptoPermissions exemptExport = new CryptoPermissions();
-        loadPolicies(exportJar, defaultExport, exemptExport);
-
-        CryptoPermissions defaultImport = new CryptoPermissions();
-        CryptoPermissions exemptImport = new CryptoPermissions();
-        loadPolicies(importJar, defaultImport, exemptImport);
-
-        // Merge the export and import policies for default applications.
-        if (defaultExport.isEmpty() || defaultImport.isEmpty()) {
-            throw new SecurityException("Missing mandatory jurisdiction " +
-                                        "policy files");
-        }
-        defaultPolicy = defaultExport.getMinimum(defaultImport);
-
-        // Merge the export and import policies for exempt applications.
-        if (exemptExport.isEmpty())  {
-            exemptPolicy = exemptImport.isEmpty() ? null : exemptImport;
-        } else {
-            exemptPolicy = exemptExport.getMinimum(exemptImport);
-        }
-    }
-
-    /**
-     * Load the policies from the specified file. Also checks that the
-     * policies are correctly signed.
-     */
-    private static void loadPolicies(File jarPathName,
-                                     CryptoPermissions defaultPolicy,
-                                     CryptoPermissions exemptPolicy)
-        throws Exception {
-
-        JarFile jf = new JarFile(jarPathName);
-
-        Enumeration<JarEntry> entries = jf.entries();
-        while (entries.hasMoreElements()) {
-            JarEntry je = entries.nextElement();
-            InputStream is = null;
-            try {
-                if (je.getName().startsWith("default_")) {
-                    is = jf.getInputStream(je);
-                    defaultPolicy.load(is);
-                } else if (je.getName().startsWith("exempt_")) {
-                    is = jf.getInputStream(je);
-                    exemptPolicy.load(is);
-                } else {
-                    continue;
-                }
-            } finally {
-                if (is != null) {
-                    is.close();
-                }
-            }
-
-            // Enforce the signer restraint, i.e. signer of JCE framework
-            // jar should also be the signer of the two jurisdiction policy
-            // jar files.
-            JarVerifier.verifyPolicySigned(je.getCertificates());
-        }
-        // Close and nullify the JarFile reference to help GC.
-        jf.close();
-        jf = null;
     }
 
     static CryptoPermissions getDefaultPolicy() {

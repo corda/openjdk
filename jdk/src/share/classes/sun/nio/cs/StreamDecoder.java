@@ -202,23 +202,6 @@ public class StreamDecoder extends Reader
 
     // -- Charset-based stream decoder impl --
 
-    // In the early stages of the build we haven't yet built the NIO native
-    // code, so guard against that by catching the first UnsatisfiedLinkError
-    // and setting this flag so that later attempts fail quickly.
-    //
-    private static volatile boolean channelsAvailable = true;
-
-    private static FileChannel getChannel(FileInputStream in) {
-        if (!channelsAvailable)
-            return null;
-        try {
-            return in.getChannel();
-        } catch (UnsatisfiedLinkError x) {
-            channelsAvailable = false;
-            return null;
-        }
-    }
-
     private Charset cs;
     private CharsetDecoder decoder;
     private ByteBuffer bb;
@@ -239,17 +222,9 @@ public class StreamDecoder extends Reader
         this.cs = dec.charset();
         this.decoder = dec;
 
-        // This path disabled until direct buffers are faster
-        if (false && in instanceof FileInputStream) {
-        ch = getChannel((FileInputStream)in);
-        if (ch != null)
-            bb = ByteBuffer.allocateDirect(DEFAULT_BYTE_BUFFER_SIZE);
-        }
-        if (ch == null) {
         this.in = in;
         this.ch = null;
         bb = ByteBuffer.allocate(DEFAULT_BYTE_BUFFER_SIZE);
-        }
         bb.flip();                      // So that bb is initially empty
     }
 
@@ -360,10 +335,9 @@ public class StreamDecoder extends Reader
 
     private boolean inReady() {
         try {
-        return (((in != null) && (in.available() > 0))
-                || (ch instanceof FileChannel)); // ## RBC.available()?
+            return (in != null) && (in.available() > 0);
         } catch (IOException x) {
-        return false;
+            return false;
         }
     }
 

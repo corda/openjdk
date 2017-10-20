@@ -135,10 +135,6 @@ class JarFileFactory implements URLJarFile.URLJarFileCloseController {
                         if ((perm instanceof java.io.FilePermission) &&
                             perm.getActions().indexOf("read") != -1) {
                             sm.checkRead(perm.getName());
-                        } else if ((perm instanceof
-                            java.net.SocketPermission) &&
-                            perm.getActions().indexOf("connect") != -1) {
-                            sm.checkConnect(url.getHost(), url.getPort());
                         } else {
                             throw se;
                         }

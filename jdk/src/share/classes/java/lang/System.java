@@ -36,7 +36,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.AllPermission;
 import java.nio.channels.Channel;
-import java.nio.channels.spi.SelectorProvider;
 import sun.nio.ch.Interruptible;
 import sun.reflect.CallerSensitive;
 import sun.reflect.Reflection;
@@ -244,7 +243,7 @@ public final class System {
      * @since 1.5
      */
     public static Channel inheritedChannel() throws IOException {
-        return SelectorProvider.provider().inheritedChannel();
+        throw new UnsupportedOperationException("No inherited channel support");
     }
 
     private static void checkIO() {

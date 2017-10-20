@@ -133,11 +133,7 @@ implements java.io.Serializable {
      */
     @Override
     public byte[] engineGenerateSeed(int numBytes) {
-        // Neither of the SeedGenerator implementations require
-        // locking, so no sync needed here.
-        byte[] b = new byte[numBytes];
-        SeedGenerator.generateSeed(b);
-        return b;
+        throw new UnsupportedOperationException("Seed generation disabled");
     }
 
     /**
@@ -184,28 +180,6 @@ implements java.io.Serializable {
     }
 
     /**
-     * This static object will be seeded by SeedGenerator, and used
-     * to seed future instances of SHA1PRNG SecureRandoms.
-     *
-     * Bloch, Effective Java Second Edition: Item 71
-     */
-    private static class SeederHolder {
-
-        private static final SecureRandom seeder;
-
-        static {
-            /*
-             * Call to SeedGenerator.generateSeed() to add additional
-             * seed material (likely from the Native implementation).
-             */
-            seeder = new SecureRandom(SeedGenerator.getSystemEntropy());
-            byte [] b = new byte[DIGEST_SIZE];
-            SeedGenerator.generateSeed(b);
-            seeder.engineSetSeed(b);
-        }
-    }
-
-    /**
      * Generates a user-specified number of random bytes.
      *
      * @param bytes the array to be filled in with random bytes.
@@ -217,9 +191,7 @@ implements java.io.Serializable {
         byte[] output = remainder;
 
         if (state == null) {
-            byte[] seed = new byte[DIGEST_SIZE];
-            SeederHolder.seeder.engineNextBytes(seed);
-            state = digest.digest(seed);
+            throw new UnsupportedOperationException("Seed generation disabled");
         }
 
         // Use remainder from last time

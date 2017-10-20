@@ -266,11 +266,9 @@ public class GeneralSubtrees implements Cloneable {
                 newName = new GeneralName(new EDIPartyName(""));
                 break;
             case GeneralNameInterface.NAME_URI:
-                newName = new GeneralName(new URIName(""));
-                break;
+                throw new UnsupportedOperationException("DNS lookup unavailable");
             case GeneralNameInterface.NAME_IP:
-                newName = new GeneralName(new IPAddressName((byte[])null));
-                break;
+                throw new UnsupportedOperationException("DNS lookup unavailable");
             case GeneralNameInterface.NAME_OID:
                 newName = new GeneralName
                     (new OIDName(new ObjectIdentifier((int[])null)));
