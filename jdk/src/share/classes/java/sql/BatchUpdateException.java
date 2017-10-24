@@ -27,8 +27,6 @@ package java.sql;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
 /**
@@ -526,39 +524,4 @@ public class BatchUpdateException extends SQLException {
       }
       return copy;
   }
-    /**
-     * readObject is called to restore the state of the
-     * {@code BatchUpdateException} from a stream.
-     */
-    private void readObject(ObjectInputStream s)
-            throws IOException, ClassNotFoundException {
-
-       ObjectInputStream.GetField fields = s.readFields();
-       int[] tmp = (int[])fields.get("updateCounts", null);
-       long[] tmp2 = (long[])fields.get("longUpdateCounts", null);
-       if(tmp != null && tmp2 != null && tmp.length != tmp2.length)
-           throw new InvalidObjectException("update counts are not the expected size");
-       if (tmp != null)
-           updateCounts = tmp.clone();
-       if (tmp2 != null)
-           longUpdateCounts = tmp2.clone();
-       if(updateCounts == null && longUpdateCounts != null)
-           updateCounts = copyUpdateCount(longUpdateCounts);
-       if(longUpdateCounts == null && updateCounts != null)
-           longUpdateCounts = copyUpdateCount(updateCounts);
-
-    }
-
-    /**
-     * writeObject is called to save the state of the {@code BatchUpdateException}
-     * to a stream.
-     */
-    private void writeObject(ObjectOutputStream s)
-            throws IOException, ClassNotFoundException {
-
-        ObjectOutputStream.PutField fields = s.putFields();
-        fields.put("updateCounts", updateCounts);
-        fields.put("longUpdateCounts", longUpdateCounts);
-        s.writeFields();
-    }
 }

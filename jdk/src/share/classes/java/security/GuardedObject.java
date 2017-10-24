@@ -86,17 +86,4 @@ public class GuardedObject implements java.io.Serializable {
 
         return object;
     }
-
-    /**
-     * Writes this object out to a stream (i.e., serializes it).
-     * We check the guard if there is one.
-     */
-    private void writeObject(java.io.ObjectOutputStream oos)
-        throws java.io.IOException
-    {
-        if (guard != null)
-            guard.checkGuard(object);
-
-        oos.defaultWriteObject();
-    }
 }

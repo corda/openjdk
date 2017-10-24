@@ -39,7 +39,6 @@
 package java.util;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
@@ -3227,19 +3226,6 @@ public class GregorianCalendar extends Calendar {
      */
     private int internalGetEra() {
         return isSet(ERA) ? internalGet(ERA) : CE;
-    }
-
-    /**
-     * Updates internal state.
-     */
-    private void readObject(ObjectInputStream stream)
-            throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        if (gdate == null) {
-            gdate = (BaseCalendar.Date) gcal.newCalendarDate(getZone());
-            cachedFixedDate = Long.MIN_VALUE;
-        }
-        setGregorianChange(gregorianCutover);
     }
 
     /**

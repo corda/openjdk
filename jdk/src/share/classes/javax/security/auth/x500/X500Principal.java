@@ -486,28 +486,4 @@ public final class X500Principal implements Principal, java.io.Serializable {
     public int hashCode() {
         return thisX500Name.hashCode();
     }
-
-    /**
-     * Save the X500Principal object to a stream.
-     *
-     * @serialData this {@code X500Principal} is serialized
-     *          by writing out its DER-encoded form
-     *          (the value of {@code getEncoded} is serialized).
-     */
-    private void writeObject(java.io.ObjectOutputStream s)
-        throws IOException {
-        s.writeObject(thisX500Name.getEncodedInternal());
-    }
-
-    /**
-     * Reads this object from a stream (i.e., deserializes it).
-     */
-    private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException,
-               java.io.NotActiveException,
-               ClassNotFoundException {
-
-        // re-create thisX500Name
-        thisX500Name = new X500Name((byte[])s.readObject());
-    }
 }

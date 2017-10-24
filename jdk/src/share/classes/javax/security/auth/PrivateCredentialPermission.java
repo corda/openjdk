@@ -485,30 +485,6 @@ public final class PrivateCredentialPermission extends Permission {
     }
 
     /**
-     * Reads this object from a stream (i.e., deserializes it)
-     */
-    private void readObject(java.io.ObjectInputStream s) throws
-                                        java.io.IOException,
-                                        ClassNotFoundException {
-
-        s.defaultReadObject();
-
-        // perform new initialization from the permission name
-
-        if (getName().indexOf(" ") == -1 && getName().indexOf("\"") == -1) {
-
-            // name only has a credential class specified
-            credentialClass = getName();
-            credOwners = EMPTY_PRINCIPALS;
-
-        } else {
-
-            // perform regular initialization
-            init(getName());
-        }
-    }
-
-    /**
      * @serial include
      */
     static class CredOwner implements java.io.Serializable {

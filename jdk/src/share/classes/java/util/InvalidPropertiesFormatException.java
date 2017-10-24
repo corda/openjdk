@@ -69,25 +69,4 @@ public class InvalidPropertiesFormatException extends IOException {
     public InvalidPropertiesFormatException(String message) {
         super(message);
     }
-
-    /**
-     * Throws NotSerializableException, since InvalidPropertiesFormatException
-     * objects are not intended to be serializable.
-     */
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws NotSerializableException
-    {
-        throw new NotSerializableException("Not serializable.");
-    }
-
-    /**
-     * Throws NotSerializableException, since InvalidPropertiesFormatException
-     * objects are not intended to be serializable.
-     */
-    private void readObject(java.io.ObjectInputStream in)
-        throws NotSerializableException
-    {
-        throw new NotSerializableException("Not serializable.");
-    }
-
 }

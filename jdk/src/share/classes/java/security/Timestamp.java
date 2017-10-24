@@ -153,12 +153,4 @@ public final class Timestamp implements Serializable {
         sb.append(")");
         return sb.toString();
     }
-
-    // Explicitly reset hash code value to -1
-    private void readObject(ObjectInputStream ois)
-        throws IOException, ClassNotFoundException {
-        ois.defaultReadObject();
-        myhash = -1;
-        timestamp = new Date(timestamp.getTime());
-    }
 }

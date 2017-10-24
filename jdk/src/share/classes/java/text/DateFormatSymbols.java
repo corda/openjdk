@@ -39,7 +39,6 @@
 package java.text;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.ref.SoftReference;
 import java.text.spi.DateFormatSymbolsProvider;
@@ -858,19 +857,5 @@ public class DateFormatSymbols implements Serializable, Cloneable {
         }
         dst.localPatternChars = src.localPatternChars;
         dst.cachedHashCode = 0;
-    }
-
-    /**
-     * Write out the default serializable data, after ensuring the
-     * <code>zoneStrings</code> field is initialized in order to make
-     * sure the backward compatibility.
-     *
-     * @since 1.6
-     */
-    private void writeObject(ObjectOutputStream stream) throws IOException {
-        if (zoneStrings == null) {
-            zoneStrings = TimeZoneNameUtility.getZoneStrings(locale);
-        }
-        stream.defaultWriteObject();
     }
 }

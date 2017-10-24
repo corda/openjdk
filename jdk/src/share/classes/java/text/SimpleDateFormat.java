@@ -39,8 +39,6 @@
 package java.text;
 
 import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
 import static java.text.DateFormatSymbols.*;
 import java.util.Calendar;
 import java.util.Date;
@@ -2369,46 +2367,6 @@ public class SimpleDateFormat extends DateFormat {
             }
         }
         return map;
-    }
-
-    /**
-     * After reading an object from the input stream, the format
-     * pattern in the object is verified.
-     * <p>
-     * @exception InvalidObjectException if the pattern is invalid
-     */
-    private void readObject(ObjectInputStream stream)
-                         throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-
-        try {
-            compiledPattern = compile(pattern);
-        } catch (Exception e) {
-            throw new InvalidObjectException("invalid pattern");
-        }
-
-        if (serialVersionOnStream < 1) {
-            // didn't have defaultCenturyStart field
-            initializeDefaultCentury();
-        }
-        else {
-            // fill in dependent transient field
-            parseAmbiguousDatesAsAfter(defaultCenturyStart);
-        }
-        serialVersionOnStream = currentSerialVersion;
-
-        // If the deserialized object has a SimpleTimeZone, try
-        // to replace it with a ZoneInfo equivalent in order to
-        // be compatible with the SimpleTimeZone-based
-        // implementation as much as possible.
-        TimeZone tz = getTimeZone();
-        if (tz instanceof SimpleTimeZone) {
-            String id = tz.getID();
-            TimeZone zi = TimeZone.getTimeZone(id);
-            if (zi != null && zi.hasSameRules(tz) && zi.getID().equals(id)) {
-                setTimeZone(zi);
-            }
-        }
     }
 
     /**

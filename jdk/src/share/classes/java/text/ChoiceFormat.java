@@ -40,7 +40,6 @@ package java.text;
 
 import java.io.InvalidObjectException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.Arrays;
 
 /**
@@ -501,19 +500,6 @@ public class ChoiceFormat extends NumberFormat {
         ChoiceFormat other = (ChoiceFormat) obj;
         return (Arrays.equals(choiceLimits, other.choiceLimits)
              && Arrays.equals(choiceFormats, other.choiceFormats));
-    }
-
-    /**
-     * After reading an object from the input stream, do a simple verification
-     * to maintain class invariants.
-     * @throws InvalidObjectException if the objects read from the stream is invalid.
-     */
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        if (choiceLimits.length != choiceFormats.length) {
-            throw new InvalidObjectException(
-                    "limits and format arrays of different length.");
-        }
     }
 
     // ===============privates===========================

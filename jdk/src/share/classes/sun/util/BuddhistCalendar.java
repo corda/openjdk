@@ -26,7 +26,6 @@
 package sun.util;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Map;
@@ -252,10 +251,4 @@ public class BuddhistCalendar extends GregorianCalendar {
     }
 
     private transient int yearOffset = BUDDHIST_YEAR_OFFSET;
-
-    private void readObject(ObjectInputStream stream)
-        throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        yearOffset = BUDDHIST_YEAR_OFFSET;
-    }
 }

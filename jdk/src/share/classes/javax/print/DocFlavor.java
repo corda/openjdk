@@ -26,8 +26,6 @@
 package javax.print;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 
@@ -612,30 +610,6 @@ public class DocFlavor implements Serializable, Cloneable {
             myStringValue = myMimeType + "; class=\"" + myClassName + "\"";
         }
         return myStringValue;
-    }
-
-    /**
-     * Write the instance to a stream (ie serialize the object).
-     */
-    private void writeObject(ObjectOutputStream s) throws IOException {
-
-        s.defaultWriteObject();
-        s.writeObject(myMimeType.getMimeType());
-    }
-
-    /**
-     * Reconstitute an instance from a stream (that is, deserialize it).
-     *
-     * @serialData
-     * The serialised form of a DocFlavor is the String naming the
-     * representation class followed by the String representing the canonical
-     * form of the mime type.
-     */
-    private void readObject(ObjectInputStream s)
-        throws ClassNotFoundException, IOException {
-
-        s.defaultReadObject();
-        myMimeType = new MimeType((String)s.readObject());
     }
 
     /**

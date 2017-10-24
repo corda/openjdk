@@ -28,8 +28,6 @@ package java.util;
 import java.text.DateFormat;
 import java.time.LocalDate;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
 import java.lang.ref.SoftReference;
 import java.time.Instant;
 import sun.util.calendar.BaseCalendar;
@@ -1308,28 +1306,6 @@ public class Date
             jcal = (BaseCalendar) CalendarSystem.forName("julian");
         }
         return jcal;
-    }
-
-    /**
-     * Save the state of this object to a stream (i.e., serialize it).
-     *
-     * @serialData The value returned by <code>getTime()</code>
-     *             is emitted (long).  This represents the offset from
-     *             January 1, 1970, 00:00:00 GMT in milliseconds.
-     */
-    private void writeObject(ObjectOutputStream s)
-         throws IOException
-    {
-        s.writeLong(getTimeImpl());
-    }
-
-    /**
-     * Reconstitute this object from a stream (i.e., deserialize it).
-     */
-    private void readObject(ObjectInputStream s)
-         throws IOException, ClassNotFoundException
-    {
-        fastTime = s.readLong();
     }
 
     /**

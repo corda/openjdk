@@ -64,8 +64,6 @@ package java.time.zone;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
@@ -171,37 +169,6 @@ public final class ZoneOffsetTransition
     }
 
     //-----------------------------------------------------------------------
-    /**
-     * Defend against malicious streams.
-     *
-     * @param s the stream to read
-     * @throws InvalidObjectException always
-     */
-    private void readObject(ObjectInputStream s) throws InvalidObjectException {
-        throw new InvalidObjectException("Deserialization via serialization delegate");
-    }
-
-    /**
-     * Writes the object using a
-     * <a href="../../../serialized-form.html#java.time.zone.Ser">dedicated serialized form</a>.
-     * @serialData
-     * Refer to the serialized form of
-     * <a href="../../../serialized-form.html#java.time.zone.ZoneRules">ZoneRules.writeReplace</a>
-     * for the encoding of epoch seconds and offsets.
-     * <pre style="font-size:1.0em">{@code
-     *
-     *   out.writeByte(2);                // identifies a ZoneOffsetTransition
-     *   out.writeEpochSec(toEpochSecond);
-     *   out.writeOffset(offsetBefore);
-     *   out.writeOffset(offsetAfter);
-     * }
-     * </pre>
-     * @return the replacing object, not null
-     */
-    private Object writeReplace() {
-        return new Ser(Ser.ZOT, this);
-    }
-
     /**
      * Writes the state to the stream.
      *

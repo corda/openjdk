@@ -28,8 +28,6 @@ package java.lang;
 import java.io.Serializable;
 import java.io.IOException;
 import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 
 /**
  * This is the common base class of all Java language enumeration types.
@@ -242,16 +240,4 @@ public abstract class Enum<E extends Enum<E>>
      * enum classes cannot have finalize methods.
      */
     protected final void finalize() { }
-
-    /**
-     * prevent default deserialization
-     */
-    private void readObject(ObjectInputStream in) throws IOException,
-        ClassNotFoundException {
-        throw new InvalidObjectException("can't deserialize enum");
-    }
-
-    private void readObjectNoData() throws ObjectStreamException {
-        throw new InvalidObjectException("can't deserialize enum");
-    }
 }

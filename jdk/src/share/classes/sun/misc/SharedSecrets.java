@@ -25,11 +25,9 @@
 
 package sun.misc;
 
-import java.io.ObjectInputStream;
 import java.util.jar.JarFile;
 import java.io.Console;
 import java.io.FileDescriptor;
-import java.io.ObjectInputStream;
 import java.security.ProtectionDomain;
 
 import java.security.AccessController;
@@ -57,8 +55,6 @@ public class SharedSecrets {
     private static JavaSecurityAccess javaSecurityAccess;
     private static JavaUtilZipFileAccess javaUtilZipFileAccess;
     private static JavaAWTAccess javaAWTAccess;
-    private static JavaOISAccess javaOISAccess;
-    private static JavaObjectInputStreamAccess javaObjectInputStreamAccess;
 
     public static JavaUtilJarAccess javaUtilJarAccess() {
         if (javaUtilJarAccess == null) {
@@ -143,18 +139,6 @@ public class SharedSecrets {
         return javaIOFileDescriptorAccess;
     }
 
-    public static void setJavaOISAccess(JavaOISAccess access) {
-        javaOISAccess = access;
-    }
-
-    public static JavaOISAccess getJavaOISAccess() {
-        if (javaOISAccess == null)
-            unsafe.ensureClassInitialized(ObjectInputStream.class);
-
-        return javaOISAccess;
-    }
-
-
     public static void setJavaSecurityProtectionDomainAccess
         (JavaSecurityProtectionDomainAccess jspda) {
             javaSecurityProtectionDomainAccess = jspda;
@@ -199,16 +183,5 @@ public class SharedSecrets {
             return null;
         }
         return javaAWTAccess;
-    }
-
-    public static JavaObjectInputStreamAccess getJavaObjectInputStreamAccess() {
-        if (javaObjectInputStreamAccess == null) {
-            unsafe.ensureClassInitialized(ObjectInputStream.class);
-        }
-        return javaObjectInputStreamAccess;
-    }
-
-    public static void setJavaObjectInputStreamAccess(JavaObjectInputStreamAccess access) {
-        javaObjectInputStreamAccess = access;
     }
 }

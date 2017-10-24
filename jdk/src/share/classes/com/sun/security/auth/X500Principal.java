@@ -168,18 +168,4 @@ public class X500Principal implements Principal, java.io.Serializable {
     public int hashCode() {
         return thisX500Name.hashCode();
     }
-
-    /**
-     * Reads this object from a stream (i.e., deserializes it)
-     */
-    private void readObject(java.io.ObjectInputStream s) throws
-                                        java.io.IOException,
-                                        java.io.NotActiveException,
-                                        ClassNotFoundException {
-
-        s.defaultReadObject();
-
-        // re-create thisX500Name
-        thisX500Name = new X500Name(name);
-    }
 }

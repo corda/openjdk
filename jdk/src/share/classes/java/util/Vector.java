@@ -1059,25 +1059,6 @@ public class Vector<E>
     }
 
     /**
-     * Save the state of the {@code Vector} instance to a stream (that
-     * is, serialize it).
-     * This method performs synchronization to ensure the consistency
-     * of the serialized data.
-     */
-    private void writeObject(java.io.ObjectOutputStream s)
-            throws java.io.IOException {
-        final java.io.ObjectOutputStream.PutField fields = s.putFields();
-        final Object[] data;
-        synchronized (this) {
-            fields.put("capacityIncrement", capacityIncrement);
-            fields.put("elementCount", elementCount);
-            data = elementData.clone();
-        }
-        fields.put("elementData", data);
-        s.writeFields();
-    }
-
-    /**
      * Returns a list iterator over the elements in this list (in proper
      * sequence), starting at the specified position in the list.
      * The specified index indicates the first element that would be

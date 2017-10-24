@@ -945,12 +945,6 @@ public class StampedLock implements java.io.Serializable {
         }
     }
 
-    private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
-        s.defaultReadObject();
-        state = ORIGIN; // reset to unlocked state
-    }
-
     // internals
 
     /**

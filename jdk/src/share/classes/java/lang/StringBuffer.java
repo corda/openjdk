@@ -670,46 +670,4 @@ import java.util.Arrays;
         }
         return new String(toStringCache, true);
     }
-
-    /**
-     * Serializable fields for StringBuffer.
-     *
-     * @serialField value  char[]
-     *              The backing character array of this StringBuffer.
-     * @serialField count int
-     *              The number of characters in this StringBuffer.
-     * @serialField shared  boolean
-     *              A flag indicating whether the backing array is shared.
-     *              The value is ignored upon deserialization.
-     */
-    private static final java.io.ObjectStreamField[] serialPersistentFields =
-    {
-        new java.io.ObjectStreamField("value", char[].class),
-        new java.io.ObjectStreamField("count", Integer.TYPE),
-        new java.io.ObjectStreamField("shared", Boolean.TYPE),
-    };
-
-    /**
-     * readObject is called to restore the state of the StringBuffer from
-     * a stream.
-     */
-    private synchronized void writeObject(java.io.ObjectOutputStream s)
-        throws java.io.IOException {
-        java.io.ObjectOutputStream.PutField fields = s.putFields();
-        fields.put("value", value);
-        fields.put("count", count);
-        fields.put("shared", false);
-        s.writeFields();
-    }
-
-    /**
-     * readObject is called to restore the state of the StringBuffer from
-     * a stream.
-     */
-    private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
-        java.io.ObjectInputStream.GetField fields = s.readFields();
-        value = (char[])fields.get("value", null);
-        count = fields.get("count", 0);
-    }
 }

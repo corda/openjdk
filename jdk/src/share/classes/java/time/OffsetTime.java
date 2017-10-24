@@ -72,8 +72,6 @@ import static java.time.temporal.ChronoUnit.NANOS;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -1391,16 +1389,6 @@ public final class OffsetTime
      */
     private Object writeReplace() {
         return new Ser(Ser.OFFSET_TIME_TYPE, this);
-    }
-
-    /**
-     * Defend against malicious streams.
-     *
-     * @param s the stream to read
-     * @throws InvalidObjectException always
-     */
-    private void readObject(ObjectInputStream s) throws InvalidObjectException {
-        throw new InvalidObjectException("Deserialization via serialization delegate");
     }
 
     void writeExternal(ObjectOutput out) throws IOException {

@@ -38,9 +38,6 @@ import java.security.PrivilegedAction;
 import java.security.AccessController;
 import java.security.Security;
 import java.io.Serializable;
-import java.io.ObjectStreamField;
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
 import java.io.IOException;
 import sun.net.util.IPAddressUtil;
 import sun.net.RegisteredDomain;
@@ -1176,33 +1173,6 @@ public final class SocketPermission extends Permission
     }
 
     /**
-     * WriteObject is called to save the state of the SocketPermission
-     * to a stream. The actions are serialized, and the superclass
-     * takes care of the name.
-     */
-    private synchronized void writeObject(java.io.ObjectOutputStream s)
-        throws IOException
-    {
-        // Write out the actions. The superclass takes care of the name
-        // call getActions to make sure actions field is initialized
-        if (actions == null)
-            getActions();
-        s.defaultWriteObject();
-    }
-
-    /**
-     * readObject is called to restore the state of the SocketPermission from
-     * a stream.
-     */
-    private synchronized void readObject(java.io.ObjectInputStream s)
-         throws IOException, ClassNotFoundException
-    {
-        // Read in the action, then initialize the rest
-        s.defaultReadObject();
-        init(getName(),getMask(actions));
-    }
-
-    /**
      * Check the system/security property for the ephemeral port range
      * for this system. The suffix is either "high" or "low"
      */
@@ -1426,61 +1396,4 @@ final class SocketPermissionCollection extends PermissionCollection
     }
 
     private static final long serialVersionUID = 2787186408602843674L;
-
-    // Need to maintain serialization interoperability with earlier releases,
-    // which had the serializable field:
-
-    //
-    // The SocketPermissions for this set.
-    // @serial
-    //
-    // private Vector permissions;
-
-    /**
-     * @serialField permissions java.util.Vector
-     *     A list of the SocketPermissions for this set.
-     */
-    private static final ObjectStreamField[] serialPersistentFields = {
-        new ObjectStreamField("permissions", Vector.class),
-    };
-
-    /**
-     * @serialData "permissions" field (a Vector containing the SocketPermissions).
-     */
-    /*
-     * Writes the contents of the perms field out as a Vector for
-     * serialization compatibility with earlier releases.
-     */
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        // Don't call out.defaultWriteObject()
-
-        // Write out Vector
-        Vector<SocketPermission> permissions = new Vector<>(perms.size());
-
-        synchronized (this) {
-            permissions.addAll(perms);
-        }
-
-        ObjectOutputStream.PutField pfields = out.putFields();
-        pfields.put("permissions", permissions);
-        out.writeFields();
-    }
-
-    /*
-     * Reads in a Vector of SocketPermissions and saves them in the perms field.
-     */
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException
-    {
-        // Don't call in.defaultReadObject()
-
-        // Read in serialized fields
-        ObjectInputStream.GetField gfields = in.readFields();
-
-        // Get the one we want
-        @SuppressWarnings("unchecked")
-        Vector<SocketPermission> permissions = (Vector<SocketPermission>)gfields.get("permissions", null);
-        perms = new ArrayList<SocketPermission>(permissions.size());
-        perms.addAll(permissions);
-    }
 }

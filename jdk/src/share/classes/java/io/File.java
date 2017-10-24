@@ -1957,39 +1957,6 @@ public class File
         return getPath();
     }
 
-    /**
-     * WriteObject is called to save this filename.
-     * The separator character is saved also so it can be replaced
-     * in case the path is reconstituted on a different host type.
-     * <p>
-     * @serialData  Default fields followed by separator character.
-     */
-    private synchronized void writeObject(java.io.ObjectOutputStream s)
-        throws IOException
-    {
-        s.defaultWriteObject();
-        s.writeChar(separatorChar); // Add the separator character
-    }
-
-    /**
-     * readObject is called to restore this filename.
-     * The original separator character is read.  If it is different
-     * than the separator character on this system, then the old separator
-     * is replaced by the local separator.
-     */
-    private synchronized void readObject(java.io.ObjectInputStream s)
-         throws IOException, ClassNotFoundException
-    {
-        ObjectInputStream.GetField fields = s.readFields();
-        String pathField = (String)fields.get("path", null);
-        char sep = s.readChar(); // read the previous separator char
-        if (sep != separatorChar)
-            pathField = pathField.replace(sep, separatorChar);
-        String path = fs.normalize(pathField);
-        UNSAFE.putObject(this, PATH_OFFSET, path);
-        UNSAFE.putIntVolatile(this, PREFIX_LENGTH_OFFSET, fs.prefixLength(path));
-    }
-
     private static final long PATH_OFFSET;
     private static final long PREFIX_LENGTH_OFFSET;
     private static final sun.misc.Unsafe UNSAFE;

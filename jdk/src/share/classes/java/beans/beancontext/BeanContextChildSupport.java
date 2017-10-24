@@ -35,8 +35,6 @@ import java.beans.VetoableChangeSupport;
 import java.beans.PropertyVetoException;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
@@ -309,40 +307,6 @@ public class BeanContextChildSupport implements BeanContextChild, BeanContextSer
     protected void initializeBeanContextResources() {
         // do nothing
     }
-
-    /**
-     * Write the persistence state of the object.
-     */
-
-    private void writeObject(ObjectOutputStream oos) throws IOException {
-
-        /*
-         * don't serialize if we are delegated and the delegator is not also
-         * serializable.
-         */
-
-        if (!equals(beanContextChildPeer) && !(beanContextChildPeer instanceof Serializable))
-            throw new IOException("BeanContextChildSupport beanContextChildPeer not Serializable");
-
-        else
-            oos.defaultWriteObject();
-
-    }
-
-
-    /**
-     * Restore a persistent object, must wait for subsequent setBeanContext()
-     * to fully restore any resources obtained from the new nesting
-     * BeanContext
-     */
-
-    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
-        ois.defaultReadObject();
-    }
-
-    /*
-     * fields
-     */
 
     /**
      * The <code>BeanContext</code> in which

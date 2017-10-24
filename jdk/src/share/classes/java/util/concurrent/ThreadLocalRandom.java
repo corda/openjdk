@@ -35,7 +35,6 @@
 
 package java.util.concurrent;
 
-import java.io.ObjectStreamField;
 import java.util.Random;
 import java.util.Spliterator;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -1003,39 +1002,6 @@ public class ThreadLocalRandom extends Random {
     // Serialization support
 
     private static final long serialVersionUID = -5851777807851030925L;
-
-    /**
-     * @serialField rnd long
-     *              seed for random computations
-     * @serialField initialized boolean
-     *              always true
-     */
-    private static final ObjectStreamField[] serialPersistentFields = {
-            new ObjectStreamField("rnd", long.class),
-            new ObjectStreamField("initialized", boolean.class),
-    };
-
-    /**
-     * Saves the {@code ThreadLocalRandom} to a stream (that is, serializes it).
-     * @param s the stream
-     * @throws java.io.IOException if an I/O error occurs
-     */
-    private void writeObject(java.io.ObjectOutputStream s)
-        throws java.io.IOException {
-
-        java.io.ObjectOutputStream.PutField fields = s.putFields();
-        fields.put("rnd", UNSAFE.getLong(Thread.currentThread(), SEED));
-        fields.put("initialized", true);
-        s.writeFields();
-    }
-
-    /**
-     * Returns the {@link #current() current} thread's {@code ThreadLocalRandom}.
-     * @return the {@link #current() current} thread's {@code ThreadLocalRandom}
-     */
-    private Object readResolve() {
-        return current();
-    }
 
     // Unsafe mechanics
     private static final sun.misc.Unsafe UNSAFE;

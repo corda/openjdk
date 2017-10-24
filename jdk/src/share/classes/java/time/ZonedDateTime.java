@@ -68,8 +68,6 @@ import static java.time.temporal.ChronoField.OFFSET_SECONDS;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.ObjectInput;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.chrono.ChronoZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -2226,16 +2224,6 @@ public final class ZonedDateTime
      */
     private Object writeReplace() {
         return new Ser(Ser.ZONE_DATE_TIME_TYPE, this);
-    }
-
-    /**
-     * Defend against malicious streams.
-     *
-     * @param s the stream to read
-     * @throws InvalidObjectException always
-     */
-    private void readObject(ObjectInputStream s) throws InvalidObjectException {
-        throw new InvalidObjectException("Deserialization via serialization delegate");
     }
 
     void writeExternal(DataOutput out) throws IOException {

@@ -741,59 +741,6 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     /**
-     * Save the state of the <tt>ArrayList</tt> instance to a stream (that
-     * is, serialize it).
-     *
-     * @serialData The length of the array backing the <tt>ArrayList</tt>
-     *             instance is emitted (int), followed by all of its elements
-     *             (each an <tt>Object</tt>) in the proper order.
-     */
-    private void writeObject(java.io.ObjectOutputStream s)
-        throws java.io.IOException{
-        // Write out element count, and any hidden stuff
-        int expectedModCount = modCount;
-        s.defaultWriteObject();
-
-        // Write out size as capacity for behavioural compatibility with clone()
-        s.writeInt(size);
-
-        // Write out all elements in the proper order.
-        for (int i=0; i<size; i++) {
-            s.writeObject(elementData[i]);
-        }
-
-        if (modCount != expectedModCount) {
-            throw new ConcurrentModificationException();
-        }
-    }
-
-    /**
-     * Reconstitute the <tt>ArrayList</tt> instance from a stream (that is,
-     * deserialize it).
-     */
-    private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
-        elementData = EMPTY_ELEMENTDATA;
-
-        // Read in size, and any hidden stuff
-        s.defaultReadObject();
-
-        // Read in capacity
-        s.readInt(); // ignored
-
-        if (size > 0) {
-            // be like clone(), allocate array based upon size not capacity
-            ensureCapacityInternal(size);
-
-            Object[] a = elementData;
-            // Read in all elements in the proper order.
-            for (int i=0; i<size; i++) {
-                a[i] = s.readObject();
-            }
-        }
-    }
-
-    /**
      * Returns a list iterator over the elements in this list (in proper
      * sequence), starting at the specified position in the list.
      * The specified index indicates the first element that would be
