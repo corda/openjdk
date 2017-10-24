@@ -598,8 +598,8 @@ public class LinkedTransferQueue<E> extends AbstractQueue<E>
      *
      * @param e the item or null for take
      * @param haveData true if this is a put, else a take
-     * @param how NOW, ASYNC, SYNC, or TIMED
-     * @param nanos timeout in nanosecs, used only if mode is TIMED
+     * @param how NOW, ASYNC, or SYNC
+     * @param nanos ignored
      * @return an item if matched, else e
      * @throws NullPointerException if haveData mode but e is null
      */
@@ -692,9 +692,9 @@ public class LinkedTransferQueue<E> extends AbstractQueue<E>
      * predecessor, or null if unknown (the null case does not occur
      * in any current calls but may in possible future extensions)
      * @param e the comparison value for checking match
-     * @param timed if true, wait only until timeout elapses
-     * @param nanos timeout in nanosecs, used only if timed is true
-     * @return matched item, or e if unmatched on interrupt or timeout
+     * @param timed ignored
+     * @param nanos ignored
+     * @return matched item, or e if unmatched on interrupt
      */
     private E awaitMatch(Node s, Node pred, E e, boolean timed, long nanos) {
         Thread w = Thread.currentThread();
@@ -1246,6 +1246,7 @@ public class LinkedTransferQueue<E> extends AbstractQueue<E>
      * returning {@code false} if the specified wait time elapses
      * before the element can be transferred.
      *
+     * @exclude Not supported
      * @throws NullPointerException if the specified element is null
      */
     public boolean tryTransfer(E e, long timeout, TimeUnit unit)
