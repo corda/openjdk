@@ -31,10 +31,6 @@ COPY_PATTERNS = .icu _dict
 
 # Copy sun/tools related files into the classes directory.
 
-# Extra jvmstat files
-COPY_FILES += \
-    $(JDK_TOPDIR)/src/share/classes/sun/jvmstat/perfdata/resources/aliasmap
-
 # Print resources
 PRINT_RESOURCES_DIR = $(JDK_TOPDIR)/src/share/classes/sun/print/resources
 COPY_FILES += \

@@ -28,7 +28,6 @@ package sun.nio.ch;
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
-import java.nio.channels.spi.*;
 
 
 /**
@@ -48,22 +47,7 @@ public class ChannelInputStream
                            boolean block)
         throws IOException
     {
-        if (ch instanceof SelectableChannel) {
-            SelectableChannel sc = (SelectableChannel)ch;
-            synchronized (sc.blockingLock()) {
-                boolean bm = sc.isBlocking();
-                if (!bm)
-                    throw new IllegalBlockingModeException();
-                if (bm != block)
-                    sc.configureBlocking(block);
-                int n = ch.read(bb);
-                if (bm != block)
-                    sc.configureBlocking(bm);
-                return n;
-            }
-        } else {
-            return ch.read(bb);
-        }
+        return ch.read(bb);
     }
 
     protected final ReadableByteChannel ch;

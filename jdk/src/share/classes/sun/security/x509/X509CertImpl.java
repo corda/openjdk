@@ -1559,17 +1559,9 @@ public class X509CertImpl extends X509Certificate implements DerEncoder {
                 nameEntry.add(((X500Name) name).getRFC2253Name());
                 break;
             case GeneralNameInterface.NAME_URI:
-                nameEntry.add(((URIName) name).getName());
-                break;
+                throw new UnsupportedOperationException("DNS lookup unavailable");
             case GeneralNameInterface.NAME_IP:
-                try {
-                    nameEntry.add(((IPAddressName) name).getName());
-                } catch (IOException ioe) {
-                    // IPAddressName in cert is bogus
-                    throw new RuntimeException("IPAddress cannot be parsed",
-                        ioe);
-                }
-                break;
+                throw new UnsupportedOperationException("DNS lookup unavailable");
             case GeneralNameInterface.NAME_OID:
                 nameEntry.add(((OIDName) name).getOID().toString());
                 break;

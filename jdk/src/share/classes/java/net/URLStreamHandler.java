@@ -71,32 +71,6 @@ public abstract class URLStreamHandler {
     abstract protected URLConnection openConnection(URL u) throws IOException;
 
     /**
-     * Same as openConnection(URL), except that the connection will be
-     * made through the specified proxy; Protocol handlers that do not
-     * support proxying will ignore the proxy parameter and make a
-     * normal connection.
-     *
-     * Calling this method preempts the system's default ProxySelector
-     * settings.
-     *
-     * @param      u   the URL that this connects to.
-     * @param      p   the proxy through which the connection will be made.
-     *                 If direct connection is desired, Proxy.NO_PROXY
-     *                 should be specified.
-     * @return     a {@code URLConnection} object for the {@code URL}.
-     * @exception  IOException  if an I/O error occurs while opening the
-     *               connection.
-     * @exception  IllegalArgumentException if either u or p is null,
-     *               or p has the wrong type.
-     * @exception  UnsupportedOperationException if the subclass that
-     *               implements the protocol doesn't support this method.
-     * @since      1.5
-     */
-    protected URLConnection openConnection(URL u, Proxy p) throws IOException {
-        throw new UnsupportedOperationException("Method not implemented.");
-    }
-
-    /**
      * Parses the string representation of a {@code URL} into a
      * {@code URL} object.
      * <p>
@@ -431,22 +405,7 @@ public abstract class URLStreamHandler {
      * @since 1.3
      */
     protected synchronized InetAddress getHostAddress(URL u) {
-        if (u.hostAddress != null)
-            return u.hostAddress;
-
-        String host = u.getHost();
-        if (host == null || host.equals("")) {
-            return null;
-        } else {
-            try {
-                u.hostAddress = InetAddress.getByName(host);
-            } catch (UnknownHostException ex) {
-                return null;
-            } catch (SecurityException se) {
-                return null;
-            }
-        }
-        return u.hostAddress;
+        return u.hostAddress != null ? u.hostAddress : null;
     }
 
     /**

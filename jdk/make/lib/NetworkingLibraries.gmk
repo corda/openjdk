@@ -24,16 +24,7 @@
 #
 
 LIBNET_SRC_DIRS := $(JDK_TOPDIR)/src/share/native/java/net \
-    $(JDK_TOPDIR)/src/$(OPENJDK_TARGET_OS_API_DIR)/native/java/net \
-    $(JDK_TOPDIR)/src/$(OPENJDK_TARGET_OS_API_DIR)/native/sun/net/ \
-    $(JDK_TOPDIR)/src/$(OPENJDK_TARGET_OS_API_DIR)/native/sun/net/dns \
-    $(JDK_TOPDIR)/src/$(OPENJDK_TARGET_OS_API_DIR)/native/sun/net/spi
-
-ifeq ($(OPENJDK_TARGET_OS), windows)
-  LIBNET_SRC_DIRS += $(JDK_TOPDIR)/src/$(OPENJDK_TARGET_OS_API_DIR)/native/sun/net/www/protocol/http/ntlm
-else
-  LIBNET_SRC_DIRS += $(JDK_TOPDIR)/src/$(OPENJDK_TARGET_OS_API_DIR)/native/sun/net/sdp
-endif
+    $(JDK_TOPDIR)/src/$(OPENJDK_TARGET_OS_API_DIR)/native/java/net
 
 LIBNET_CFLAGS := $(foreach dir, $(LIBNET_SRC_DIRS), -I$(dir))
 
@@ -48,14 +39,6 @@ endif
 
 ifeq ($(OPENJDK_TARGET_OS), aix)
   LIBNET_SRC_DIRS += $(JDK_TOPDIR)/src/aix/native/java/net/
-endif
-
-ifeq ($(OPENJDK_TARGET_OS), windows)
-  LIBNET_EXCLUDE_FILES += PlainSocketImpl.c PlainDatagramSocketImpl.c SdpSupport.c
-else
-  LIBNET_EXCLUDE_FILES += TwoStacksPlainSocketImpl.c DualStackPlainSocketImpl.c \
-      TwoStacksPlainDatagramSocketImpl.c DualStackPlainDatagramSocketImpl.c \
-      NTLMAuthSequence.c NetworkInterface_winXP.c
 endif
 
 $(eval $(call SetupNativeCompilation,BUILD_LIBNET, \

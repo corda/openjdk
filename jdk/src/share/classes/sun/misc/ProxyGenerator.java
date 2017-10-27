@@ -32,9 +32,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -310,12 +307,6 @@ public class ProxyGenerator {
     /** name of field for storing a proxy instance's invocation handler */
     private final static String handlerFieldName = "h";
 
-    /** debugging flag for saving generated class files */
-    private final static boolean saveGeneratedFiles =
-        java.security.AccessController.doPrivileged(
-            new GetBooleanAction(
-                "sun.misc.ProxyGenerator.saveGeneratedFiles")).booleanValue();
-
     /**
      * Generate a public proxy class given a name and a list of proxy interfaces.
      */
@@ -337,31 +328,6 @@ public class ProxyGenerator {
     {
         ProxyGenerator gen = new ProxyGenerator(name, interfaces, accessFlags);
         final byte[] classFile = gen.generateClassFile();
-
-        if (saveGeneratedFiles) {
-            java.security.AccessController.doPrivileged(
-            new java.security.PrivilegedAction<Void>() {
-                public Void run() {
-                    try {
-                        int i = name.lastIndexOf('.');
-                        Path path;
-                        if (i > 0) {
-                            Path dir = Paths.get(name.substring(0, i).replace('.', File.separatorChar));
-                            Files.createDirectories(dir);
-                            path = dir.resolve(name.substring(i+1, name.length()) + ".class");
-                        } else {
-                            path = Paths.get(name + ".class");
-                        }
-                        Files.write(path, classFile);
-                        return null;
-                    } catch (IOException e) {
-                        throw new InternalError(
-                            "I/O exception saving generated file: " + e);
-                    }
-                }
-            });
-        }
-
         return classFile;
     }
 

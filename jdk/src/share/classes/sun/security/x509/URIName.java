@@ -84,66 +84,6 @@ public class URIName implements GeneralNameInterface {
     private URI uri;
     private String host;
     private DNSName hostDNS;
-    private IPAddressName hostIP;
-
-    /**
-     * Create the URIName object from the passed encoded Der value.
-     *
-     * @param derValue the encoded DER URIName.
-     * @exception IOException on error.
-     */
-    public URIName(DerValue derValue) throws IOException {
-        this(derValue.getIA5String());
-    }
-
-    /**
-     * Create the URIName object with the specified name.
-     *
-     * @param name the URIName.
-     * @throws IOException if name is not a proper URIName
-     */
-    public URIName(String name) throws IOException {
-        try {
-            uri = new URI(name);
-        } catch (URISyntaxException use) {
-            throw new IOException("invalid URI name:" + name, use);
-        }
-        if (uri.getScheme() == null) {
-            throw new IOException("URI name must include scheme:" + name);
-        }
-
-        host = uri.getHost();
-        // RFC 3280 says that the host should be non-null, but we allow it to
-        // be null because some widely deployed certificates contain CDP
-        // extensions with URIs that have no hostname (see bugs 4802236 and
-        // 5107944).
-        if (host != null) {
-            if (host.charAt(0) == '[') {
-                // Verify host is a valid IPv6 address name
-                String ipV6Host = host.substring(1, host.length()-1);
-                try {
-                    hostIP = new IPAddressName(ipV6Host);
-                } catch (IOException ioe) {
-                    throw new IOException("invalid URI name (host " +
-                        "portion is not a valid IPv6 address):" + name);
-                }
-            } else {
-                try {
-                    hostDNS = new DNSName(host);
-                } catch (IOException ioe) {
-                    // Not a valid DNS Name; see if it is a valid IPv4
-                    // IPAddressName
-                    try {
-                        hostIP = new IPAddressName(host);
-                    } catch (Exception ioe2) {
-                        throw new IOException("invalid URI name (host " +
-                            "portion is not a valid DNS name, IPv4 address," +
-                            " or IPv6 address):" + name);
-                    }
-                }
-            }
-        }
-    }
 
     /**
      * Create the URIName object with the specified name constraint. URI
@@ -269,11 +209,7 @@ public class URIName implements GeneralNameInterface {
      * @returns host name as DNSName or IPAddressName
      */
     public Object getHostObject() {
-        if (hostIP != null) {
-            return hostIP;
-        } else {
-            return hostDNS;
-        }
+        return hostDNS;
     }
 
     /**

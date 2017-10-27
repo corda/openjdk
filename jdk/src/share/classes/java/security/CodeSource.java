@@ -27,7 +27,6 @@ package java.security;
 
 
 import java.net.URL;
-import java.net.SocketPermission;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Hashtable;
@@ -65,9 +64,6 @@ public class CodeSource implements java.io.Serializable {
      * The code signers. Certificate chains are concatenated.
      */
     private transient java.security.cert.Certificate certs[] = null;
-
-    // cached SocketPermission used for matchLocation
-    private transient SocketPermission sp;
 
     // for generating cert paths
     private transient CertificateFactory factory = null;
@@ -436,18 +432,7 @@ public class CodeSource implements java.io.Serializable {
                 ("".equals(thatHost) || "localhost".equals(thatHost))) {
                 // ok
             } else if (!thisHost.equals(thatHost)) {
-                if (thatHost == null) {
-                    return false;
-                }
-                if (this.sp == null) {
-                    this.sp = new SocketPermission(thisHost, "resolve");
-                }
-                if (that.sp == null) {
-                    that.sp = new SocketPermission(thatHost, "resolve");
-                }
-                if (!this.sp.implies(that.sp)) {
-                    return false;
-                }
+                throw new UnsupportedOperationException("Networking unavailable");
             }
         }
         // everything matches

@@ -159,45 +159,6 @@ public abstract class Validator {
     }
 
     /**
-     * Get a new Validator instance using the trusted certificates from the
-     * specified KeyStore as trust anchors.
-     */
-    public static Validator getInstance(String type, String variant,
-            KeyStore ks) {
-        return getInstance(type, variant, KeyStores.getTrustedCerts(ks));
-    }
-
-    /**
-     * Get a new Validator instance using the Set of X509Certificates as trust
-     * anchors.
-     */
-    public static Validator getInstance(String type, String variant,
-            Collection<X509Certificate> trustedCerts) {
-        if (type.equals(TYPE_SIMPLE)) {
-            return new SimpleValidator(variant, trustedCerts);
-        } else if (type.equals(TYPE_PKIX)) {
-            return new PKIXValidator(variant, trustedCerts);
-        } else {
-            throw new IllegalArgumentException
-                ("Unknown validator type: " + type);
-        }
-    }
-
-    /**
-     * Get a new Validator instance using the provided PKIXBuilderParameters.
-     * This method can only be used with the PKIX validator.
-     */
-    public static Validator getInstance(String type, String variant,
-            PKIXBuilderParameters params) {
-        if (type.equals(TYPE_PKIX) == false) {
-            throw new IllegalArgumentException
-                ("getInstance(PKIXBuilderParameters) can only be used "
-                + "with PKIX validator");
-        }
-        return new PKIXValidator(variant, params);
-    }
-
-    /**
      * Validate the given certificate chain.
      */
     public final X509Certificate[] validate(X509Certificate[] chain)

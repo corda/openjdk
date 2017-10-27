@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.security.AccessController;
 import java.nio.file.Path;
-import java.nio.file.FileSystems;
 import sun.security.action.GetPropertyAction;
 
 /**
@@ -883,35 +882,6 @@ public class File
     }
 
     /**
-     * Tests whether the file named by this abstract pathname is a hidden
-     * file.  The exact definition of <em>hidden</em> is system-dependent.  On
-     * UNIX systems, a file is considered to be hidden if its name begins with
-     * a period character (<code>'.'</code>).  On Microsoft Windows systems, a file is
-     * considered to be hidden if it has been marked as such in the filesystem.
-     *
-     * @return  <code>true</code> if and only if the file denoted by this
-     *          abstract pathname is hidden according to the conventions of the
-     *          underlying platform
-     *
-     * @throws  SecurityException
-     *          If a security manager exists and its <code>{@link
-     *          java.lang.SecurityManager#checkRead(java.lang.String)}</code>
-     *          method denies read access to the file
-     *
-     * @since 1.2
-     */
-    public boolean isHidden() {
-        SecurityManager security = System.getSecurityManager();
-        if (security != null) {
-            security.checkRead(path);
-        }
-        if (isInvalid()) {
-            return false;
-        }
-        return ((fs.getBooleanAttributes(this) & FileSystem.BA_HIDDEN) != 0);
-    }
-
-    /**
      * Returns the time that the file denoted by this abstract pathname was
      * last modified.
      *
@@ -1010,73 +980,6 @@ public class File
             throw new IOException("Invalid file path");
         }
         return fs.createFileExclusively(path);
-    }
-
-    /**
-     * Deletes the file or directory denoted by this abstract pathname.  If
-     * this pathname denotes a directory, then the directory must be empty in
-     * order to be deleted.
-     *
-     * <p> Note that the {@link java.nio.file.Files} class defines the {@link
-     * java.nio.file.Files#delete(Path) delete} method to throw an {@link IOException}
-     * when a file cannot be deleted. This is useful for error reporting and to
-     * diagnose why a file cannot be deleted.
-     *
-     * @return  <code>true</code> if and only if the file or directory is
-     *          successfully deleted; <code>false</code> otherwise
-     *
-     * @throws  SecurityException
-     *          If a security manager exists and its <code>{@link
-     *          java.lang.SecurityManager#checkDelete}</code> method denies
-     *          delete access to the file
-     */
-    public boolean delete() {
-        SecurityManager security = System.getSecurityManager();
-        if (security != null) {
-            security.checkDelete(path);
-        }
-        if (isInvalid()) {
-            return false;
-        }
-        return fs.delete(this);
-    }
-
-    /**
-     * Requests that the file or directory denoted by this abstract
-     * pathname be deleted when the virtual machine terminates.
-     * Files (or directories) are deleted in the reverse order that
-     * they are registered. Invoking this method to delete a file or
-     * directory that is already registered for deletion has no effect.
-     * Deletion will be attempted only for normal termination of the
-     * virtual machine, as defined by the Java Language Specification.
-     *
-     * <p> Once deletion has been requested, it is not possible to cancel the
-     * request.  This method should therefore be used with care.
-     *
-     * <P>
-     * Note: this method should <i>not</i> be used for file-locking, as
-     * the resulting protocol cannot be made to work reliably. The
-     * {@link java.nio.channels.FileLock FileLock}
-     * facility should be used instead.
-     *
-     * @throws  SecurityException
-     *          If a security manager exists and its <code>{@link
-     *          java.lang.SecurityManager#checkDelete}</code> method denies
-     *          delete access to the file
-     *
-     * @see #delete
-     *
-     * @since 1.2
-     */
-    public void deleteOnExit() {
-        SecurityManager security = System.getSecurityManager();
-        if (security != null) {
-            security.checkDelete(path);
-        }
-        if (isInvalid()) {
-            return;
-        }
-        DeleteOnExitHook.add(path);
     }
 
     /**
@@ -1292,147 +1195,6 @@ public class File
                 files.add(f);
         }
         return files.toArray(new File[files.size()]);
-    }
-
-    /**
-     * Creates the directory named by this abstract pathname.
-     *
-     * @return  <code>true</code> if and only if the directory was
-     *          created; <code>false</code> otherwise
-     *
-     * @throws  SecurityException
-     *          If a security manager exists and its <code>{@link
-     *          java.lang.SecurityManager#checkWrite(java.lang.String)}</code>
-     *          method does not permit the named directory to be created
-     */
-    public boolean mkdir() {
-        SecurityManager security = System.getSecurityManager();
-        if (security != null) {
-            security.checkWrite(path);
-        }
-        if (isInvalid()) {
-            return false;
-        }
-        return fs.createDirectory(this);
-    }
-
-    /**
-     * Creates the directory named by this abstract pathname, including any
-     * necessary but nonexistent parent directories.  Note that if this
-     * operation fails it may have succeeded in creating some of the necessary
-     * parent directories.
-     *
-     * @return  <code>true</code> if and only if the directory was created,
-     *          along with all necessary parent directories; <code>false</code>
-     *          otherwise
-     *
-     * @throws  SecurityException
-     *          If a security manager exists and its <code>{@link
-     *          java.lang.SecurityManager#checkRead(java.lang.String)}</code>
-     *          method does not permit verification of the existence of the
-     *          named directory and all necessary parent directories; or if
-     *          the <code>{@link
-     *          java.lang.SecurityManager#checkWrite(java.lang.String)}</code>
-     *          method does not permit the named directory and all necessary
-     *          parent directories to be created
-     */
-    public boolean mkdirs() {
-        if (exists()) {
-            return false;
-        }
-        if (mkdir()) {
-            return true;
-        }
-        File canonFile = null;
-        try {
-            canonFile = getCanonicalFile();
-        } catch (IOException e) {
-            return false;
-        }
-
-        File parent = canonFile.getParentFile();
-        return (parent != null && (parent.mkdirs() || parent.exists()) &&
-                canonFile.mkdir());
-    }
-
-    /**
-     * Renames the file denoted by this abstract pathname.
-     *
-     * <p> Many aspects of the behavior of this method are inherently
-     * platform-dependent: The rename operation might not be able to move a
-     * file from one filesystem to another, it might not be atomic, and it
-     * might not succeed if a file with the destination abstract pathname
-     * already exists.  The return value should always be checked to make sure
-     * that the rename operation was successful.
-     *
-     * <p> Note that the {@link java.nio.file.Files} class defines the {@link
-     * java.nio.file.Files#move move} method to move or rename a file in a
-     * platform independent manner.
-     *
-     * @param  dest  The new abstract pathname for the named file
-     *
-     * @return  <code>true</code> if and only if the renaming succeeded;
-     *          <code>false</code> otherwise
-     *
-     * @throws  SecurityException
-     *          If a security manager exists and its <code>{@link
-     *          java.lang.SecurityManager#checkWrite(java.lang.String)}</code>
-     *          method denies write access to either the old or new pathnames
-     *
-     * @throws  NullPointerException
-     *          If parameter <code>dest</code> is <code>null</code>
-     */
-    public boolean renameTo(File dest) {
-        SecurityManager security = System.getSecurityManager();
-        if (security != null) {
-            security.checkWrite(path);
-            security.checkWrite(dest.path);
-        }
-        if (dest == null) {
-            throw new NullPointerException();
-        }
-        if (this.isInvalid() || dest.isInvalid()) {
-            return false;
-        }
-        return fs.rename(this, dest);
-    }
-
-    /**
-     * Sets the last-modified time of the file or directory named by this
-     * abstract pathname.
-     *
-     * <p> All platforms support file-modification times to the nearest second,
-     * but some provide more precision.  The argument will be truncated to fit
-     * the supported precision.  If the operation succeeds and no intervening
-     * operations on the file take place, then the next invocation of the
-     * <code>{@link #lastModified}</code> method will return the (possibly
-     * truncated) <code>time</code> argument that was passed to this method.
-     *
-     * @param  time  The new last-modified time, measured in milliseconds since
-     *               the epoch (00:00:00 GMT, January 1, 1970)
-     *
-     * @return <code>true</code> if and only if the operation succeeded;
-     *          <code>false</code> otherwise
-     *
-     * @throws  IllegalArgumentException  If the argument is negative
-     *
-     * @throws  SecurityException
-     *          If a security manager exists and its <code>{@link
-     *          java.lang.SecurityManager#checkWrite(java.lang.String)}</code>
-     *          method denies write access to the named file
-     *
-     * @since 1.2
-     */
-    public boolean setLastModified(long time) {
-        if (time < 0) throw new IllegalArgumentException("Negative time");
-        SecurityManager security = System.getSecurityManager();
-        if (security != null) {
-            security.checkWrite(path);
-        }
-        if (isInvalid()) {
-            return false;
-        }
-        return fs.setLastModifiedTime(this, time);
     }
 
     /**
@@ -1976,48 +1738,4 @@ public class File
 
     /** use serialVersionUID from JDK 1.0.2 for interoperability */
     private static final long serialVersionUID = 301077366599181567L;
-
-    // -- Integration with java.nio.file --
-
-    private volatile transient Path filePath;
-
-    /**
-     * Returns a {@link Path java.nio.file.Path} object constructed from the
-     * this abstract path. The resulting {@code Path} is associated with the
-     * {@link java.nio.file.FileSystems#getDefault default-filesystem}.
-     *
-     * <p> The first invocation of this method works as if invoking it were
-     * equivalent to evaluating the expression:
-     * <blockquote><pre>
-     * {@link java.nio.file.FileSystems#getDefault FileSystems.getDefault}().{@link
-     * java.nio.file.FileSystem#getPath getPath}(this.{@link #getPath getPath}());
-     * </pre></blockquote>
-     * Subsequent invocations of this method return the same {@code Path}.
-     *
-     * <p> If this abstract pathname is the empty abstract pathname then this
-     * method returns a {@code Path} that may be used to access the current
-     * user directory.
-     *
-     * @return  a {@code Path} constructed from this abstract path
-     *
-     * @throws  java.nio.file.InvalidPathException
-     *          if a {@code Path} object cannot be constructed from the abstract
-     *          path (see {@link java.nio.file.FileSystem#getPath FileSystem.getPath})
-     *
-     * @since   1.7
-     * @see Path#toFile
-     */
-    public Path toPath() {
-        Path result = filePath;
-        if (result == null) {
-            synchronized (this) {
-                result = filePath;
-                if (result == null) {
-                    result = FileSystems.getDefault().getPath(path);
-                    filePath = result;
-                }
-            }
-        }
-        return result;
-    }
 }

@@ -976,55 +976,6 @@ public final class URL implements java.io.Serializable {
     }
 
     /**
-     * Same as {@link #openConnection()}, except that the connection will be
-     * made through the specified proxy; Protocol handlers that do not
-     * support proxing will ignore the proxy parameter and make a
-     * normal connection.
-     *
-     * Invoking this method preempts the system's default ProxySelector
-     * settings.
-     *
-     * @param      proxy the Proxy through which this connection
-     *             will be made. If direct connection is desired,
-     *             Proxy.NO_PROXY should be specified.
-     * @return     a {@code URLConnection} to the URL.
-     * @exception  IOException  if an I/O exception occurs.
-     * @exception  SecurityException if a security manager is present
-     *             and the caller doesn't have permission to connect
-     *             to the proxy.
-     * @exception  IllegalArgumentException will be thrown if proxy is null,
-     *             or proxy has the wrong type
-     * @exception  UnsupportedOperationException if the subclass that
-     *             implements the protocol handler doesn't support
-     *             this method.
-     * @see        java.net.URL#URL(java.lang.String, java.lang.String,
-     *             int, java.lang.String)
-     * @see        java.net.URLConnection
-     * @see        java.net.URLStreamHandler#openConnection(java.net.URL,
-     *             java.net.Proxy)
-     * @since      1.5
-     */
-    public URLConnection openConnection(Proxy proxy)
-        throws java.io.IOException {
-        if (proxy == null) {
-            throw new IllegalArgumentException("proxy can not be null");
-        }
-
-        // Create a copy of Proxy as a security measure
-        Proxy p = proxy == Proxy.NO_PROXY ? Proxy.NO_PROXY : sun.net.ApplicationProxy.create(proxy);
-        SecurityManager sm = System.getSecurityManager();
-        if (p.type() != Proxy.Type.DIRECT && sm != null) {
-            InetSocketAddress epoint = (InetSocketAddress) p.address();
-            if (epoint.isUnresolved())
-                sm.checkConnect(epoint.getHostName(), epoint.getPort());
-            else
-                sm.checkConnect(epoint.getAddress().getHostAddress(),
-                                epoint.getPort());
-        }
-        return handler.openConnection(this, p);
-    }
-
-    /**
      * Opens a connection to this {@code URL} and returns an
      * {@code InputStream} for reading from that connection. This
      * method is a shorthand for:
