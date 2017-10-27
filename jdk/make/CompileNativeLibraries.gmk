@@ -75,9 +75,9 @@ include lib/CoreLibraries.gmk
 
 include lib/PlatformLibraries.gmk
 
-include lib/NetworkingLibraries.gmk
+#include lib/NetworkingLibraries.gmk
 
-include lib/NioLibraries.gmk
+#include lib/NioLibraries.gmk
 
 include lib/SecurityLibraries.gmk
 
