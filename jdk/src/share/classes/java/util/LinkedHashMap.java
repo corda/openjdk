@@ -327,13 +327,6 @@ public class LinkedHashMap<K,V>
         }
     }
 
-    void internalWriteEntries(java.io.ObjectOutputStream s) throws IOException {
-        for (LinkedHashMap.Entry<K,V> e = head; e != null; e = e.after) {
-            s.writeObject(e.key);
-            s.writeObject(e.value);
-        }
-    }
-
     /**
      * Constructs an empty insertion-ordered <tt>LinkedHashMap</tt> instance
      * with the specified initial capacity and load factor.

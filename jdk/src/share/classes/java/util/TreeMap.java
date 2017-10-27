@@ -197,7 +197,7 @@ public class TreeMap<K,V>
     public TreeMap(SortedMap<K, ? extends V> m) {
         comparator = m.comparator();
         try {
-            buildFromSorted(m.size(), m.entrySet().iterator(), null, null);
+            buildFromSorted(m.size(), m.entrySet().iterator(), null);
         } catch (java.io.IOException cannotHappen) {
         } catch (ClassNotFoundException cannotHappen) {
         }
@@ -316,8 +316,7 @@ public class TreeMap<K,V>
             if (c == comparator || (c != null && c.equals(comparator))) {
                 ++modCount;
                 try {
-                    buildFromSorted(mapSize, map.entrySet().iterator(),
-                                    null, null);
+                    buildFromSorted(mapSize, map.entrySet().iterator(), null);
                 } catch (java.io.IOException cannotHappen) {
                 } catch (ClassNotFoundException cannotHappen) {
                 }
@@ -643,7 +642,7 @@ public class TreeMap<K,V>
 
         // Initialize clone with our mappings
         try {
-            clone.buildFromSorted(size, entrySet().iterator(), null, null);
+            clone.buildFromSorted(size, entrySet().iterator(), null);
         } catch (java.io.IOException cannotHappen) {
         } catch (ClassNotFoundException cannotHappen) {
         }
@@ -2411,59 +2410,10 @@ public class TreeMap<K,V>
 
     private static final long serialVersionUID = 919286545866124006L;
 
-    /**
-     * Save the state of the {@code TreeMap} instance to a stream (i.e.,
-     * serialize it).
-     *
-     * @serialData The <em>size</em> of the TreeMap (the number of key-value
-     *             mappings) is emitted (int), followed by the key (Object)
-     *             and value (Object) for each key-value mapping represented
-     *             by the TreeMap. The key-value mappings are emitted in
-     *             key-order (as determined by the TreeMap's Comparator,
-     *             or by the keys' natural ordering if the TreeMap has no
-     *             Comparator).
-     */
-    private void writeObject(java.io.ObjectOutputStream s)
-        throws java.io.IOException {
-        // Write out the Comparator and any hidden stuff
-        s.defaultWriteObject();
-
-        // Write out size (number of Mappings)
-        s.writeInt(size);
-
-        // Write out keys and values (alternating)
-        for (Iterator<Map.Entry<K,V>> i = entrySet().iterator(); i.hasNext(); ) {
-            Map.Entry<K,V> e = i.next();
-            s.writeObject(e.getKey());
-            s.writeObject(e.getValue());
-        }
-    }
-
-    /**
-     * Reconstitute the {@code TreeMap} instance from a stream (i.e.,
-     * deserialize it).
-     */
-    private void readObject(final java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
-        // Read in the Comparator and any hidden stuff
-        s.defaultReadObject();
-
-        // Read in size
-        int size = s.readInt();
-
-        buildFromSorted(size, null, s, null);
-    }
-
-    /** Intended to be called only from TreeSet.readObject */
-    void readTreeSet(int size, java.io.ObjectInputStream s, V defaultVal)
-        throws java.io.IOException, ClassNotFoundException {
-        buildFromSorted(size, null, s, defaultVal);
-    }
-
     /** Intended to be called only from TreeSet.addAll */
     void addAllForTreeSet(SortedSet<? extends K> set, V defaultVal) {
         try {
-            buildFromSorted(set.size(), set.iterator(), null, defaultVal);
+            buildFromSorted(set.size(), set.iterator(), defaultVal);
         } catch (java.io.IOException cannotHappen) {
         } catch (ClassNotFoundException cannotHappen) {
         }
@@ -2487,11 +2437,8 @@ public class TreeMap<K,V>
      *
      * @param size the number of keys (or key-value pairs) to be read from
      *        the iterator or stream
-     * @param it If non-null, new entries are created from entries
+     * @param it new entries are created from entries
      *        or keys read from this iterator.
-     * @param str If non-null, new entries are created from keys and
-     *        possibly values read from this stream in serialized form.
-     *        Exactly one of it and str should be non-null.
      * @param defaultVal if non-null, this default value is used for
      *        each value in the map.  If null, each value is read from
      *        iterator or stream, as described above.
@@ -2501,12 +2448,11 @@ public class TreeMap<K,V>
      *         This cannot occur if str is null.
      */
     private void buildFromSorted(int size, Iterator<?> it,
-                                 java.io.ObjectInputStream str,
                                  V defaultVal)
         throws  java.io.IOException, ClassNotFoundException {
         this.size = size;
         root = buildFromSorted(0, 0, size-1, computeRedLevel(size),
-                               it, str, defaultVal);
+                               it, defaultVal);
     }
 
     /**
@@ -2527,7 +2473,6 @@ public class TreeMap<K,V>
     private final Entry<K,V> buildFromSorted(int level, int lo, int hi,
                                              int redLevel,
                                              Iterator<?> it,
-                                             java.io.ObjectInputStream str,
                                              V defaultVal)
         throws  java.io.IOException, ClassNotFoundException {
         /*
@@ -2549,23 +2494,18 @@ public class TreeMap<K,V>
         Entry<K,V> left  = null;
         if (lo < mid)
             left = buildFromSorted(level+1, lo, mid - 1, redLevel,
-                                   it, str, defaultVal);
+                                   it, defaultVal);
 
         // extract key and/or value from iterator or stream
         K key;
         V value;
-        if (it != null) {
-            if (defaultVal==null) {
-                Map.Entry<?,?> entry = (Map.Entry<?,?>)it.next();
-                key = (K)entry.getKey();
-                value = (V)entry.getValue();
-            } else {
-                key = (K)it.next();
-                value = defaultVal;
-            }
-        } else { // use stream
-            key = (K) str.readObject();
-            value = (defaultVal != null ? defaultVal : (V) str.readObject());
+        if (defaultVal==null) {
+            Map.Entry<?,?> entry = (Map.Entry<?,?>)it.next();
+            key = (K)entry.getKey();
+            value = (V)entry.getValue();
+        } else {
+            key = (K)it.next();
+            value = defaultVal;
         }
 
         Entry<K,V> middle =  new Entry<>(key, value, null);
@@ -2581,7 +2521,7 @@ public class TreeMap<K,V>
 
         if (mid < hi) {
             Entry<K,V> right = buildFromSorted(level+1, mid+1, hi, redLevel,
-                                               it, str, defaultVal);
+                                               it, defaultVal);
             middle.right = right;
             right.parent = middle;
         }

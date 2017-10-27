@@ -64,9 +64,7 @@ package java.time.chrono;
 import static java.time.temporal.ChronoUnit.SECONDS;
 
 import java.io.IOException;
-import java.io.InvalidObjectException;
 import java.io.ObjectInput;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.time.Instant;
@@ -335,16 +333,6 @@ final class ChronoZonedDateTimeImpl<D extends ChronoLocalDate>
      */
     private Object writeReplace() {
         return new Ser(Ser.CHRONO_ZONE_DATE_TIME_TYPE, this);
-    }
-
-    /**
-     * Defend against malicious streams.
-     *
-     * @param s the stream to read
-     * @throws InvalidObjectException always
-     */
-    private void readObject(ObjectInputStream s) throws InvalidObjectException {
-        throw new InvalidObjectException("Deserialization via serialization delegate");
     }
 
     void writeExternal(ObjectOutput out) throws IOException {

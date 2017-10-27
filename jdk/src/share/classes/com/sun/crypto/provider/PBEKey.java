@@ -115,33 +115,6 @@ final class PBEKey implements SecretKey {
     }
 
     /**
-     * readObject is called to restore the state of this key from
-     * a stream.
-     */
-    private void readObject(java.io.ObjectInputStream s)
-         throws java.io.IOException, ClassNotFoundException
-    {
-        s.defaultReadObject();
-        key = key.clone();
-    }
-
-
-    /**
-     * Replace the PBE key to be serialized.
-     *
-     * @return the standard KeyRep object to be serialized
-     *
-     * @throws java.io.ObjectStreamException if a new object representing
-     * this PBE key could not be created
-     */
-    private Object writeReplace() throws java.io.ObjectStreamException {
-        return new KeyRep(KeyRep.Type.SECRET,
-                        getAlgorithm(),
-                        getFormat(),
-                        getEncoded());
-    }
-
-    /**
      * Ensures that the password bytes of this key are
      * set to zero when there are no more references to it.
      */

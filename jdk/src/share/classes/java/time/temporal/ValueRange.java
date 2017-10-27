@@ -62,8 +62,6 @@
 package java.time.temporal;
 
 import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.DateTimeException;
 
@@ -337,33 +335,6 @@ public final class ValueRange implements Serializable {
             return "Invalid value for " + field + " (valid values " + this + "): " + value;
         } else {
             return "Invalid value (valid values " + this + "): " + value;
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    /**
-     * Restore the state of an ValueRange from the stream.
-     * Check that the values are valid.
-     *
-     * @param s the stream to read
-     * @throws InvalidObjectException if
-     *     the smallest minimum is greater than the smallest maximum,
-     *  or the smallest maximum is greater than the largest maximum
-     *  or the largest minimum is greater than the largest maximum
-     * @throws ClassNotFoundException if a class cannot be resolved
-     */
-    private void readObject(ObjectInputStream s)
-         throws IOException, ClassNotFoundException, InvalidObjectException
-    {
-        s.defaultReadObject();
-        if (minSmallest > minLargest) {
-            throw new InvalidObjectException("Smallest minimum value must be less than largest minimum value");
-        }
-        if (maxSmallest > maxLargest) {
-            throw new InvalidObjectException("Smallest maximum value must be less than largest maximum value");
-        }
-        if (minLargest > maxLargest) {
-            throw new InvalidObjectException("Minimum value must be less than maximum value");
         }
     }
 

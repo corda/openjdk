@@ -26,9 +26,6 @@
 package sun.reflect;
 
 import java.io.Externalizable;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamClass;
 import java.io.OptionalDataException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -433,33 +430,6 @@ public class ReflectionFactory {
             return cons;
         } catch (NoSuchMethodException ex) {
             return null;
-        }
-    }
-
-    /**
-     * Returns true if the class has a static initializer.
-     * The presence of a static initializer is used to compute the serialVersionUID.
-     * @param cl a serializable classLook
-     * @return {@code true} if the class has a static initializer,
-     *          otherwise {@code false}
-     */
-    public final boolean hasStaticInitializerForSerialization(Class<?> cl) {
-        Method m = hasStaticInitializerMethod;
-        if (m == null) {
-            try {
-                m = ObjectStreamClass.class.getDeclaredMethod("hasStaticInitializer",
-                        new Class<?>[]{Class.class});
-                m.setAccessible(true);
-                hasStaticInitializerMethod = m;
-            } catch (NoSuchMethodException ex) {
-                throw new InternalError("No such method hasStaticInitializer on "
-                        + ObjectStreamClass.class, ex);
-            }
-        }
-        try {
-            return (Boolean) m.invoke(null, cl);
-        } catch (InvocationTargetException | IllegalAccessException ex) {
-            throw new InternalError("Exception invoking hasStaticInitializer", ex);
         }
     }
 

@@ -403,28 +403,6 @@ public class X509Key implements PublicKey {
         decode(new ByteArrayInputStream(encodedKey));
     }
 
-    /**
-     * Serialization write ... X.509 keys serialize as
-     * themselves, and they're parsed when they get read back.
-     */
-    private void writeObject(ObjectOutputStream stream) throws IOException {
-        stream.write(getEncoded());
-    }
-
-    /**
-     * Serialization read ... X.509 keys serialize as
-     * themselves, and they're parsed when they get read back.
-     */
-    private void readObject(ObjectInputStream stream) throws IOException {
-        try {
-            decode(stream);
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-            throw new IOException("deserialized key is invalid: " +
-                                  e.getMessage());
-        }
-    }
-
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;

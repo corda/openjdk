@@ -39,8 +39,6 @@
 package java.util;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
 import java.io.Serializable;
 import java.security.AccessControlContext;
@@ -3479,56 +3477,6 @@ public abstract class Calendar implements Serializable, Cloneable, Comparable<Ca
         }
     }
 
-    /**
-     * Save the state of this object to a stream (i.e., serialize it).
-     *
-     * Ideally, <code>Calendar</code> would only write out its state data and
-     * the current time, and not write any field data out, such as
-     * <code>fields[]</code>, <code>isTimeSet</code>, <code>areFieldsSet</code>,
-     * and <code>isSet[]</code>.  <code>nextStamp</code> also should not be part
-     * of the persistent state. Unfortunately, this didn't happen before JDK 1.1
-     * shipped. To be compatible with JDK 1.1, we will always have to write out
-     * the field values and state flags.  However, <code>nextStamp</code> can be
-     * removed from the serialization stream; this will probably happen in the
-     * near future.
-     */
-    private synchronized void writeObject(ObjectOutputStream stream)
-         throws IOException
-    {
-        // Try to compute the time correctly, for the future (stream
-        // version 2) in which we don't write out fields[] or isSet[].
-        if (!isTimeSet) {
-            try {
-                updateTime();
-            }
-            catch (IllegalArgumentException e) {}
-        }
-
-        // If this Calendar has a ZoneInfo, save it and set a
-        // SimpleTimeZone equivalent (as a single DST schedule) for
-        // backward compatibility.
-        TimeZone savedZone = null;
-        if (zone instanceof ZoneInfo) {
-            SimpleTimeZone stz = ((ZoneInfo)zone).getLastRuleInstance();
-            if (stz == null) {
-                stz = new SimpleTimeZone(zone.getRawOffset(), zone.getID());
-            }
-            savedZone = zone;
-            zone = stz;
-        }
-
-        // Write out the 1.1 FCS object.
-        stream.defaultWriteObject();
-
-        // Write out the ZoneInfo object
-        // 4802409: we write out even if it is null, a temporary workaround
-        // the real fix for bug 4844924 in corba-iiop
-        stream.writeObject(savedZone);
-        if (savedZone != null) {
-            zone = savedZone;
-        }
-    }
-
     private static class CalendarAccessControlContext {
         private static final AccessControlContext INSTANCE;
         static {
@@ -3540,80 +3488,6 @@ public abstract class Calendar implements Serializable, Cloneable, Comparable<Ca
                                                 });
         }
         private CalendarAccessControlContext() {
-        }
-    }
-
-    /**
-     * Reconstitutes this object from a stream (i.e., deserialize it).
-     */
-    private void readObject(ObjectInputStream stream)
-         throws IOException, ClassNotFoundException
-    {
-        final ObjectInputStream input = stream;
-        input.defaultReadObject();
-
-        stamp = new int[FIELD_COUNT];
-
-        // Starting with version 2 (not implemented yet), we expect that
-        // fields[], isSet[], isTimeSet, and areFieldsSet may not be
-        // streamed out anymore.  We expect 'time' to be correct.
-        if (serialVersionOnStream >= 2)
-        {
-            isTimeSet = true;
-            if (fields == null) {
-                fields = new int[FIELD_COUNT];
-            }
-            if (isSet == null) {
-                isSet = new boolean[FIELD_COUNT];
-            }
-        }
-        else if (serialVersionOnStream >= 0)
-        {
-            for (int i=0; i<FIELD_COUNT; ++i) {
-                stamp[i] = isSet[i] ? COMPUTED : UNSET;
-            }
-        }
-
-        serialVersionOnStream = currentSerialVersion;
-
-        // If there's a ZoneInfo object, use it for zone.
-        ZoneInfo zi = null;
-        try {
-            zi = AccessController.doPrivileged(
-                    new PrivilegedExceptionAction<ZoneInfo>() {
-                        @Override
-                        public ZoneInfo run() throws Exception {
-                            return (ZoneInfo) input.readObject();
-                        }
-                    },
-                    CalendarAccessControlContext.INSTANCE);
-        } catch (PrivilegedActionException pae) {
-            Exception e = pae.getException();
-            if (!(e instanceof OptionalDataException)) {
-                if (e instanceof RuntimeException) {
-                    throw (RuntimeException) e;
-                } else if (e instanceof IOException) {
-                    throw (IOException) e;
-                } else if (e instanceof ClassNotFoundException) {
-                    throw (ClassNotFoundException) e;
-                }
-                throw new RuntimeException(e);
-            }
-        }
-        if (zi != null) {
-            zone = zi;
-        }
-
-        // If the deserialized object has a SimpleTimeZone, try to
-        // replace it with a ZoneInfo equivalent (as of 1.4) in order
-        // to be compatible with the SimpleTimeZone-based
-        // implementation as much as possible.
-        if (zone instanceof SimpleTimeZone) {
-            String id = zone.getID();
-            TimeZone tz = TimeZone.getTimeZone(id);
-            if (tz != null && tz.hasSameRules(zone) && tz.getID().equals(id)) {
-                zone = tz;
-            }
         }
     }
 

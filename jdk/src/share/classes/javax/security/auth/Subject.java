@@ -947,52 +947,6 @@ public final class Subject implements java.io.Serializable {
     }
 
     /**
-     * Writes this object out to a stream (i.e., serializes it).
-     */
-    private void writeObject(java.io.ObjectOutputStream oos)
-                throws java.io.IOException {
-        synchronized(principals) {
-            oos.defaultWriteObject();
-        }
-    }
-
-    /**
-     * Reads this object from a stream (i.e., deserializes it)
-     */
-    @SuppressWarnings("unchecked")
-    private void readObject(java.io.ObjectInputStream s)
-                throws java.io.IOException, ClassNotFoundException {
-
-        ObjectInputStream.GetField gf = s.readFields();
-
-        readOnly = gf.get("readOnly", false);
-
-        Set<Principal> inputPrincs = (Set<Principal>)gf.get("principals", null);
-
-        // Rewrap the principals into a SecureSet
-        if (inputPrincs == null) {
-            throw new NullPointerException
-                (ResourcesMgr.getString("invalid.null.input.s."));
-        }
-        try {
-            principals = Collections.synchronizedSet(new SecureSet<Principal>
-                                (this, PRINCIPAL_SET, inputPrincs));
-        } catch (NullPointerException npe) {
-            // Sometimes people deserialize the principals set only.
-            // Subject is not accessible, so just don't fail.
-            principals = Collections.synchronizedSet
-                        (new SecureSet<Principal>(this, PRINCIPAL_SET));
-        }
-
-        // The Credential {@code Set} is not serialized, but we do not
-        // want the default deserialization routine to set it to null.
-        this.pubCredentials = Collections.synchronizedSet
-                        (new SecureSet<Object>(this, PUB_CREDENTIAL_SET));
-        this.privCredentials = Collections.synchronizedSet
-                        (new SecureSet<Object>(this, PRIV_CREDENTIAL_SET));
-    }
-
-    /**
      * Prevent modifications unless caller has permission.
      *
      * @serial include
@@ -1002,16 +956,6 @@ public final class Subject implements java.io.Serializable {
         implements java.io.Serializable {
 
         private static final long serialVersionUID = 7911754171111800359L;
-
-        /**
-         * @serialField this$0 Subject The outer Subject instance.
-         * @serialField elements LinkedList The elements in this set.
-         */
-        private static final ObjectStreamField[] serialPersistentFields = {
-            new ObjectStreamField("this$0", Subject.class),
-            new ObjectStreamField("elements", LinkedList.class),
-            new ObjectStreamField("which", int.class)
-        };
 
         Subject subject;
         LinkedList<E> elements;
@@ -1298,50 +1242,6 @@ public final class Subject implements java.io.Serializable {
                     });
                 }
                 e.remove();
-            }
-        }
-
-        /**
-         * Writes this object out to a stream (i.e., serializes it).
-         *
-         * <p>
-         *
-         * @serialData If this is a private credential set,
-         *      a security check is performed to ensure that
-         *      the caller has permission to access each credential
-         *      in the set.  If the security check passes,
-         *      the set is serialized.
-         */
-        private void writeObject(java.io.ObjectOutputStream oos)
-                throws java.io.IOException {
-
-            if (which == Subject.PRIV_CREDENTIAL_SET) {
-                // check permissions before serializing
-                Iterator<E> i = iterator();
-                while (i.hasNext()) {
-                    i.next();
-                }
-            }
-            ObjectOutputStream.PutField fields = oos.putFields();
-            fields.put("this$0", subject);
-            fields.put("elements", elements);
-            fields.put("which", which);
-            oos.writeFields();
-        }
-
-        @SuppressWarnings("unchecked")
-        private void readObject(ObjectInputStream ois)
-            throws IOException, ClassNotFoundException
-        {
-            ObjectInputStream.GetField fields = ois.readFields();
-            subject = (Subject) fields.get("this$0", null);
-            which = fields.get("which", 0);
-
-            LinkedList<E> tmp = (LinkedList<E>) fields.get("elements", null);
-            if (tmp.getClass() != LinkedList.class) {
-                elements = new LinkedList<E>(tmp);
-            } else {
-                elements = tmp;
             }
         }
     }

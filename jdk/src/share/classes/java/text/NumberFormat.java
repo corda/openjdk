@@ -40,8 +40,6 @@ package java.text;
 
 import java.io.InvalidObjectException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.spi.NumberFormatProvider;
@@ -885,68 +883,6 @@ public abstract class NumberFormat extends Format  {
             break;
         }
         return numberFormat;
-    }
-
-    /**
-     * First, read in the default serializable data.
-     *
-     * Then, if <code>serialVersionOnStream</code> is less than 1, indicating that
-     * the stream was written by JDK 1.1,
-     * set the <code>int</code> fields such as <code>maximumIntegerDigits</code>
-     * to be equal to the <code>byte</code> fields such as <code>maxIntegerDigits</code>,
-     * since the <code>int</code> fields were not present in JDK 1.1.
-     * Finally, set serialVersionOnStream back to the maximum allowed value so that
-     * default serialization will work properly if this object is streamed out again.
-     *
-     * <p>If <code>minimumIntegerDigits</code> is greater than
-     * <code>maximumIntegerDigits</code> or <code>minimumFractionDigits</code>
-     * is greater than <code>maximumFractionDigits</code>, then the stream data
-     * is invalid and this method throws an <code>InvalidObjectException</code>.
-     * In addition, if any of these values is negative, then this method throws
-     * an <code>InvalidObjectException</code>.
-     *
-     * @since 1.2
-     */
-    private void readObject(ObjectInputStream stream)
-         throws IOException, ClassNotFoundException
-    {
-        stream.defaultReadObject();
-        if (serialVersionOnStream < 1) {
-            // Didn't have additional int fields, reassign to use them.
-            maximumIntegerDigits = maxIntegerDigits;
-            minimumIntegerDigits = minIntegerDigits;
-            maximumFractionDigits = maxFractionDigits;
-            minimumFractionDigits = minFractionDigits;
-        }
-        if (minimumIntegerDigits > maximumIntegerDigits ||
-            minimumFractionDigits > maximumFractionDigits ||
-            minimumIntegerDigits < 0 || minimumFractionDigits < 0) {
-            throw new InvalidObjectException("Digit count range invalid");
-        }
-        serialVersionOnStream = currentSerialVersion;
-    }
-
-    /**
-     * Write out the default serializable data, after first setting
-     * the <code>byte</code> fields such as <code>maxIntegerDigits</code> to be
-     * equal to the <code>int</code> fields such as <code>maximumIntegerDigits</code>
-     * (or to <code>Byte.MAX_VALUE</code>, whichever is smaller), for compatibility
-     * with the JDK 1.1 version of the stream format.
-     *
-     * @since 1.2
-     */
-    private void writeObject(ObjectOutputStream stream)
-         throws IOException
-    {
-        maxIntegerDigits = (maximumIntegerDigits > Byte.MAX_VALUE) ?
-                           Byte.MAX_VALUE : (byte)maximumIntegerDigits;
-        minIntegerDigits = (minimumIntegerDigits > Byte.MAX_VALUE) ?
-                           Byte.MAX_VALUE : (byte)minimumIntegerDigits;
-        maxFractionDigits = (maximumFractionDigits > Byte.MAX_VALUE) ?
-                            Byte.MAX_VALUE : (byte)maximumFractionDigits;
-        minFractionDigits = (minimumFractionDigits > Byte.MAX_VALUE) ?
-                            Byte.MAX_VALUE : (byte)minimumFractionDigits;
-        stream.defaultWriteObject();
     }
 
     // Constants used by factory methods to specify a style of format.

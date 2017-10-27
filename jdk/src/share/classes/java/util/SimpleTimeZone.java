@@ -38,8 +38,6 @@
 
 package java.util;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.IOException;
 import sun.util.calendar.CalendarSystem;
 import sun.util.calendar.CalendarUtils;
@@ -1618,89 +1616,5 @@ public class SimpleTimeZone extends TimeZone {
     private void unpackTimes(int[] times) {
         startTime = times[0];
         endTime = times[1];
-    }
-
-    /**
-     * Save the state of this object to a stream (i.e., serialize it).
-     *
-     * @serialData We write out two formats, a JDK 1.1 compatible format, using
-     * <code>DOW_IN_MONTH_MODE</code> rules, in the required section, followed
-     * by the full rules, in packed format, in the optional section.  The
-     * optional section will be ignored by JDK 1.1 code upon stream in.
-     * <p> Contents of the optional section: The length of a byte array is
-     * emitted (int); this is 4 as of this release. The byte array of the given
-     * length is emitted. The contents of the byte array are the true values of
-     * the fields <code>startDay</code>, <code>startDayOfWeek</code>,
-     * <code>endDay</code>, and <code>endDayOfWeek</code>.  The values of these
-     * fields in the required section are approximate values suited to the rule
-     * mode <code>DOW_IN_MONTH_MODE</code>, which is the only mode recognized by
-     * JDK 1.1.
-     */
-    private void writeObject(ObjectOutputStream stream)
-         throws IOException
-    {
-        // Construct a binary rule
-        byte[] rules = packRules();
-        int[] times = packTimes();
-
-        // Convert to 1.1 FCS rules.  This step may cause us to lose information.
-        makeRulesCompatible();
-
-        // Write out the 1.1 FCS rules
-        stream.defaultWriteObject();
-
-        // Write out the binary rules in the optional data area of the stream.
-        stream.writeInt(rules.length);
-        stream.write(rules);
-        stream.writeObject(times);
-
-        // Recover the original rules.  This recovers the information lost
-        // by makeRulesCompatible.
-        unpackRules(rules);
-        unpackTimes(times);
-    }
-
-    /**
-     * Reconstitute this object from a stream (i.e., deserialize it).
-     *
-     * We handle both JDK 1.1
-     * binary formats and full formats with a packed byte array.
-     */
-    private void readObject(ObjectInputStream stream)
-         throws IOException, ClassNotFoundException
-    {
-        stream.defaultReadObject();
-
-        if (serialVersionOnStream < 1) {
-            // Fix a bug in the 1.1 SimpleTimeZone code -- namely,
-            // startDayOfWeek and endDayOfWeek were usually uninitialized.  We can't do
-            // too much, so we assume SUNDAY, which actually works most of the time.
-            if (startDayOfWeek == 0) {
-                startDayOfWeek = Calendar.SUNDAY;
-            }
-            if (endDayOfWeek == 0) {
-                endDayOfWeek = Calendar.SUNDAY;
-            }
-
-            // The variables dstSavings, startMode, and endMode are post-1.1, so they
-            // won't be present if we're reading from a 1.1 stream.  Fix them up.
-            startMode = endMode = DOW_IN_MONTH_MODE;
-            dstSavings = millisPerHour;
-        } else {
-            // For 1.1.4, in addition to the 3 new instance variables, we also
-            // store the actual rules (which have not be made compatible with 1.1)
-            // in the optional area.  Read them in here and parse them.
-            int length = stream.readInt();
-            byte[] rules = new byte[length];
-            stream.readFully(rules);
-            unpackRules(rules);
-        }
-
-        if (serialVersionOnStream >= 2) {
-            int[] times = (int[]) stream.readObject();
-            unpackTimes(times);
-        }
-
-        serialVersionOnStream = currentSerialVersion;
     }
 }

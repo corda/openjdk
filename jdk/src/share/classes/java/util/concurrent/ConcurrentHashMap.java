@@ -35,7 +35,6 @@
 
 package java.util.concurrent;
 
-import java.io.ObjectStreamField;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -598,13 +597,6 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
 
     /** Number of CPUS, to place bounds on some sizings */
     static final int NCPU = Runtime.getRuntime().availableProcessors();
-
-    /** For serialization compatibility. */
-    private static final ObjectStreamField[] serialPersistentFields = {
-        new ObjectStreamField("segments", Segment[].class),
-        new ObjectStreamField("segmentMask", Integer.TYPE),
-        new ObjectStreamField("segmentShift", Integer.TYPE)
-    };
 
     /* ---------------- Nodes -------------- */
 
@@ -1371,155 +1363,6 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
         private static final long serialVersionUID = 2249069246763182397L;
         final float loadFactor;
         Segment(float lf) { this.loadFactor = lf; }
-    }
-
-    /**
-     * Saves the state of the {@code ConcurrentHashMap} instance to a
-     * stream (i.e., serializes it).
-     * @param s the stream
-     * @throws java.io.IOException if an I/O error occurs
-     * @serialData
-     * the key (Object) and value (Object)
-     * for each key-value mapping, followed by a null pair.
-     * The key-value mappings are emitted in no particular order.
-     */
-    private void writeObject(java.io.ObjectOutputStream s)
-        throws java.io.IOException {
-        // For serialization compatibility
-        // Emulate segment calculation from previous version of this class
-        int sshift = 0;
-        int ssize = 1;
-        while (ssize < DEFAULT_CONCURRENCY_LEVEL) {
-            ++sshift;
-            ssize <<= 1;
-        }
-        int segmentShift = 32 - sshift;
-        int segmentMask = ssize - 1;
-        @SuppressWarnings("unchecked")
-        Segment<K,V>[] segments = (Segment<K,V>[])
-            new Segment<?,?>[DEFAULT_CONCURRENCY_LEVEL];
-        for (int i = 0; i < segments.length; ++i)
-            segments[i] = new Segment<K,V>(LOAD_FACTOR);
-        s.putFields().put("segments", segments);
-        s.putFields().put("segmentShift", segmentShift);
-        s.putFields().put("segmentMask", segmentMask);
-        s.writeFields();
-
-        Node<K,V>[] t;
-        if ((t = table) != null) {
-            Traverser<K,V> it = new Traverser<K,V>(t, t.length, 0, t.length);
-            for (Node<K,V> p; (p = it.advance()) != null; ) {
-                s.writeObject(p.key);
-                s.writeObject(p.val);
-            }
-        }
-        s.writeObject(null);
-        s.writeObject(null);
-        segments = null; // throw away
-    }
-
-    /**
-     * Reconstitutes the instance from a stream (that is, deserializes it).
-     * @param s the stream
-     * @throws ClassNotFoundException if the class of a serialized object
-     *         could not be found
-     * @throws java.io.IOException if an I/O error occurs
-     */
-    private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
-        /*
-         * To improve performance in typical cases, we create nodes
-         * while reading, then place in table once size is known.
-         * However, we must also validate uniqueness and deal with
-         * overpopulated bins while doing so, which requires
-         * specialized versions of putVal mechanics.
-         */
-        sizeCtl = -1; // force exclusion for table construction
-        s.defaultReadObject();
-        long size = 0L;
-        Node<K,V> p = null;
-        for (;;) {
-            @SuppressWarnings("unchecked")
-            K k = (K) s.readObject();
-            @SuppressWarnings("unchecked")
-            V v = (V) s.readObject();
-            if (k != null && v != null) {
-                p = new Node<K,V>(spread(k.hashCode()), k, v, p);
-                ++size;
-            }
-            else
-                break;
-        }
-        if (size == 0L)
-            sizeCtl = 0;
-        else {
-            int n;
-            if (size >= (long)(MAXIMUM_CAPACITY >>> 1))
-                n = MAXIMUM_CAPACITY;
-            else {
-                int sz = (int)size;
-                n = tableSizeFor(sz + (sz >>> 1) + 1);
-            }
-            @SuppressWarnings("unchecked")
-            Node<K,V>[] tab = (Node<K,V>[])new Node<?,?>[n];
-            int mask = n - 1;
-            long added = 0L;
-            while (p != null) {
-                boolean insertAtFront;
-                Node<K,V> next = p.next, first;
-                int h = p.hash, j = h & mask;
-                if ((first = tabAt(tab, j)) == null)
-                    insertAtFront = true;
-                else {
-                    K k = p.key;
-                    if (first.hash < 0) {
-                        TreeBin<K,V> t = (TreeBin<K,V>)first;
-                        if (t.putTreeVal(h, k, p.val) == null)
-                            ++added;
-                        insertAtFront = false;
-                    }
-                    else {
-                        int binCount = 0;
-                        insertAtFront = true;
-                        Node<K,V> q; K qk;
-                        for (q = first; q != null; q = q.next) {
-                            if (q.hash == h &&
-                                ((qk = q.key) == k ||
-                                 (qk != null && k.equals(qk)))) {
-                                insertAtFront = false;
-                                break;
-                            }
-                            ++binCount;
-                        }
-                        if (insertAtFront && binCount >= TREEIFY_THRESHOLD) {
-                            insertAtFront = false;
-                            ++added;
-                            p.next = first;
-                            TreeNode<K,V> hd = null, tl = null;
-                            for (q = p; q != null; q = q.next) {
-                                TreeNode<K,V> t = new TreeNode<K,V>
-                                    (q.hash, q.key, q.val, null, null);
-                                if ((t.prev = tl) == null)
-                                    hd = t;
-                                else
-                                    tl.next = t;
-                                tl = t;
-                            }
-                            setTabAt(tab, j, new TreeBin<K,V>(hd));
-                        }
-                    }
-                }
-                if (insertAtFront) {
-                    ++added;
-                    p.next = first;
-                    setTabAt(tab, j, p);
-                }
-                p = next;
-            }
-            table = tab;
-            sizeCtl = n - (n >>> 2);
-            baseCount = added;
-        }
     }
 
     // ConcurrentMap methods

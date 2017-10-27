@@ -40,7 +40,6 @@ package java.text;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -3668,87 +3667,6 @@ public class DecimalFormat extends NumberFormat {
         this.roundingMode = roundingMode;
         digitList.setRoundingMode(roundingMode);
         fastPathCheckNeeded = true;
-    }
-
-    /**
-     * Reads the default serializable fields from the stream and performs
-     * validations and adjustments for older serialized versions. The
-     * validations and adjustments are:
-     * <ol>
-     * <li>
-     * Verify that the superclass's digit count fields correctly reflect
-     * the limits imposed on formatting numbers other than
-     * <code>BigInteger</code> and <code>BigDecimal</code> objects. These
-     * limits are stored in the superclass for serialization compatibility
-     * with older versions, while the limits for <code>BigInteger</code> and
-     * <code>BigDecimal</code> objects are kept in this class.
-     * If, in the superclass, the minimum or maximum integer digit count is
-     * larger than <code>DOUBLE_INTEGER_DIGITS</code> or if the minimum or
-     * maximum fraction digit count is larger than
-     * <code>DOUBLE_FRACTION_DIGITS</code>, then the stream data is invalid
-     * and this method throws an <code>InvalidObjectException</code>.
-     * <li>
-     * If <code>serialVersionOnStream</code> is less than 4, initialize
-     * <code>roundingMode</code> to {@link java.math.RoundingMode#HALF_EVEN
-     * RoundingMode.HALF_EVEN}.  This field is new with version 4.
-     * <li>
-     * If <code>serialVersionOnStream</code> is less than 3, then call
-     * the setters for the minimum and maximum integer and fraction digits with
-     * the values of the corresponding superclass getters to initialize the
-     * fields in this class. The fields in this class are new with version 3.
-     * <li>
-     * If <code>serialVersionOnStream</code> is less than 1, indicating that
-     * the stream was written by JDK 1.1, initialize
-     * <code>useExponentialNotation</code>
-     * to false, since it was not present in JDK 1.1.
-     * <li>
-     * Set <code>serialVersionOnStream</code> to the maximum allowed value so
-     * that default serialization will work properly if this object is streamed
-     * out again.
-     * </ol>
-     *
-     * <p>Stream versions older than 2 will not have the affix pattern variables
-     * <code>posPrefixPattern</code> etc.  As a result, they will be initialized
-     * to <code>null</code>, which means the affix strings will be taken as
-     * literal values.  This is exactly what we want, since that corresponds to
-     * the pre-version-2 behavior.
-     */
-    private void readObject(ObjectInputStream stream)
-         throws IOException, ClassNotFoundException
-    {
-        stream.defaultReadObject();
-        digitList = new DigitList();
-
-        // We force complete fast-path reinitialization when the instance is
-        // deserialized. See clone() comment on fastPathCheckNeeded.
-        fastPathCheckNeeded = true;
-        isFastPath = false;
-        fastPathData = null;
-
-        if (serialVersionOnStream < 4) {
-            setRoundingMode(RoundingMode.HALF_EVEN);
-        } else {
-            setRoundingMode(getRoundingMode());
-        }
-
-        // We only need to check the maximum counts because NumberFormat
-        // .readObject has already ensured that the maximum is greater than the
-        // minimum count.
-        if (super.getMaximumIntegerDigits() > DOUBLE_INTEGER_DIGITS ||
-            super.getMaximumFractionDigits() > DOUBLE_FRACTION_DIGITS) {
-            throw new InvalidObjectException("Digit count out of range");
-        }
-        if (serialVersionOnStream < 3) {
-            setMaximumIntegerDigits(super.getMaximumIntegerDigits());
-            setMinimumIntegerDigits(super.getMinimumIntegerDigits());
-            setMaximumFractionDigits(super.getMaximumFractionDigits());
-            setMinimumFractionDigits(super.getMinimumFractionDigits());
-        }
-        if (serialVersionOnStream < 1) {
-            // Didn't have exponential fields
-            useExponentialNotation = false;
-        }
-        serialVersionOnStream = currentSerialVersion;
     }
 
     //----------------------------------------------------------------------

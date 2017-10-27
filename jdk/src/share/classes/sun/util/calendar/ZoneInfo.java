@@ -26,7 +26,6 @@
 package sun.util.calendar;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.lang.ref.SoftReference;
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -725,13 +724,5 @@ public class ZoneInfo extends TimeZone {
      */
     public static Map<String, String> getAliasTable() {
          return ZoneInfoFile.getAliasMap();
-    }
-
-    private void readObject(ObjectInputStream stream)
-            throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        // We don't know how this object from 1.4.x or earlier has
-        // been mutated. So it should always be marked as `dirty'.
-        dirty = true;
     }
 }

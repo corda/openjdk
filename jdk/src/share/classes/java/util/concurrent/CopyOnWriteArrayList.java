@@ -950,54 +950,6 @@ public class CopyOnWriteArrayList<E>
     }
 
     /**
-     * Saves this list to a stream (that is, serializes it).
-     *
-     * @param s the stream
-     * @throws java.io.IOException if an I/O error occurs
-     * @serialData The length of the array backing the list is emitted
-     *               (int), followed by all of its elements (each an Object)
-     *               in the proper order.
-     */
-    private void writeObject(java.io.ObjectOutputStream s)
-        throws java.io.IOException {
-
-        s.defaultWriteObject();
-
-        Object[] elements = getArray();
-        // Write out array length
-        s.writeInt(elements.length);
-
-        // Write out all elements in the proper order.
-        for (Object element : elements)
-            s.writeObject(element);
-    }
-
-    /**
-     * Reconstitutes this list from a stream (that is, deserializes it).
-     * @param s the stream
-     * @throws ClassNotFoundException if the class of a serialized object
-     *         could not be found
-     * @throws java.io.IOException if an I/O error occurs
-     */
-    private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
-
-        s.defaultReadObject();
-
-        // bind to new lock
-        resetLock();
-
-        // Read in array length and allocate array
-        int len = s.readInt();
-        Object[] elements = new Object[len];
-
-        // Read in all elements in the proper order.
-        for (int i = 0; i < len; i++)
-            elements[i] = s.readObject();
-        setArray(elements);
-    }
-
-    /**
      * Returns a string representation of this list.  The string
      * representation consists of the string representations of the list's
      * elements in the order they are returned by its iterator, enclosed in

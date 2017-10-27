@@ -25,8 +25,6 @@
 
 package java.security.cert;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
@@ -177,71 +175,5 @@ public class CertificateRevokedException extends CertificateException {
                + reason + ", revocation date: " + revocationDate
                + ", authority: " + authority + ", extension OIDs: "
                + extensions.keySet();
-    }
-
-    /**
-     * Serialize this {@code CertificateRevokedException} instance.
-     *
-     * @serialData the size of the extensions map (int), followed by all of
-     * the extensions in the map, in no particular order. For each extension,
-     * the following data is emitted: the OID String (Object), the criticality
-     * flag (boolean), the length of the encoded extension value byte array
-     * (int), and the encoded extension value bytes.
-     */
-    private void writeObject(ObjectOutputStream oos) throws IOException {
-        // Write out the non-transient fields
-        // (revocationDate, reason, authority)
-        oos.defaultWriteObject();
-
-        // Write out the size (number of mappings) of the extensions map
-        oos.writeInt(extensions.size());
-
-        // For each extension in the map, the following are emitted (in order):
-        // the OID String (Object), the criticality flag (boolean), the length
-        // of the encoded extension value byte array (int), and the encoded
-        // extension value byte array. The extensions themselves are emitted
-        // in no particular order.
-        for (Map.Entry<String, Extension> entry : extensions.entrySet()) {
-            Extension ext = entry.getValue();
-            oos.writeObject(ext.getId());
-            oos.writeBoolean(ext.isCritical());
-            byte[] extVal = ext.getValue();
-            oos.writeInt(extVal.length);
-            oos.write(extVal);
-        }
-    }
-
-    /**
-     * Deserialize the {@code CertificateRevokedException} instance.
-     */
-    private void readObject(ObjectInputStream ois)
-        throws IOException, ClassNotFoundException {
-        // Read in the non-transient fields
-        // (revocationDate, reason, authority)
-        ois.defaultReadObject();
-
-        // Defensively copy the revocation date
-        revocationDate = new Date(revocationDate.getTime());
-
-        // Read in the size (number of mappings) of the extensions map
-        // and create the extensions map
-        int size = ois.readInt();
-        if (size == 0) {
-            extensions = Collections.emptyMap();
-        } else {
-            extensions = new HashMap<String, Extension>(size);
-        }
-
-        // Read in the extensions and put the mappings in the extensions map
-        for (int i = 0; i < size; i++) {
-            String oid = (String) ois.readObject();
-            boolean critical = ois.readBoolean();
-            int length = ois.readInt();
-            byte[] extVal = new byte[length];
-            ois.readFully(extVal);
-            Extension ext = sun.security.x509.Extension.newExtension
-                (new ObjectIdentifier(oid), critical, extVal);
-            extensions.put(oid, ext);
-        }
     }
 }

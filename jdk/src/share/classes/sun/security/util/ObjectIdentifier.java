@@ -106,30 +106,6 @@ class ObjectIdentifier implements Serializable
     // Is the components field calculated?
     transient private boolean   componentsCalculated = false;
 
-    private void readObject(ObjectInputStream is)
-            throws IOException, ClassNotFoundException {
-        is.defaultReadObject();
-
-        if (encoding == null) {  // from an old version
-            init((int[])components, componentLen);
-        }
-    }
-
-    private void writeObject(ObjectOutputStream os)
-            throws IOException {
-        if (!componentsCalculated) {
-            int[] comps = toIntArray();
-            if (comps != null) {    // every one understands this
-                components = comps;
-                componentLen = comps.length;
-            } else {
-                components = HugeOidNotSupportedByOldJDK.theOne;
-            }
-            componentsCalculated = true;
-        }
-        os.defaultWriteObject();
-    }
-
     static class HugeOidNotSupportedByOldJDK implements Serializable {
         private static final long serialVersionUID = 1L;
         static HugeOidNotSupportedByOldJDK theOne = new HugeOidNotSupportedByOldJDK();

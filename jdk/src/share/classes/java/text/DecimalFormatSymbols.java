@@ -39,7 +39,6 @@
 package java.text;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.text.spi.DecimalFormatSymbolsProvider;
 import java.util.ArrayList;
@@ -662,50 +661,6 @@ public class DecimalFormatSymbols implements Cloneable, Serializable {
         // standard decimal separator for all locales that we support.
         // If that changes, add a new entry to NumberElements.
         monetarySeparator = decimalSeparator;
-    }
-
-    /**
-     * Reads the default serializable fields, provides default values for objects
-     * in older serial versions, and initializes non-serializable fields.
-     * If <code>serialVersionOnStream</code>
-     * is less than 1, initializes <code>monetarySeparator</code> to be
-     * the same as <code>decimalSeparator</code> and <code>exponential</code>
-     * to be 'E'.
-     * If <code>serialVersionOnStream</code> is less than 2,
-     * initializes <code>locale</code>to the root locale, and initializes
-     * If <code>serialVersionOnStream</code> is less than 3, it initializes
-     * <code>exponentialSeparator</code> using <code>exponential</code>.
-     * Sets <code>serialVersionOnStream</code> back to the maximum allowed value so that
-     * default serialization will work properly if this object is streamed out again.
-     * Initializes the currency from the intlCurrencySymbol field.
-     *
-     * @since JDK 1.1.6
-     */
-    private void readObject(ObjectInputStream stream)
-            throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        if (serialVersionOnStream < 1) {
-            // Didn't have monetarySeparator or exponential field;
-            // use defaults.
-            monetarySeparator = decimalSeparator;
-            exponential       = 'E';
-        }
-        if (serialVersionOnStream < 2) {
-            // didn't have locale; use root locale
-            locale = Locale.ROOT;
-        }
-        if (serialVersionOnStream < 3) {
-            // didn't have exponentialSeparator. Create one using exponential
-            exponentialSeparator = Character.toString(exponential);
-        }
-        serialVersionOnStream = currentSerialVersion;
-
-        if (intlCurrencySymbol != null) {
-            try {
-                 currency = Currency.getInstance(intlCurrencySymbol);
-            } catch (IllegalArgumentException e) {
-            }
-        }
     }
 
     /**

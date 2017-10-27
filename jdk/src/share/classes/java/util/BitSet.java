@@ -76,17 +76,6 @@ public class BitSet implements Cloneable, java.io.Serializable {
     private static final long WORD_MASK = 0xffffffffffffffffL;
 
     /**
-     * @serialField bits long[]
-     *
-     * The bits in this BitSet.  The ith bit is stored in bits[i/64] at
-     * bit position i % 64 (where bit position 0 refers to the least
-     * significant bit and 63 refers to the most significant bit).
-     */
-    private static final ObjectStreamField[] serialPersistentFields = {
-        new ObjectStreamField("bits", long[].class),
-    };
-
-    /**
      * The internal field corresponding to the serialField "bits".
      */
     private long[] words;
@@ -1117,42 +1106,6 @@ public class BitSet implements Cloneable, java.io.Serializable {
             words = Arrays.copyOf(words, wordsInUse);
             checkInvariants();
         }
-    }
-
-    /**
-     * Save the state of the {@code BitSet} instance to a stream (i.e.,
-     * serialize it).
-     */
-    private void writeObject(ObjectOutputStream s)
-        throws IOException {
-
-        checkInvariants();
-
-        if (! sizeIsSticky)
-            trimToSize();
-
-        ObjectOutputStream.PutField fields = s.putFields();
-        fields.put("bits", words);
-        s.writeFields();
-    }
-
-    /**
-     * Reconstitute the {@code BitSet} instance from a stream (i.e.,
-     * deserialize it).
-     */
-    private void readObject(ObjectInputStream s)
-        throws IOException, ClassNotFoundException {
-
-        ObjectInputStream.GetField fields = s.readFields();
-        words = (long[]) fields.get("bits", null);
-
-        // Assume maximum length then find real length
-        // because recalculateWordsInUse assumes maintenance
-        // or reduction in logical size
-        wordsInUse = words.length;
-        recalculateWordsInUse();
-        sizeIsSticky = (words.length > 0 && words[words.length-1] == 0L); // heuristic
-        checkInvariants();
     }
 
     /**

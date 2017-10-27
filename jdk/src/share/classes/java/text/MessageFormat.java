@@ -40,7 +40,6 @@ package java.text;
 
 import java.io.InvalidObjectException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1571,33 +1570,6 @@ public class MessageFormat extends Format {
         }
         if (quoted) {
             target.append('\'');
-        }
-    }
-
-    /**
-     * After reading an object from the input stream, do a simple verification
-     * to maintain class invariants.
-     * @throws InvalidObjectException if the objects read from the stream is invalid.
-     */
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        boolean isValid = maxOffset >= -1
-                && formats.length > maxOffset
-                && offsets.length > maxOffset
-                && argumentNumbers.length > maxOffset;
-        if (isValid) {
-            int lastOffset = pattern.length() + 1;
-            for (int i = maxOffset; i >= 0; --i) {
-                if ((offsets[i] < 0) || (offsets[i] > lastOffset)) {
-                    isValid = false;
-                    break;
-                } else {
-                    lastOffset = offsets[i];
-                }
-            }
-        }
-        if (!isValid) {
-            throw new InvalidObjectException("Could not reconstruct MessageFormat from corrupt stream.");
         }
     }
 }

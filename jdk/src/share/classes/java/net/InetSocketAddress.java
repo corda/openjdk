@@ -26,10 +26,6 @@ package java.net;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamException;
-import java.io.ObjectStreamField;
 
 /**
  *
@@ -252,54 +248,6 @@ public class InetSocketAddress
      */
     public static InetSocketAddress createUnresolved(String host, int port) {
         return new InetSocketAddress(checkPort(port), checkHost(host));
-    }
-
-    /**
-     * @serialField hostname String
-     * @serialField addr InetAddress
-     * @serialField port int
-     */
-    private static final ObjectStreamField[] serialPersistentFields = {
-         new ObjectStreamField("hostname", String.class),
-         new ObjectStreamField("addr", InetAddress.class),
-         new ObjectStreamField("port", int.class)};
-
-    private void writeObject(ObjectOutputStream out)
-        throws IOException
-    {
-        // Don't call defaultWriteObject()
-         ObjectOutputStream.PutField pfields = out.putFields();
-         pfields.put("hostname", holder.hostname);
-         pfields.put("addr", holder.addr);
-         pfields.put("port", holder.port);
-         out.writeFields();
-     }
-
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException
-    {
-        // Don't call defaultReadObject()
-        ObjectInputStream.GetField oisFields = in.readFields();
-        final String oisHostname = (String)oisFields.get("hostname", null);
-        final InetAddress oisAddr = (InetAddress)oisFields.get("addr", null);
-        final int oisPort = oisFields.get("port", -1);
-
-        // Check that our invariants are satisfied
-        checkPort(oisPort);
-        if (oisHostname == null && oisAddr == null)
-            throw new InvalidObjectException("hostname and addr " +
-                                             "can't both be null");
-
-        InetSocketAddressHolder h = new InetSocketAddressHolder(oisHostname,
-                                                                oisAddr,
-                                                                oisPort);
-        UNSAFE.putObject(this, FIELDS_OFFSET, h);
-    }
-
-    private void readObjectNoData()
-        throws ObjectStreamException
-    {
-        throw new InvalidObjectException("Stream data required");
     }
 
     private static final long FIELDS_OFFSET;

@@ -26,10 +26,6 @@
 package java.net;
 
 import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamField;
 import java.util.Enumeration;
 import java.util.Arrays;
 
@@ -559,22 +555,6 @@ class Inet6Address extends InetAddress {
         throw new UnknownHostException ("No matching address found for interface : " +ifname);
     }
 
-    /**
-     * @serialField ipaddress byte[]
-     * @serialField scope_id int
-     * @serialField scope_id_set boolean
-     * @serialField scope_ifname_set boolean
-     * @serialField ifname String
-     */
-
-    private static final ObjectStreamField[] serialPersistentFields = {
-         new ObjectStreamField("ipaddress", byte[].class),
-         new ObjectStreamField("scope_id", int.class),
-         new ObjectStreamField("scope_id_set", boolean.class),
-         new ObjectStreamField("scope_ifname_set", boolean.class),
-         new ObjectStreamField("ifname", String.class)
-    };
-
     private static final long FIELDS_OFFSET;
     private static final sun.misc.Unsafe UNSAFE;
 
@@ -587,92 +567,6 @@ class Inet6Address extends InetAddress {
         } catch (ReflectiveOperationException e) {
             throw new Error(e);
         }
-    }
-
-    /**
-     * restore the state of this object from stream
-     * including the scope information, only if the
-     * scoped interface name is valid on this system
-     */
-    private void readObject(ObjectInputStream s)
-        throws IOException, ClassNotFoundException {
-        NetworkInterface scope_ifname = null;
-
-        if (getClass().getClassLoader() != null) {
-            throw new SecurityException ("invalid address type");
-        }
-
-        ObjectInputStream.GetField gf = s.readFields();
-        byte[] ipaddress = (byte[])gf.get("ipaddress", null);
-        int scope_id = (int)gf.get("scope_id", -1);
-        boolean scope_id_set = (boolean)gf.get("scope_id_set", false);
-        boolean scope_ifname_set = (boolean)gf.get("scope_ifname_set", false);
-        String ifname = (String)gf.get("ifname", null);
-
-        if (ifname != null && !"".equals (ifname)) {
-            try {
-                scope_ifname = NetworkInterface.getByName(ifname);
-                if (scope_ifname == null) {
-                    /* the interface does not exist on this system, so we clear
-                     * the scope information completely */
-                    scope_id_set = false;
-                    scope_ifname_set = false;
-                    scope_id = 0;
-                } else {
-                    scope_ifname_set = true;
-                    try {
-                        scope_id = deriveNumericScope (ipaddress, scope_ifname);
-                    } catch (UnknownHostException e) {
-                        // typically should not happen, but it may be that
-                        // the machine being used for deserialization has
-                        // the same interface name but without IPv6 configured.
-                    }
-                }
-            } catch (SocketException e) {}
-        }
-
-        /* if ifname was not supplied, then the numeric info is used */
-
-        ipaddress = ipaddress.clone();
-
-        // Check that our invariants are satisfied
-        if (ipaddress.length != INADDRSZ) {
-            throw new InvalidObjectException("invalid address length: "+
-                                             ipaddress.length);
-        }
-
-        if (holder.getFamily() != IPv6) {
-            throw new InvalidObjectException("invalid address family type");
-        }
-
-        Inet6AddressHolder h = new Inet6AddressHolder(
-            ipaddress, scope_id, scope_id_set, scope_ifname, scope_ifname_set
-        );
-
-        UNSAFE.putObject(this, FIELDS_OFFSET, h);
-    }
-
-    /**
-     * default behavior is overridden in order to write the
-     * scope_ifname field as a String, rather than a NetworkInterface
-     * which is not serializable
-     */
-    private synchronized void writeObject(ObjectOutputStream s)
-        throws IOException
-    {
-            String ifname = null;
-
-        if (holder6.scope_ifname != null) {
-            ifname = holder6.scope_ifname.getName();
-            holder6.scope_ifname_set = true;
-        }
-        ObjectOutputStream.PutField pfields = s.putFields();
-        pfields.put("ipaddress", holder6.ipaddress);
-        pfields.put("scope_id", holder6.scope_id);
-        pfields.put("scope_id_set", holder6.scope_id_set);
-        pfields.put("scope_ifname_set", holder6.scope_ifname_set);
-        pfields.put("ifname", ifname);
-        s.writeFields();
     }
 
     /**

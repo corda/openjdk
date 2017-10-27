@@ -33,9 +33,6 @@ import java.util.HashMap;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Collections;
-import java.io.ObjectStreamField;
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
 import java.io.IOException;
 import sun.security.util.SecurityConstants;
 
@@ -380,33 +377,6 @@ public final class PropertyPermission extends BasicPermission {
 
 
     private static final long serialVersionUID = 885438825399942851L;
-
-    /**
-     * WriteObject is called to save the state of the PropertyPermission
-     * to a stream. The actions are serialized, and the superclass
-     * takes care of the name.
-     */
-    private synchronized void writeObject(java.io.ObjectOutputStream s)
-        throws IOException
-    {
-        // Write out the actions. The superclass takes care of the name
-        // call getActions to make sure actions field is initialized
-        if (actions == null)
-            getActions();
-        s.defaultWriteObject();
-    }
-
-    /**
-     * readObject is called to restore the state of the PropertyPermission from
-     * a stream.
-     */
-    private synchronized void readObject(java.io.ObjectInputStream s)
-         throws IOException, ClassNotFoundException
-    {
-        // Read in the action, then initialize the rest
-        s.defaultReadObject();
-        init(getMask(actions));
-    }
 }
 
 /**
@@ -587,71 +557,4 @@ final class PropertyPermissionCollection extends PermissionCollection
     }
 
     private static final long serialVersionUID = 7015263904581634791L;
-
-    // Need to maintain serialization interoperability with earlier releases,
-    // which had the serializable field:
-    //
-    // Table of permissions.
-    //
-    // @serial
-    //
-    // private Hashtable permissions;
-    /**
-     * @serialField permissions java.util.Hashtable
-     *     A table of the PropertyPermissions.
-     * @serialField all_allowed boolean
-     *     boolean saying if "*" is in the collection.
-     */
-    private static final ObjectStreamField[] serialPersistentFields = {
-        new ObjectStreamField("permissions", Hashtable.class),
-        new ObjectStreamField("all_allowed", Boolean.TYPE),
-    };
-
-    /**
-     * @serialData Default fields.
-     */
-    /*
-     * Writes the contents of the perms field out as a Hashtable for
-     * serialization compatibility with earlier releases. all_allowed
-     * unchanged.
-     */
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        // Don't call out.defaultWriteObject()
-
-        // Copy perms into a Hashtable
-        Hashtable<String, Permission> permissions =
-            new Hashtable<>(perms.size()*2);
-        synchronized (this) {
-            permissions.putAll(perms);
-        }
-
-        // Write out serializable fields
-        ObjectOutputStream.PutField pfields = out.putFields();
-        pfields.put("all_allowed", all_allowed);
-        pfields.put("permissions", permissions);
-        out.writeFields();
-    }
-
-    /*
-     * Reads in a Hashtable of PropertyPermissions and saves them in the
-     * perms field. Reads in all_allowed.
-     */
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException
-    {
-        // Don't call defaultReadObject()
-
-        // Read in serialized fields
-        ObjectInputStream.GetField gfields = in.readFields();
-
-        // Get all_allowed
-        all_allowed = gfields.get("all_allowed", false);
-
-        // Get permissions
-        @SuppressWarnings("unchecked")
-        Hashtable<String, PropertyPermission> permissions =
-            (Hashtable<String, PropertyPermission>)gfields.get("permissions", null);
-        perms = new HashMap<>(permissions.size()*2);
-        perms.putAll(permissions);
-    }
 }
