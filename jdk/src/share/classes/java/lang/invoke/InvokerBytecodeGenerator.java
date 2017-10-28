@@ -655,7 +655,6 @@ class InvokerBytecodeGenerator {
         bogusMethod(lambdaForm);
 
         final byte[] classFile = cw.toByteArray();
-        //maybeDump(className, classFile);
         return classFile;
     }
 
@@ -1287,7 +1286,6 @@ class InvokerBytecodeGenerator {
         bogusMethod(invokerType);
 
         final byte[] classFile = cw.toByteArray();
-        //maybeDump(className, classFile);
         return classFile;
     }
 
@@ -1355,7 +1353,6 @@ class InvokerBytecodeGenerator {
         bogusMethod(dstType);
 
         final byte[] classFile = cw.toByteArray();
-        //maybeDump(className, classFile);
         return classFile;
     }
 

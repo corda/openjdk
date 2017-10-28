@@ -199,24 +199,6 @@ public final class System {
         setErr0(err);
     }
 
-    private static volatile Console cons = null;
-    /**
-     * Returns the unique {@link java.io.Console Console} object associated
-     * with the current Java virtual machine, if any.
-     *
-     * @return  The system console, if any, otherwise <tt>null</tt>.
-     *
-     * @since   1.6
-     */
-     public static Console console() {
-         if (cons == null) {
-             synchronized (System.class) {
-                 cons = sun.misc.SharedSecrets.getJavaIOAccess().console();
-             }
-         }
-         return cons;
-     }
-
     /**
      * Returns the channel inherited from the entity that created this
      * Java virtual machine.
