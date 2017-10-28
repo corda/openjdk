@@ -85,40 +85,6 @@ final class SunEntries {
     static void putEntries(Map<Object, Object> map) {
 
         /*
-         * SecureRandom
-         *
-         * Register these first to speed up "new SecureRandom()",
-         * which iterates through the list of algorithms
-         */
-        // register the native PRNG, if available
-        // if user selected /dev/urandom, we put it before SHA1PRNG,
-        // otherwise after it
-        boolean nativeAvailable = NativePRNG.isAvailable();
-        boolean useNativePRNG = seedSource.equals(URL_DEV_URANDOM) ||
-            seedSource.equals(URL_DEV_RANDOM);
-
-        if (nativeAvailable && useNativePRNG) {
-            map.put("SecureRandom.NativePRNG",
-                "sun.security.provider.NativePRNG");
-        }
-        map.put("SecureRandom.SHA1PRNG",
-             "sun.security.provider.SecureRandom");
-        if (nativeAvailable && !useNativePRNG) {
-            map.put("SecureRandom.NativePRNG",
-                "sun.security.provider.NativePRNG");
-        }
-
-        if (NativePRNG.Blocking.isAvailable()) {
-            map.put("SecureRandom.NativePRNGBlocking",
-                "sun.security.provider.NativePRNG$Blocking");
-        }
-
-        if (NativePRNG.NonBlocking.isAvailable()) {
-            map.put("SecureRandom.NativePRNGNonBlocking",
-                "sun.security.provider.NativePRNG$NonBlocking");
-        }
-
-        /*
          * Signature engines
          */
         map.put("Signature.SHA1withDSA",
