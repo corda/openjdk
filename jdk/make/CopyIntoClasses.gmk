@@ -36,10 +36,6 @@ PRINT_RESOURCES_DIR = $(JDK_TOPDIR)/src/share/classes/sun/print/resources
 COPY_FILES += \
     $(wildcard $(PRINT_RESOURCES_DIR)/*.png)
 
-# IDN resources
-COPY_FILES += \
-    $(JDK_TOPDIR)/src/share/classes/sun/net/idn/uidna.spp
-
 ifeq ($(ENABLE_JFR), true)
   JFR_CONFIGURATION_DIR_CLOSED = $(JDK_TOPDIR)/src/closed/share/classes/oracle/jrockit/jfr/settings
   COPY_FILES += \
