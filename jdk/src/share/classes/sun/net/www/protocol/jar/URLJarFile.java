@@ -28,7 +28,6 @@ package sun.net.www.protocol.jar;
 import java.io.*;
 import java.net.*;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.jar.*;
 import java.util.zip.ZipFile;
