@@ -71,15 +71,6 @@ final class CompletedFuture<V> implements Future<V> {
     }
 
     @Override
-    public V get(long timeout, TimeUnit unit) throws ExecutionException {
-        if (unit == null)
-            throw new NullPointerException();
-        if (exc != null)
-            throw new ExecutionException(exc);
-        return result;
-    }
-
-    @Override
     public boolean isCancelled() {
         return false;
     }

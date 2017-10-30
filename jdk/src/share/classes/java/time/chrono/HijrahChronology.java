@@ -499,21 +499,6 @@ public final class HijrahChronology extends AbstractChronology implements Serial
     }
 
     @Override
-    public HijrahDate dateNow() {
-        return dateNow(Clock.systemDefaultZone());
-    }
-
-    @Override
-    public HijrahDate dateNow(ZoneId zone) {
-        return dateNow(Clock.system(zone));
-    }
-
-    @Override
-    public HijrahDate dateNow(Clock clock) {
-        return date(LocalDate.now(clock));
-    }
-
-    @Override
     public HijrahDate date(TemporalAccessor temporal) {
         if (temporal instanceof HijrahDate) {
             return (HijrahDate) temporal;

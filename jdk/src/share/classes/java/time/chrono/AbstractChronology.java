@@ -495,15 +495,7 @@ public abstract class AbstractChronology implements Chronology {
     void resolveProlepticMonth(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
         Long pMonth = fieldValues.remove(PROLEPTIC_MONTH);
         if (pMonth != null) {
-            if (resolverStyle != ResolverStyle.LENIENT) {
-                PROLEPTIC_MONTH.checkValidValue(pMonth);
-            }
-            // first day-of-month is likely to be safest for setting proleptic-month
-            // cannot add to year zero, as not all chronologies have a year zero
-            ChronoLocalDate chronoDate = dateNow()
-                    .with(DAY_OF_MONTH, 1).with(PROLEPTIC_MONTH, pMonth);
-            addFieldValue(fieldValues, MONTH_OF_YEAR, chronoDate.get(MONTH_OF_YEAR));
-            addFieldValue(fieldValues, YEAR, chronoDate.get(YEAR));
+            throw new UnsupportedOperationException("Proleptic month not supported");
         }
     }
 

@@ -47,7 +47,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RunnableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 import java.lang.reflect.Constructor;
@@ -1004,68 +1003,6 @@ public abstract class ForkJoinTask<V> implements Future<V>, Serializable {
             throw new CancellationException();
         if (s == EXCEPTIONAL && (ex = getThrowableException()) != null)
             throw new ExecutionException(ex);
-        return getRawResult();
-    }
-
-    /**
-     * Waits if necessary for at most the given time for the computation
-     * to complete, and then retrieves its result, if available.
-     *
-     * @param timeout the maximum time to wait
-     * @param unit the time unit of the timeout argument
-     * @return the computed result
-     * @throws CancellationException if the computation was cancelled
-     * @throws ExecutionException if the computation threw an
-     * exception
-     * @throws InterruptedException if the current thread is not a
-     * member of a ForkJoinPool and was interrupted while waiting
-     * @throws TimeoutException if the wait timed out
-     */
-    public final V get(long timeout, TimeUnit unit)
-        throws InterruptedException, ExecutionException, TimeoutException {
-        int s;
-        long nanos = unit.toNanos(timeout);
-        if (Thread.interrupted())
-            throw new InterruptedException();
-        if ((s = status) >= 0 && nanos > 0L) {
-            long d = System.nanoTime() + nanos;
-            long deadline = (d == 0L) ? 1L : d; // avoid 0
-            Thread t = Thread.currentThread();
-            if (t instanceof ForkJoinWorkerThread) {
-                ForkJoinWorkerThread wt = (ForkJoinWorkerThread)t;
-                s = wt.pool.awaitJoin(wt.workQueue, this, deadline);
-            }
-            else if ((s = ((this instanceof CountedCompleter) ?
-                           ForkJoinPool.common.externalHelpComplete(
-                               (CountedCompleter<?>)this, 0) :
-                           ForkJoinPool.common.tryExternalUnpush(this) ?
-                           doExec() : 0)) >= 0) {
-                long ns, ms; // measure in nanosecs, but wait in millisecs
-                while ((s = status) >= 0 &&
-                       (ns = deadline - System.nanoTime()) > 0L) {
-                    if ((ms = TimeUnit.NANOSECONDS.toMillis(ns)) > 0L &&
-                        U.compareAndSwapInt(this, STATUS, s, s | SIGNAL)) {
-                        synchronized (this) {
-                            if (status >= 0)
-                                wait(ms); // OK to throw InterruptedException
-                            else
-                                notifyAll();
-                        }
-                    }
-                }
-            }
-        }
-        if (s >= 0)
-            s = status;
-        if ((s &= DONE_MASK) != NORMAL) {
-            Throwable ex;
-            if (s == CANCELLED)
-                throw new CancellationException();
-            if (s != EXCEPTIONAL)
-                throw new TimeoutException();
-            if ((ex = getThrowableException()) != null)
-                throw new ExecutionException(ex);
-        }
         return getRawResult();
     }
 

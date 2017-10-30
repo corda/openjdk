@@ -361,42 +361,6 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
     }
 
     /**
-     * Inserts the specified element at the tail of this queue, waiting if
-     * necessary up to the specified wait time for space to become available.
-     *
-     * @return {@code true} if successful, or {@code false} if
-     *         the specified waiting time elapses before space is available
-     * @throws InterruptedException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     */
-    public boolean offer(E e, long timeout, TimeUnit unit)
-        throws InterruptedException {
-
-        if (e == null) throw new NullPointerException();
-        long nanos = unit.toNanos(timeout);
-        int c = -1;
-        final ReentrantLock putLock = this.putLock;
-        final AtomicInteger count = this.count;
-        putLock.lockInterruptibly();
-        try {
-            while (count.get() == capacity) {
-                if (nanos <= 0)
-                    return false;
-                nanos = notFull.awaitNanos(nanos);
-            }
-            enqueue(new Node<E>(e));
-            c = count.getAndIncrement();
-            if (c + 1 < capacity)
-                notFull.signal();
-        } finally {
-            putLock.unlock();
-        }
-        if (c == 0)
-            signalNotEmpty();
-        return true;
-    }
-
-    /**
      * Inserts the specified element at the tail of this queue if it is
      * possible to do so immediately without exceeding the queue's capacity,
      * returning {@code true} upon success and {@code false} if this queue
@@ -440,31 +404,6 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
         try {
             while (count.get() == 0) {
                 notEmpty.await();
-            }
-            x = dequeue();
-            c = count.getAndDecrement();
-            if (c > 1)
-                notEmpty.signal();
-        } finally {
-            takeLock.unlock();
-        }
-        if (c == capacity)
-            signalNotFull();
-        return x;
-    }
-
-    public E poll(long timeout, TimeUnit unit) throws InterruptedException {
-        E x = null;
-        int c = -1;
-        long nanos = unit.toNanos(timeout);
-        final AtomicInteger count = this.count;
-        final ReentrantLock takeLock = this.takeLock;
-        takeLock.lockInterruptibly();
-        try {
-            while (count.get() == 0) {
-                if (nanos <= 0)
-                    return null;
-                nanos = notEmpty.awaitNanos(nanos);
             }
             x = dequeue();
             c = count.getAndDecrement();

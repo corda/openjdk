@@ -67,14 +67,12 @@ import java.util.*;
  *    <td>{@link #addFirst addFirst(e)}</td>
  *    <td>{@link #offerFirst(Object) offerFirst(e)}</td>
  *    <td>{@link #putFirst putFirst(e)}</td>
- *    <td>{@link #offerFirst(Object, long, TimeUnit) offerFirst(e, time, unit)}</td>
  *  </tr>
  *  <tr>
  *    <td><b>Remove</b></td>
  *    <td>{@link #removeFirst removeFirst()}</td>
  *    <td>{@link #pollFirst pollFirst()}</td>
  *    <td>{@link #takeFirst takeFirst()}</td>
- *    <td>{@link #pollFirst(long, TimeUnit) pollFirst(time, unit)}</td>
  *  </tr>
  *  <tr>
  *    <td><b>Examine</b></td>
@@ -98,14 +96,12 @@ import java.util.*;
  *    <td>{@link #addLast addLast(e)}</td>
  *    <td>{@link #offerLast(Object) offerLast(e)}</td>
  *    <td>{@link #putLast putLast(e)}</td>
- *    <td>{@link #offerLast(Object, long, TimeUnit) offerLast(e, time, unit)}</td>
  *  </tr>
  *  <tr>
  *    <td><b>Remove</b></td>
  *    <td>{@link #removeLast() removeLast()}</td>
  *    <td>{@link #pollLast() pollLast()}</td>
  *    <td>{@link #takeLast takeLast()}</td>
- *    <td>{@link #pollLast(long, TimeUnit) pollLast(time, unit)}</td>
  *  </tr>
  *  <tr>
  *    <td><b>Examine</b></td>
@@ -147,10 +143,6 @@ import java.util.*;
  *    <td>{@link #putLast(Object) putLast(e)}</td>
  *  </tr>
  *  <tr>
- *    <td>{@link #offer(Object, long, TimeUnit) offer(e, time, unit)}</td>
- *    <td>{@link #offerLast(Object, long, TimeUnit) offerLast(e, time, unit)}</td>
- *  </tr>
- *  <tr>
  *    <td ALIGN=CENTER COLSPAN = 2> <b>Remove</b></td>
  *  </tr>
  *  <tr>
@@ -164,10 +156,6 @@ import java.util.*;
  *  <tr>
  *    <td>{@link #take() take()}</td>
  *    <td>{@link #takeFirst() takeFirst()}</td>
- *  </tr>
- *  <tr>
- *    <td>{@link #poll(long, TimeUnit) poll(time, unit)}</td>
- *    <td>{@link #pollFirst(long, TimeUnit) pollFirst(time, unit)}</td>
  *  </tr>
  *  <tr>
  *    <td ALIGN=CENTER COLSPAN = 2> <b>Examine</b></td>
@@ -296,50 +284,6 @@ public interface BlockingDeque<E> extends BlockingQueue<E>, Deque<E> {
     void putLast(E e) throws InterruptedException;
 
     /**
-     * Inserts the specified element at the front of this deque,
-     * waiting up to the specified wait time if necessary for space to
-     * become available.
-     *
-     * @param e the element to add
-     * @param timeout how long to wait before giving up, in units of
-     *        {@code unit}
-     * @param unit a {@code TimeUnit} determining how to interpret the
-     *        {@code timeout} parameter
-     * @return {@code true} if successful, or {@code false} if
-     *         the specified waiting time elapses before space is available
-     * @throws InterruptedException if interrupted while waiting
-     * @throws ClassCastException if the class of the specified element
-     *         prevents it from being added to this deque
-     * @throws NullPointerException if the specified element is null
-     * @throws IllegalArgumentException if some property of the specified
-     *         element prevents it from being added to this deque
-     */
-    boolean offerFirst(E e, long timeout, TimeUnit unit)
-        throws InterruptedException;
-
-    /**
-     * Inserts the specified element at the end of this deque,
-     * waiting up to the specified wait time if necessary for space to
-     * become available.
-     *
-     * @param e the element to add
-     * @param timeout how long to wait before giving up, in units of
-     *        {@code unit}
-     * @param unit a {@code TimeUnit} determining how to interpret the
-     *        {@code timeout} parameter
-     * @return {@code true} if successful, or {@code false} if
-     *         the specified waiting time elapses before space is available
-     * @throws InterruptedException if interrupted while waiting
-     * @throws ClassCastException if the class of the specified element
-     *         prevents it from being added to this deque
-     * @throws NullPointerException if the specified element is null
-     * @throws IllegalArgumentException if some property of the specified
-     *         element prevents it from being added to this deque
-     */
-    boolean offerLast(E e, long timeout, TimeUnit unit)
-        throws InterruptedException;
-
-    /**
      * Retrieves and removes the first element of this deque, waiting
      * if necessary until an element becomes available.
      *
@@ -356,38 +300,6 @@ public interface BlockingDeque<E> extends BlockingQueue<E>, Deque<E> {
      * @throws InterruptedException if interrupted while waiting
      */
     E takeLast() throws InterruptedException;
-
-    /**
-     * Retrieves and removes the first element of this deque, waiting
-     * up to the specified wait time if necessary for an element to
-     * become available.
-     *
-     * @param timeout how long to wait before giving up, in units of
-     *        {@code unit}
-     * @param unit a {@code TimeUnit} determining how to interpret the
-     *        {@code timeout} parameter
-     * @return the head of this deque, or {@code null} if the specified
-     *         waiting time elapses before an element is available
-     * @throws InterruptedException if interrupted while waiting
-     */
-    E pollFirst(long timeout, TimeUnit unit)
-        throws InterruptedException;
-
-    /**
-     * Retrieves and removes the last element of this deque, waiting
-     * up to the specified wait time if necessary for an element to
-     * become available.
-     *
-     * @param timeout how long to wait before giving up, in units of
-     *        {@code unit}
-     * @param unit a {@code TimeUnit} determining how to interpret the
-     *        {@code timeout} parameter
-     * @return the tail of this deque, or {@code null} if the specified
-     *         waiting time elapses before an element is available
-     * @throws InterruptedException if interrupted while waiting
-     */
-    E pollLast(long timeout, TimeUnit unit)
-        throws InterruptedException;
 
     /**
      * Removes the first occurrence of the specified element from this deque.
@@ -486,27 +398,6 @@ public interface BlockingDeque<E> extends BlockingQueue<E>, Deque<E> {
     void put(E e) throws InterruptedException;
 
     /**
-     * Inserts the specified element into the queue represented by this deque
-     * (in other words, at the tail of this deque), waiting up to the
-     * specified wait time if necessary for space to become available.
-     *
-     * <p>This method is equivalent to
-     * {@link #offerLast(Object,long,TimeUnit) offerLast}.
-     *
-     * @param e the element to add
-     * @return {@code true} if the element was added to this deque, else
-     *         {@code false}
-     * @throws InterruptedException {@inheritDoc}
-     * @throws ClassCastException if the class of the specified element
-     *         prevents it from being added to this deque
-     * @throws NullPointerException if the specified element is null
-     * @throws IllegalArgumentException if some property of the specified
-     *         element prevents it from being added to this deque
-     */
-    boolean offer(E e, long timeout, TimeUnit unit)
-        throws InterruptedException;
-
-    /**
      * Retrieves and removes the head of the queue represented by this deque
      * (in other words, the first element of this deque).
      * This method differs from {@link #poll poll} only in that it
@@ -541,21 +432,6 @@ public interface BlockingDeque<E> extends BlockingQueue<E>, Deque<E> {
      * @throws InterruptedException if interrupted while waiting
      */
     E take() throws InterruptedException;
-
-    /**
-     * Retrieves and removes the head of the queue represented by this deque
-     * (in other words, the first element of this deque), waiting up to the
-     * specified wait time if necessary for an element to become available.
-     *
-     * <p>This method is equivalent to
-     * {@link #pollFirst(long,TimeUnit) pollFirst}.
-     *
-     * @return the head of this deque, or {@code null} if the
-     *         specified waiting time elapses before an element is available
-     * @throws InterruptedException if interrupted while waiting
-     */
-    E poll(long timeout, TimeUnit unit)
-        throws InterruptedException;
 
     /**
      * Retrieves, but does not remove, the head of the queue represented by

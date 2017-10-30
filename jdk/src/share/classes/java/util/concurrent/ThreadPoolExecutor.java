@@ -1037,8 +1037,6 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      *         workerCount is decremented
      */
     private Runnable getTask() {
-        boolean timedOut = false; // Did the last poll() time out?
-
         for (;;) {
             int c = ctl.get();
             int rs = runStateOf(c);
@@ -1051,10 +1049,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 
             int wc = workerCountOf(c);
 
-            // Are workers subject to culling?
-            boolean timed = allowCoreThreadTimeOut || wc > corePoolSize;
-
-            if ((wc > maximumPoolSize || (timed && timedOut))
+            if ((wc > maximumPoolSize)
                 && (wc > 1 || workQueue.isEmpty())) {
                 if (compareAndDecrementWorkerCount(c))
                     return null;
@@ -1062,14 +1057,10 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
             }
 
             try {
-                Runnable r = timed ?
-                    workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :
-                    workQueue.take();
+                Runnable r = workQueue.take();
                 if (r != null)
                     return r;
-                timedOut = true;
             } catch (InterruptedException retry) {
-                timedOut = false;
             }
         }
     }
@@ -1449,24 +1440,6 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 
     public boolean isTerminated() {
         return runStateAtLeast(ctl.get(), TERMINATED);
-    }
-
-    public boolean awaitTermination(long timeout, TimeUnit unit)
-        throws InterruptedException {
-        long nanos = unit.toNanos(timeout);
-        final ReentrantLock mainLock = this.mainLock;
-        mainLock.lock();
-        try {
-            for (;;) {
-                if (runStateAtLeast(ctl.get(), TERMINATED))
-                    return true;
-                if (nanos <= 0)
-                    return false;
-                nanos = termination.awaitNanos(nanos);
-            }
-        } finally {
-            mainLock.unlock();
-        }
     }
 
     /**

@@ -400,52 +400,6 @@ public class LinkedBlockingDeque<E>
     }
 
     /**
-     * @throws NullPointerException {@inheritDoc}
-     * @throws InterruptedException {@inheritDoc}
-     */
-    public boolean offerFirst(E e, long timeout, TimeUnit unit)
-        throws InterruptedException {
-        if (e == null) throw new NullPointerException();
-        Node<E> node = new Node<E>(e);
-        long nanos = unit.toNanos(timeout);
-        final ReentrantLock lock = this.lock;
-        lock.lockInterruptibly();
-        try {
-            while (!linkFirst(node)) {
-                if (nanos <= 0)
-                    return false;
-                nanos = notFull.awaitNanos(nanos);
-            }
-            return true;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * @throws NullPointerException {@inheritDoc}
-     * @throws InterruptedException {@inheritDoc}
-     */
-    public boolean offerLast(E e, long timeout, TimeUnit unit)
-        throws InterruptedException {
-        if (e == null) throw new NullPointerException();
-        Node<E> node = new Node<E>(e);
-        long nanos = unit.toNanos(timeout);
-        final ReentrantLock lock = this.lock;
-        lock.lockInterruptibly();
-        try {
-            while (!linkLast(node)) {
-                if (nanos <= 0)
-                    return false;
-                nanos = notFull.awaitNanos(nanos);
-            }
-            return true;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
      * @throws NoSuchElementException {@inheritDoc}
      */
     public E removeFirst() {
@@ -503,42 +457,6 @@ public class LinkedBlockingDeque<E>
             E x;
             while ( (x = unlinkLast()) == null)
                 notEmpty.await();
-            return x;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    public E pollFirst(long timeout, TimeUnit unit)
-        throws InterruptedException {
-        long nanos = unit.toNanos(timeout);
-        final ReentrantLock lock = this.lock;
-        lock.lockInterruptibly();
-        try {
-            E x;
-            while ( (x = unlinkFirst()) == null) {
-                if (nanos <= 0)
-                    return null;
-                nanos = notEmpty.awaitNanos(nanos);
-            }
-            return x;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    public E pollLast(long timeout, TimeUnit unit)
-        throws InterruptedException {
-        long nanos = unit.toNanos(timeout);
-        final ReentrantLock lock = this.lock;
-        lock.lockInterruptibly();
-        try {
-            E x;
-            while ( (x = unlinkLast()) == null) {
-                if (nanos <= 0)
-                    return null;
-                nanos = notEmpty.awaitNanos(nanos);
-            }
             return x;
         } finally {
             lock.unlock();
@@ -650,15 +568,6 @@ public class LinkedBlockingDeque<E>
     }
 
     /**
-     * @throws NullPointerException {@inheritDoc}
-     * @throws InterruptedException {@inheritDoc}
-     */
-    public boolean offer(E e, long timeout, TimeUnit unit)
-        throws InterruptedException {
-        return offerLast(e, timeout, unit);
-    }
-
-    /**
      * Retrieves and removes the head of the queue represented by this deque.
      * This method differs from {@link #poll poll} only in that it throws an
      * exception if this deque is empty.
@@ -678,10 +587,6 @@ public class LinkedBlockingDeque<E>
 
     public E take() throws InterruptedException {
         return takeFirst();
-    }
-
-    public E poll(long timeout, TimeUnit unit) throws InterruptedException {
-        return pollFirst(timeout, unit);
     }
 
     /**

@@ -282,21 +282,6 @@ public final class JapaneseChronology extends AbstractChronology implements Seri
     }
 
     @Override
-    public JapaneseDate dateNow() {
-        return dateNow(Clock.systemDefaultZone());
-    }
-
-    @Override
-    public JapaneseDate dateNow(ZoneId zone) {
-        return dateNow(Clock.system(zone));
-    }
-
-    @Override
-    public JapaneseDate dateNow(Clock clock) {
-        return date(LocalDate.now(clock));
-    }
-
-    @Override
     public JapaneseDate date(TemporalAccessor temporal) {
         if (temporal instanceof JapaneseDate) {
             return (JapaneseDate) temporal;

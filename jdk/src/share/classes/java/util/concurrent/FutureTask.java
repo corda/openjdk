@@ -193,17 +193,12 @@ public class FutureTask<V> implements RunnableFuture<V> {
     }
 
     /**
-     * @throws CancellationException {@inheritDoc}
+     * @exclude The function is not supported.
+     * @throws UnsupportedOperationException
      */
     public V get(long timeout, TimeUnit unit)
         throws InterruptedException, ExecutionException, TimeoutException {
-        if (unit == null)
-            throw new NullPointerException();
-        int s = state;
-        if (s <= COMPLETING &&
-            (s = awaitDone(true, unit.toNanos(timeout))) <= COMPLETING)
-            throw new TimeoutException();
-        return report(s);
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     /**
@@ -395,7 +390,6 @@ public class FutureTask<V> implements RunnableFuture<V> {
      */
     private int awaitDone(boolean timed, long nanos)
         throws InterruptedException {
-        final long deadline = timed ? System.nanoTime() + nanos : 0L;
         WaitNode q = null;
         boolean queued = false;
         for (;;) {
@@ -417,14 +411,6 @@ public class FutureTask<V> implements RunnableFuture<V> {
             else if (!queued)
                 queued = UNSAFE.compareAndSwapObject(this, waitersOffset,
                                                      q.next = waiters, q);
-            else if (timed) {
-                nanos = deadline - System.nanoTime();
-                if (nanos <= 0L) {
-                    removeWaiter(q);
-                    return state;
-                }
-                LockSupport.parkNanos(this, nanos);
-            }
             else
                 LockSupport.park(this);
         }

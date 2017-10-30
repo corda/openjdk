@@ -269,21 +269,6 @@ public final class ThaiBuddhistChronology extends AbstractChronology implements 
     }
 
     @Override
-    public ThaiBuddhistDate dateNow() {
-        return dateNow(Clock.systemDefaultZone());
-    }
-
-    @Override
-    public ThaiBuddhistDate dateNow(ZoneId zone) {
-        return dateNow(Clock.system(zone));
-    }
-
-    @Override
-    public ThaiBuddhistDate dateNow(Clock clock) {
-        return date(LocalDate.now(clock));
-    }
-
-    @Override
     public ThaiBuddhistDate date(TemporalAccessor temporal) {
         if (temporal instanceof ThaiBuddhistDate) {
             return (ThaiBuddhistDate) temporal;

@@ -1651,16 +1651,12 @@ public class CompletableFuture<T> implements Future<T>, CompletionStage<T> {
     @SuppressWarnings("serial")
     static final class Signaller extends Completion
         implements ForkJoinPool.ManagedBlocker {
-        long nanos;                    // wait time if timed
-        final long deadline;           // non-zero if timed
         volatile int interruptControl; // > 0: interruptible, < 0: interrupted
         volatile Thread thread;
 
-        Signaller(boolean interruptible, long nanos, long deadline) {
+        Signaller(boolean interruptible) {
             this.thread = Thread.currentThread();
             this.interruptControl = interruptible ? 1 : 0;
-            this.nanos = nanos;
-            this.deadline = deadline;
         }
         final CompletableFuture<?> tryFire(int ignore) {
             Thread w; // no need to atomically claim
@@ -1679,20 +1675,13 @@ public class CompletableFuture<T> implements Future<T>, CompletionStage<T> {
                 if (i > 0)
                     return true;
             }
-            if (deadline != 0L &&
-                (nanos <= 0L || (nanos = deadline - System.nanoTime()) <= 0L)) {
-                thread = null;
-                return true;
-            }
             return false;
         }
         public boolean block() {
             if (isReleasable())
                 return true;
-            else if (deadline == 0L)
+            else
                 LockSupport.park(this);
-            else if (nanos > 0L)
-                LockSupport.parkNanos(this, nanos);
             return isReleasable();
         }
         final boolean isLive() { return thread != null; }
@@ -1716,7 +1705,7 @@ public class CompletableFuture<T> implements Future<T>, CompletionStage<T> {
                     --spins;
             }
             else if (q == null)
-                q = new Signaller(interruptible, 0L, 0L);
+                q = new Signaller(interruptible);
             else if (!queued)
                 queued = tryPushStack(q);
             else if (interruptible && q.interruptControl < 0) {
@@ -1754,8 +1743,7 @@ public class CompletableFuture<T> implements Future<T>, CompletionStage<T> {
             return null;
         if (nanos <= 0L)
             throw new TimeoutException();
-        long d = System.nanoTime() + nanos;
-        Signaller q = new Signaller(true, nanos, d == 0L ? 1L : d); // avoid 0
+        Signaller q = new Signaller(true);
         boolean queued = false;
         Object r;
         // We intentionally don't spin here (as waitingGet does) because
@@ -1763,7 +1751,7 @@ public class CompletableFuture<T> implements Future<T>, CompletionStage<T> {
         while ((r = result) == null) {
             if (!queued)
                 queued = tryPushStack(q);
-            else if (q.interruptControl < 0 || q.nanos <= 0L) {
+            else if (q.interruptControl < 0) {
                 q.thread = null;
                 cleanStack();
                 if (q.interruptControl < 0)

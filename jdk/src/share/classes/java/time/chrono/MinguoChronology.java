@@ -233,21 +233,6 @@ public final class MinguoChronology extends AbstractChronology implements Serial
     }
 
     @Override
-    public MinguoDate dateNow() {
-        return dateNow(Clock.systemDefaultZone());
-    }
-
-    @Override
-    public MinguoDate dateNow(ZoneId zone) {
-        return dateNow(Clock.system(zone));
-    }
-
-    @Override
-    public MinguoDate dateNow(Clock clock) {
-        return date(LocalDate.now(clock));
-    }
-
-    @Override
     public MinguoDate date(TemporalAccessor temporal) {
         if (temporal instanceof MinguoDate) {
             return (MinguoDate) temporal;

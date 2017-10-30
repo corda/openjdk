@@ -160,7 +160,6 @@ public abstract class AbstractExecutorService implements ExecutorService {
             // Record exceptions so that if we fail to obtain any
             // result, we can throw the last exception we got.
             ExecutionException ee = null;
-            final long deadline = timed ? System.nanoTime() + nanos : 0L;
             Iterator<? extends Callable<T>> it = tasks.iterator();
 
             // Start one task for sure; the rest incrementally
@@ -178,12 +177,6 @@ public abstract class AbstractExecutorService implements ExecutorService {
                     }
                     else if (active == 0)
                         break;
-                    else if (timed) {
-                        f = ecs.poll(nanos, TimeUnit.NANOSECONDS);
-                        if (f == null)
-                            throw new TimeoutException();
-                        nanos = deadline - System.nanoTime();
-                    }
                     else
                         f = ecs.take();
                 }
@@ -219,12 +212,6 @@ public abstract class AbstractExecutorService implements ExecutorService {
         }
     }
 
-    public <T> T invokeAny(Collection<? extends Callable<T>> tasks,
-                           long timeout, TimeUnit unit)
-        throws InterruptedException, ExecutionException, TimeoutException {
-        return doInvokeAny(tasks, true, unit.toNanos(timeout));
-    }
-
     public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)
         throws InterruptedException {
         if (tasks == null)
@@ -255,53 +242,4 @@ public abstract class AbstractExecutorService implements ExecutorService {
                     futures.get(i).cancel(true);
         }
     }
-
-    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks,
-                                         long timeout, TimeUnit unit)
-        throws InterruptedException {
-        if (tasks == null)
-            throw new NullPointerException();
-        long nanos = unit.toNanos(timeout);
-        ArrayList<Future<T>> futures = new ArrayList<Future<T>>(tasks.size());
-        boolean done = false;
-        try {
-            for (Callable<T> t : tasks)
-                futures.add(newTaskFor(t));
-
-            final long deadline = System.nanoTime() + nanos;
-            final int size = futures.size();
-
-            // Interleave time checks and calls to execute in case
-            // executor doesn't have any/much parallelism.
-            for (int i = 0; i < size; i++) {
-                execute((Runnable)futures.get(i));
-                nanos = deadline - System.nanoTime();
-                if (nanos <= 0L)
-                    return futures;
-            }
-
-            for (int i = 0; i < size; i++) {
-                Future<T> f = futures.get(i);
-                if (!f.isDone()) {
-                    if (nanos <= 0L)
-                        return futures;
-                    try {
-                        f.get(nanos, TimeUnit.NANOSECONDS);
-                    } catch (CancellationException ignore) {
-                    } catch (ExecutionException ignore) {
-                    } catch (TimeoutException toe) {
-                        return futures;
-                    }
-                    nanos = deadline - System.nanoTime();
-                }
-            }
-            done = true;
-            return futures;
-        } finally {
-            if (!done)
-                for (int i = 0, size = futures.size(); i < size; i++)
-                    futures.get(i).cancel(true);
-        }
-    }
-
 }

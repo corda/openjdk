@@ -587,10 +587,6 @@ public class Executors {
         public List<Runnable> shutdownNow() { return e.shutdownNow(); }
         public boolean isShutdown() { return e.isShutdown(); }
         public boolean isTerminated() { return e.isTerminated(); }
-        public boolean awaitTermination(long timeout, TimeUnit unit)
-            throws InterruptedException {
-            return e.awaitTermination(timeout, unit);
-        }
         public Future<?> submit(Runnable task) {
             return e.submit(task);
         }
@@ -604,19 +600,9 @@ public class Executors {
             throws InterruptedException {
             return e.invokeAll(tasks);
         }
-        public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks,
-                                             long timeout, TimeUnit unit)
-            throws InterruptedException {
-            return e.invokeAll(tasks, timeout, unit);
-        }
         public <T> T invokeAny(Collection<? extends Callable<T>> tasks)
             throws InterruptedException, ExecutionException {
             return e.invokeAny(tasks);
-        }
-        public <T> T invokeAny(Collection<? extends Callable<T>> tasks,
-                               long timeout, TimeUnit unit)
-            throws InterruptedException, ExecutionException, TimeoutException {
-            return e.invokeAny(tasks, timeout, unit);
         }
     }
 
