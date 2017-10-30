@@ -39,7 +39,6 @@
 package java.text;
 
 import java.io.IOException;
-import java.io.InvalidObjectException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;

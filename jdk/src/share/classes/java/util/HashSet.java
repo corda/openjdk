@@ -25,8 +25,6 @@
 
 package java.util;
 
-import java.io.InvalidObjectException;
-
 /**
  * This class implements the <tt>Set</tt> interface, backed by a hash table
  * (actually a <tt>HashMap</tt> instance).  It makes no guarantees as to the

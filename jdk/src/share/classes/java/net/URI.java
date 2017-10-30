@@ -26,7 +26,6 @@
 package java.net;
 
 import java.io.IOException;
-import java.io.InvalidObjectException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;

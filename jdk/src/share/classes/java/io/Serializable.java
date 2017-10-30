@@ -158,9 +158,8 @@ package java.io;
  * the default computed value, but the requirement for matching
  * serialVersionUID values is waived for array classes.
  *
+ * @exclude Not supported.
  * @author  unascribed
- * @see java.io.ObjectOutputStream
- * @see java.io.ObjectInputStream
  * @see java.io.ObjectOutput
  * @see java.io.ObjectInput
  * @see java.io.Externalizable

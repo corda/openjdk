@@ -25,7 +25,6 @@
 
 package java.text;
 
-import java.io.InvalidObjectException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -144,26 +143,6 @@ public interface AttributedCharacterIterator extends CharacterIterator {
          */
         protected String getName() {
             return name;
-        }
-
-        /**
-         * Resolves instances being deserialized to the predefined constants.
-         *
-         * @return the resolved {@code Attribute} object
-         * @throws InvalidObjectException if the object to resolve is not
-         *                                an instance of {@code Attribute}
-         */
-        protected Object readResolve() throws InvalidObjectException {
-            if (this.getClass() != Attribute.class) {
-                throw new InvalidObjectException("subclass didn't correctly implement readResolve");
-            }
-
-            Attribute instance = instanceMap.get(getName());
-            if (instance != null) {
-                return instance;
-            } else {
-                throw new InvalidObjectException("unknown attribute name");
-            }
         }
 
         /**

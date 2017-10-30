@@ -55,9 +55,8 @@ import java.io.ObjectInput;
  * the writeReplace and readResolve methods documented in the Serializable
  * interface.<br>
  *
+ * @exclude Not Supported.
  * @author  unascribed
- * @see java.io.ObjectOutputStream
- * @see java.io.ObjectInputStream
  * @see java.io.ObjectOutput
  * @see java.io.ObjectInput
  * @see java.io.Serializable

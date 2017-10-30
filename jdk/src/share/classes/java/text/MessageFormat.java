@@ -38,7 +38,6 @@
 
 package java.text;
 
-import java.io.InvalidObjectException;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -1139,21 +1138,6 @@ public class MessageFormat extends Format {
          */
         protected Field(String name) {
             super(name);
-        }
-
-        /**
-         * Resolves instances being deserialized to the predefined constants.
-         *
-         * @throws InvalidObjectException if the constant could not be
-         *         resolved.
-         * @return resolved MessageFormat.Field constant
-         */
-        protected Object readResolve() throws InvalidObjectException {
-            if (this.getClass() != MessageFormat.Field.class) {
-                throw new InvalidObjectException("subclass didn't correctly implement readResolve");
-            }
-
-            return ARGUMENT;
         }
 
         //

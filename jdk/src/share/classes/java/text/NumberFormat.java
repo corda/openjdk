@@ -38,7 +38,6 @@
 
 package java.text;
 
-import java.io.InvalidObjectException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -1073,7 +1072,6 @@ public abstract class NumberFormat extends Format  {
         // Proclaim serial compatibility with 1.4 FCS
         private static final long serialVersionUID = 7494728892700160890L;
 
-        // table of all instances in this class, used by readResolve
         private static final Map<String, Field> instanceMap = new HashMap<>(11);
 
         /**
@@ -1086,26 +1084,6 @@ public abstract class NumberFormat extends Format  {
             super(name);
             if (this.getClass() == NumberFormat.Field.class) {
                 instanceMap.put(name, this);
-            }
-        }
-
-        /**
-         * Resolves instances being deserialized to the predefined constants.
-         *
-         * @throws InvalidObjectException if the constant could not be resolved.
-         * @return resolved NumberFormat.Field constant
-         */
-        @Override
-        protected Object readResolve() throws InvalidObjectException {
-            if (this.getClass() != NumberFormat.Field.class) {
-                throw new InvalidObjectException("subclass didn't correctly implement readResolve");
-            }
-
-            Object instance = instanceMap.get(getName());
-            if (instance != null) {
-                return instance;
-            } else {
-                throw new InvalidObjectException("unknown attribute name");
             }
         }
 
