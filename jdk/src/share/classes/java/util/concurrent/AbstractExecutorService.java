@@ -212,12 +212,6 @@ public abstract class AbstractExecutorService implements ExecutorService {
         }
     }
 
-    public <T> T invokeAny(Collection<? extends Callable<T>> tasks,
-                           long timeout, TimeUnit unit)
-        throws InterruptedException, ExecutionException, TimeoutException {
-        throw new UnsupportedOperationException("System clock unavailable");
-    }
-
     public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)
         throws InterruptedException {
         if (tasks == null)
@@ -248,53 +242,4 @@ public abstract class AbstractExecutorService implements ExecutorService {
                     futures.get(i).cancel(true);
         }
     }
-
-    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks,
-                                         long timeout, TimeUnit unit)
-        throws InterruptedException {
-        if (tasks == null)
-            throw new NullPointerException();
-        long nanos = unit.toNanos(timeout);
-        ArrayList<Future<T>> futures = new ArrayList<Future<T>>(tasks.size());
-        boolean done = false;
-        try {
-            for (Callable<T> t : tasks)
-                futures.add(newTaskFor(t));
-
-            final long deadline = System.nanoTime() + nanos;
-            final int size = futures.size();
-
-            // Interleave time checks and calls to execute in case
-            // executor doesn't have any/much parallelism.
-            for (int i = 0; i < size; i++) {
-                execute((Runnable)futures.get(i));
-                nanos = deadline - System.nanoTime();
-                if (nanos <= 0L)
-                    return futures;
-            }
-
-            for (int i = 0; i < size; i++) {
-                Future<T> f = futures.get(i);
-                if (!f.isDone()) {
-                    if (nanos <= 0L)
-                        return futures;
-                    try {
-                        f.get(nanos, TimeUnit.NANOSECONDS);
-                    } catch (CancellationException ignore) {
-                    } catch (ExecutionException ignore) {
-                    } catch (TimeoutException toe) {
-                        return futures;
-                    }
-                    nanos = deadline - System.nanoTime();
-                }
-            }
-            done = true;
-            return futures;
-        } finally {
-            if (!done)
-                for (int i = 0, size = futures.size(); i < size; i++)
-                    futures.get(i).cancel(true);
-        }
-    }
-
 }
