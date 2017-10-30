@@ -744,7 +744,7 @@ public abstract class AbstractQueuedLongSynchronizer
     }
 
     /**
-     * This function is not supported.
+     * @exclude This function is not supported.
      *
      * @throws UnsupportedOperationException
      */
@@ -756,7 +756,7 @@ public abstract class AbstractQueuedLongSynchronizer
     // Main exported methods
 
     /**
-     * This function is not supported.
+     * @exclude This function is not supported.
      *
      * @throws UnsupportedOperationException
      */
@@ -765,7 +765,7 @@ public abstract class AbstractQueuedLongSynchronizer
     }
 
     /**
-     * This function is not supported.
+     * @exclude This function is not supported.
      *
      * @throws UnsupportedOperationException
      */
@@ -774,7 +774,7 @@ public abstract class AbstractQueuedLongSynchronizer
     }
 
     /**
-     * This function is not supported.
+     * @exclude This function is not supported.
      *
      * @throws UnsupportedOperationException
      */
@@ -783,7 +783,7 @@ public abstract class AbstractQueuedLongSynchronizer
     }
 
     /**
-     * This function is not supported.
+     * @exclude This function is not supported.
      *
      * @throws UnsupportedOperationException
      */
@@ -792,7 +792,7 @@ public abstract class AbstractQueuedLongSynchronizer
     }
 
     /**
-     * This function is not supported.
+     * @exclude This function is not supported.
      *
      * @throws UnsupportedOperationException
      */
@@ -841,7 +841,7 @@ public abstract class AbstractQueuedLongSynchronizer
     }
 
     /**
-     * This function is not supported.
+     * @exclude This function is not supported.
      *
      * @throws UnsupportedOperationException
      */
@@ -1654,7 +1654,7 @@ public abstract class AbstractQueuedLongSynchronizer
         }
 
         /**
-         * This function is not supported.
+         * @exclude This function is not supported.
          *
          * @throws UnsupportedOperationException
          */
@@ -1705,7 +1705,7 @@ public abstract class AbstractQueuedLongSynchronizer
         }
 
         /**
-         * This function is not supported.
+         * @exclude This function is not supported.
          *
          * @throws UnsupportedOperationException
          */

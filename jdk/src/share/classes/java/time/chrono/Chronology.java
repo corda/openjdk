@@ -118,9 +118,6 @@ import java.util.Set;
  * The {@code Chronology} instance provides a set of methods to create {@code ChronoLocalDate} instances.
  * The date classes are used to manipulate specific dates.
  * <ul>
- * <li> {@link #dateNow() dateNow()}
- * <li> {@link #dateNow(Clock) dateNow(clock)}
- * <li> {@link #dateNow(ZoneId) dateNow(zone)}
  * <li> {@link #date(int, int, int) date(yearProleptic, month, day)}
  * <li> {@link #date(Era, int, int, int) date(era, yearOfEra, month, day)}
  * <li> {@link #dateYearDay(int, int) dateYearDay(yearProleptic, dayOfYear)}
@@ -365,64 +362,6 @@ public interface Chronology extends Comparable<Chronology> {
      * @throws DateTimeException if unable to create the date
      */
     ChronoLocalDate dateEpochDay(long epochDay);
-
-    //-----------------------------------------------------------------------
-    /**
-     * Obtains the current local date in this chronology from the system clock in the default time-zone.
-     * <p>
-     * This will query the {@link Clock#systemDefaultZone() system clock} in the default
-     * time-zone to obtain the current date.
-     * <p>
-     * Using this method will prevent the ability to use an alternate clock for testing
-     * because the clock is hard-coded.
-     *
-     * @implSpec
-     * The default implementation invokes {@link #dateNow(Clock)}.
-     *
-     * @return the current local date using the system clock and default time-zone, not null
-     * @throws DateTimeException if unable to create the date
-     */
-    default ChronoLocalDate dateNow() {
-        throw new UnsupportedOperationException("System clock unavailable");
-    }
-
-    /**
-     * Obtains the current local date in this chronology from the system clock in the specified time-zone.
-     * <p>
-     * This will query the {@link Clock#system(ZoneId) system clock} to obtain the current date.
-     * Specifying the time-zone avoids dependence on the default time-zone.
-     * <p>
-     * Using this method will prevent the ability to use an alternate clock for testing
-     * because the clock is hard-coded.
-     *
-     * @implSpec
-     * The default implementation invokes {@link #dateNow(Clock)}.
-     *
-     * @param zone  the zone ID to use, not null
-     * @return the current local date using the system clock, not null
-     * @throws DateTimeException if unable to create the date
-     */
-    default ChronoLocalDate dateNow(ZoneId zone) {
-        throw new UnsupportedOperationException("System clock unavailable");
-    }
-
-    /**
-     * Obtains the current local date in this chronology from the specified clock.
-     * <p>
-     * This will query the specified clock to obtain the current date - today.
-     * Using this method allows the use of an alternate clock for testing.
-     * The alternate clock may be introduced using {@link Clock dependency injection}.
-     *
-     * @implSpec
-     * The default implementation invokes {@link #date(TemporalAccessor)}.
-     *
-     * @param clock  the clock to use, not null
-     * @return the current local date, not null
-     * @throws DateTimeException if unable to create the date
-     */
-    default ChronoLocalDate dateNow(Clock clock) {
-        throw new UnsupportedOperationException("System clock unavailable");
-    }
 
     //-----------------------------------------------------------------------
     /**

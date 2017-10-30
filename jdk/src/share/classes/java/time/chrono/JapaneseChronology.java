@@ -282,21 +282,6 @@ public final class JapaneseChronology extends AbstractChronology implements Seri
     }
 
     @Override
-    public JapaneseDate dateNow() {
-        throw new UnsupportedOperationException("System clock unavailable");
-    }
-
-    @Override
-    public JapaneseDate dateNow(ZoneId zone) {
-        throw new UnsupportedOperationException("System clock unavailable");
-    }
-
-    @Override
-    public JapaneseDate dateNow(Clock clock) {
-        throw new UnsupportedOperationException("System clock unavailable");
-    }
-
-    @Override
     public JapaneseDate date(TemporalAccessor temporal) {
         if (temporal instanceof JapaneseDate) {
             return (JapaneseDate) temporal;

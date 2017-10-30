@@ -193,6 +193,7 @@ public class FutureTask<V> implements RunnableFuture<V> {
     }
 
     /**
+     * @exclude The function is not supported.
      * @throws UnsupportedOperationException
      */
     public V get(long timeout, TimeUnit unit)

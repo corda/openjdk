@@ -499,21 +499,6 @@ public final class HijrahChronology extends AbstractChronology implements Serial
     }
 
     @Override
-    public HijrahDate dateNow() {
-        throw new UnsupportedOperationException("System clock unavailable");
-    }
-
-    @Override
-    public HijrahDate dateNow(ZoneId zone) {
-        throw new UnsupportedOperationException("System clock unavailable");
-    }
-
-    @Override
-    public HijrahDate dateNow(Clock clock) {
-        throw new UnsupportedOperationException("System clock unavailable");
-    }
-
-    @Override
     public HijrahDate date(TemporalAccessor temporal) {
         if (temporal instanceof HijrahDate) {
             return (HijrahDate) temporal;

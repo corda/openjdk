@@ -233,21 +233,6 @@ public final class MinguoChronology extends AbstractChronology implements Serial
     }
 
     @Override
-    public MinguoDate dateNow() {
-        throw new UnsupportedOperationException("System clock unavailable");
-    }
-
-    @Override
-    public MinguoDate dateNow(ZoneId zone) {
-        throw new UnsupportedOperationException("System clock unavailable");
-    }
-
-    @Override
-    public MinguoDate dateNow(Clock clock) {
-        throw new UnsupportedOperationException("System clock unavailable");
-    }
-
-    @Override
     public MinguoDate date(TemporalAccessor temporal) {
         if (temporal instanceof MinguoDate) {
             return (MinguoDate) temporal;

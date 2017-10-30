@@ -1008,7 +1008,7 @@ public abstract class ForkJoinTask<V> implements Future<V>, Serializable {
     }
 
     /**
-     * This function is not supported.
+     * @exclude This function is not supported.
      *
      * @param timeout the maximum time to wait
      * @param unit the time unit of the timeout argument

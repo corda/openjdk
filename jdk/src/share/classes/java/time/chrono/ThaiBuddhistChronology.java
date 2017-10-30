@@ -269,21 +269,6 @@ public final class ThaiBuddhistChronology extends AbstractChronology implements 
     }
 
     @Override
-    public ThaiBuddhistDate dateNow() {
-        throw new UnsupportedOperationException("System clock unavailable");
-    }
-
-    @Override
-    public ThaiBuddhistDate dateNow(ZoneId zone) {
-        throw new UnsupportedOperationException("System clock unavailable");
-    }
-
-    @Override
-    public ThaiBuddhistDate dateNow(Clock clock) {
-        throw new UnsupportedOperationException("System clock unavailable");
-    }
-
-    @Override
     public ThaiBuddhistDate date(TemporalAccessor temporal) {
         if (temporal instanceof ThaiBuddhistDate) {
             return (ThaiBuddhistDate) temporal;
