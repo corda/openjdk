@@ -40,7 +40,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Queue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -1164,21 +1163,6 @@ public class LinkedTransferQueue<E> extends AbstractQueue<E>
 
     /**
      * Inserts the specified element at the tail of this queue.
-     * As the queue is unbounded, this method will never block or
-     * return {@code false}.
-     *
-     * @return {@code true} (as specified by
-     *  {@link java.util.concurrent.BlockingQueue#offer(Object,long,TimeUnit)
-     *  BlockingQueue.offer})
-     * @throws NullPointerException if the specified element is null
-     */
-    public boolean offer(E e, long timeout, TimeUnit unit) {
-        xfer(e, true, ASYNC, 0);
-        return true;
-    }
-
-    /**
-     * Inserts the specified element at the tail of this queue.
      * As the queue is unbounded, this method will never return {@code false}.
      *
      * @return {@code true} (as specified by {@link Queue#offer})
@@ -1207,7 +1191,7 @@ public class LinkedTransferQueue<E> extends AbstractQueue<E>
      *
      * <p>More precisely, transfers the specified element immediately
      * if there exists a consumer already waiting to receive it (in
-     * {@link #take} or timed {@link #poll(long,TimeUnit) poll}),
+     * {@link #take},
      * otherwise returning {@code false} without enqueuing the element.
      *
      * @throws NullPointerException if the specified element is null
@@ -1221,7 +1205,7 @@ public class LinkedTransferQueue<E> extends AbstractQueue<E>
      *
      * <p>More precisely, transfers the specified element immediately
      * if there exists a consumer already waiting to receive it (in
-     * {@link #take} or timed {@link #poll(long,TimeUnit) poll}),
+     * {@link #take},
      * else inserts the specified element at the tail of this queue
      * and waits until the element is received by a consumer.
      *
@@ -1234,36 +1218,12 @@ public class LinkedTransferQueue<E> extends AbstractQueue<E>
         }
     }
 
-    /**
-     * Transfers the element to a consumer if it is possible to do so
-     * before the timeout elapses.
-     *
-     * <p>More precisely, transfers the specified element immediately
-     * if there exists a consumer already waiting to receive it (in
-     * {@link #take} or timed {@link #poll(long,TimeUnit) poll}),
-     * else inserts the specified element at the tail of this queue
-     * and waits until the element is received by a consumer,
-     * returning {@code false} if the specified wait time elapses
-     * before the element can be transferred.
-     *
-     * @exclude Not supported
-     * @throws NullPointerException if the specified element is null
-     */
-    public boolean tryTransfer(E e, long timeout, TimeUnit unit)
-        throws InterruptedException {
-        throw new UnsupportedOperationException("System clock unavailable");
-    }
-
     public E take() throws InterruptedException {
         E e = xfer(null, false, SYNC, 0);
         if (e != null)
             return e;
         Thread.interrupted();
         throw new InterruptedException();
-    }
-
-    public E poll(long timeout, TimeUnit unit) throws InterruptedException {
-        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     public E poll() {
