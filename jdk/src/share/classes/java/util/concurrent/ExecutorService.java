@@ -101,29 +101,6 @@ import java.util.Collection;
  *   }
  * }}</pre>
  *
- * The following method shuts down an {@code ExecutorService} in two phases,
- * first by calling {@code shutdown} to reject incoming tasks, and then
- * calling {@code shutdownNow}, if necessary, to cancel any lingering tasks:
- *
- *  <pre> {@code
- * void shutdownAndAwaitTermination(ExecutorService pool) {
- *   pool.shutdown(); // Disable new tasks from being submitted
- *   try {
- *     // Wait a while for existing tasks to terminate
- *     if (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
- *       pool.shutdownNow(); // Cancel currently executing tasks
- *       // Wait a while for tasks to respond to being cancelled
- *       if (!pool.awaitTermination(60, TimeUnit.SECONDS))
- *           System.err.println("Pool did not terminate");
- *     }
- *   } catch (InterruptedException ie) {
- *     // (Re-)Cancel if current thread also interrupted
- *     pool.shutdownNow();
- *     // Preserve interrupt status
- *     Thread.currentThread().interrupt();
- *   }
- * }}</pre>
- *
  * <p>Memory consistency effects: Actions in a thread prior to the
  * submission of a {@code Runnable} or {@code Callable} task to an
  * {@code ExecutorService}
@@ -142,8 +119,7 @@ public interface ExecutorService extends Executor {
      * Invocation has no additional effect if already shut down.
      *
      * <p>This method does not wait for previously submitted tasks to
-     * complete execution.  Use {@link #awaitTermination awaitTermination}
-     * to do that.
+     * complete execution.
      *
      * @throws SecurityException if a security manager exists and
      *         shutting down this ExecutorService may manipulate
@@ -161,8 +137,7 @@ public interface ExecutorService extends Executor {
      * that were awaiting execution.
      *
      * <p>This method does not wait for actively executing tasks to
-     * terminate.  Use {@link #awaitTermination awaitTermination} to
-     * do that.
+     * terminate.
      *
      * <p>There are no guarantees beyond best-effort attempts to stop
      * processing actively executing tasks.  For example, typical
@@ -195,20 +170,6 @@ public interface ExecutorService extends Executor {
      * @return {@code true} if all tasks have completed following shut down
      */
     boolean isTerminated();
-
-    /**
-     * Blocks until all tasks have completed execution after a shutdown
-     * request, or the timeout occurs, or the current thread is
-     * interrupted, whichever happens first.
-     *
-     * @param timeout the maximum time to wait
-     * @param unit the time unit of the timeout argument
-     * @return {@code true} if this executor terminated and
-     *         {@code false} if the timeout elapsed before termination
-     * @throws InterruptedException if interrupted while waiting
-     */
-    boolean awaitTermination(long timeout, TimeUnit unit)
-        throws InterruptedException;
 
     /**
      * Submits a value-returning task for execution and returns a

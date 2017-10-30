@@ -47,7 +47,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RunnableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 import java.lang.reflect.Constructor;
@@ -1005,19 +1004,6 @@ public abstract class ForkJoinTask<V> implements Future<V>, Serializable {
         if (s == EXCEPTIONAL && (ex = getThrowableException()) != null)
             throw new ExecutionException(ex);
         return getRawResult();
-    }
-
-    /**
-     * @exclude This function is not supported.
-     *
-     * @param timeout the maximum time to wait
-     * @param unit the time unit of the timeout argument
-     * member of a ForkJoinPool and was interrupted while waiting
-     * @throws UnsupportedOperationException
-     */
-    public final V get(long timeout, TimeUnit unit)
-        throws InterruptedException, ExecutionException, TimeoutException {
-        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     /**

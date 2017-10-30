@@ -841,16 +841,6 @@ public abstract class AbstractQueuedLongSynchronizer
     }
 
     /**
-     * @exclude This function is not supported.
-     *
-     * @throws UnsupportedOperationException
-     */
-    public final boolean tryAcquireNanos(long arg, long nanosTimeout)
-            throws InterruptedException {
-        throw new UnsupportedOperationException("System clock unavailable");
-    }
-
-    /**
      * Releases in exclusive mode.  Implemented by unblocking one or
      * more threads if {@link #tryRelease} returns true.
      * This method can be used to implement method {@link Lock#unlock}.
@@ -1651,16 +1641,6 @@ public abstract class AbstractQueuedLongSynchronizer
                 unlinkCancelledWaiters();
             if (interruptMode != 0)
                 reportInterruptAfterWait(interruptMode);
-        }
-
-        /**
-         * @exclude This function is not supported.
-         *
-         * @throws UnsupportedOperationException
-         */
-        public final long awaitNanos(long nanosTimeout)
-                throws InterruptedException {
-            throw new UnsupportedOperationException("System clock unavailable");
         }
 
         /**

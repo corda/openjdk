@@ -67,14 +67,12 @@ import java.util.Queue;
  *    <td>{@link #add add(e)}</td>
  *    <td>{@link #offer offer(e)}</td>
  *    <td>{@link #put put(e)}</td>
- *    <td>{@link #offer(Object, long, TimeUnit) offer(e, time, unit)}</td>
  *  </tr>
  *  <tr>
  *    <td><b>Remove</b></td>
  *    <td>{@link #remove remove()}</td>
  *    <td>{@link #poll poll()}</td>
  *    <td>{@link #take take()}</td>
- *    <td>{@link #poll(long, TimeUnit) poll(time, unit)}</td>
  *  </tr>
  *  <tr>
  *    <td><b>Examine</b></td>
@@ -232,27 +230,6 @@ public interface BlockingQueue<E> extends Queue<E> {
     void put(E e) throws InterruptedException;
 
     /**
-     * Inserts the specified element into this queue, waiting up to the
-     * specified wait time if necessary for space to become available.
-     *
-     * @param e the element to add
-     * @param timeout how long to wait before giving up, in units of
-     *        {@code unit}
-     * @param unit a {@code TimeUnit} determining how to interpret the
-     *        {@code timeout} parameter
-     * @return {@code true} if successful, or {@code false} if
-     *         the specified waiting time elapses before space is available
-     * @throws InterruptedException if interrupted while waiting
-     * @throws ClassCastException if the class of the specified element
-     *         prevents it from being added to this queue
-     * @throws NullPointerException if the specified element is null
-     * @throws IllegalArgumentException if some property of the specified
-     *         element prevents it from being added to this queue
-     */
-    boolean offer(E e, long timeout, TimeUnit unit)
-        throws InterruptedException;
-
-    /**
      * Retrieves and removes the head of this queue, waiting if necessary
      * until an element becomes available.
      *
@@ -260,21 +237,6 @@ public interface BlockingQueue<E> extends Queue<E> {
      * @throws InterruptedException if interrupted while waiting
      */
     E take() throws InterruptedException;
-
-    /**
-     * Retrieves and removes the head of this queue, waiting up to the
-     * specified wait time if necessary for an element to become available.
-     *
-     * @param timeout how long to wait before giving up, in units of
-     *        {@code unit}
-     * @param unit a {@code TimeUnit} determining how to interpret the
-     *        {@code timeout} parameter
-     * @return the head of this queue, or {@code null} if the
-     *         specified waiting time elapses before an element is available
-     * @throws InterruptedException if interrupted while waiting
-     */
-    E poll(long timeout, TimeUnit unit)
-        throws InterruptedException;
 
     /**
      * Returns the number of additional elements that this queue can ideally

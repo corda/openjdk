@@ -587,10 +587,6 @@ public class Executors {
         public List<Runnable> shutdownNow() { return e.shutdownNow(); }
         public boolean isShutdown() { return e.isShutdown(); }
         public boolean isTerminated() { return e.isTerminated(); }
-        public boolean awaitTermination(long timeout, TimeUnit unit)
-            throws InterruptedException {
-            return e.awaitTermination(timeout, unit);
-        }
         public Future<?> submit(Runnable task) {
             return e.submit(task);
         }
