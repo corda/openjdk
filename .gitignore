@@ -1,7 +1,11 @@
 build/
 dist/
 nbproject/private/
+pkgdiff_reports/
+pkgdiff_extra/
+exclusions/
 webrev
 .hgtip
 .bridge2
+.idea
 *.DS_Store
