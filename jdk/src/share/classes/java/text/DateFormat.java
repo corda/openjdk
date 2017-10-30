@@ -38,7 +38,6 @@
 
 package java.text;
 
-import java.io.InvalidObjectException;
 import java.text.spi.DateFormatProvider;
 import java.util.Calendar;
 import java.util.Date;
@@ -904,27 +903,6 @@ public abstract class DateFormat extends Format {
          */
         public int getCalendarField() {
             return calendarField;
-        }
-
-        /**
-         * Resolves instances being deserialized to the predefined constants.
-         *
-         * @throws InvalidObjectException if the constant could not be
-         *         resolved.
-         * @return resolved DateFormat.Field constant
-         */
-        @Override
-        protected Object readResolve() throws InvalidObjectException {
-            if (this.getClass() != DateFormat.Field.class) {
-                throw new InvalidObjectException("subclass didn't correctly implement readResolve");
-            }
-
-            Object instance = instanceMap.get(getName());
-            if (instance != null) {
-                return instance;
-            } else {
-                throw new InvalidObjectException("unknown attribute name");
-            }
         }
 
         //

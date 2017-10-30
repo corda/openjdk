@@ -25,7 +25,6 @@
 
 package java.security.cert;
 
-import java.io.InvalidObjectException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 

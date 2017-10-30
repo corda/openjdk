@@ -27,7 +27,6 @@ package java.lang;
 
 import java.io.Serializable;
 import java.io.IOException;
-import java.io.InvalidObjectException;
 
 /**
  * This is the common base class of all Java language enumeration types.
