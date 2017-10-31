@@ -30,7 +30,6 @@ import java.lang.reflect.*;
 import java.io.IOException;
 import java.io.FileDescriptor;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.*;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -44,21 +43,8 @@ public class Util {
 
     // -- Caches --
 
-    // The number of temp buffers in our pool
-    private static final int TEMP_BUF_POOL_SIZE = IOUtil.IOV_MAX;
-
     // The max size allowed for a cached temp buffer, in bytes
     private static final long MAX_CACHED_BUFFER_SIZE = getMaxCachedBufferSize();
-
-    // Per-thread cache of temporary direct buffers
-    private static ThreadLocal<BufferCache> bufferCache =
-        new ThreadLocal<BufferCache>()
-    {
-        @Override
-        protected BufferCache initialValue() {
-            return new BufferCache();
-        }
-    };
 
     /**
      * Returns the max size allowed for a cached temp buffers, in
@@ -105,200 +91,6 @@ public class Util {
     private static boolean isBufferTooLarge(ByteBuffer buf) {
         return isBufferTooLarge(buf.capacity());
     }
-
-    /**
-     * A simple cache of direct buffers.
-     */
-    private static class BufferCache {
-        // the array of buffers
-        private ByteBuffer[] buffers;
-
-        // the number of buffers in the cache
-        private int count;
-
-        // the index of the first valid buffer (undefined if count == 0)
-        private int start;
-
-        private int next(int i) {
-            return (i + 1) % TEMP_BUF_POOL_SIZE;
-        }
-
-        BufferCache() {
-            buffers = new ByteBuffer[TEMP_BUF_POOL_SIZE];
-        }
-
-        /**
-         * Removes and returns a buffer from the cache of at least the given
-         * size (or null if no suitable buffer is found).
-         */
-        ByteBuffer get(int size) {
-            // Don't call this if the buffer would be too large.
-            assert !isBufferTooLarge(size);
-
-            if (count == 0)
-                return null;  // cache is empty
-
-            ByteBuffer[] buffers = this.buffers;
-
-            // search for suitable buffer (often the first buffer will do)
-            ByteBuffer buf = buffers[start];
-            if (buf.capacity() < size) {
-                buf = null;
-                int i = start;
-                while ((i = next(i)) != start) {
-                    ByteBuffer bb = buffers[i];
-                    if (bb == null)
-                        break;
-                    if (bb.capacity() >= size) {
-                        buf = bb;
-                        break;
-                    }
-                }
-                if (buf == null)
-                    return null;
-                // move first element to here to avoid re-packing
-                buffers[i] = buffers[start];
-            }
-
-            // remove first element
-            buffers[start] = null;
-            start = next(start);
-            count--;
-
-            // prepare the buffer and return it
-            buf.rewind();
-            buf.limit(size);
-            return buf;
-        }
-
-        boolean offerFirst(ByteBuffer buf) {
-            // Don't call this if the buffer is too large.
-            assert !isBufferTooLarge(buf);
-
-            if (count >= TEMP_BUF_POOL_SIZE) {
-                return false;
-            } else {
-                start = (start + TEMP_BUF_POOL_SIZE - 1) % TEMP_BUF_POOL_SIZE;
-                buffers[start] = buf;
-                count++;
-                return true;
-            }
-        }
-
-        boolean offerLast(ByteBuffer buf) {
-            // Don't call this if the buffer is too large.
-            assert !isBufferTooLarge(buf);
-
-            if (count >= TEMP_BUF_POOL_SIZE) {
-                return false;
-            } else {
-                int next = (start + count) % TEMP_BUF_POOL_SIZE;
-                buffers[next] = buf;
-                count++;
-                return true;
-            }
-        }
-
-        boolean isEmpty() {
-            return count == 0;
-        }
-
-        ByteBuffer removeFirst() {
-            assert count > 0;
-            ByteBuffer buf = buffers[start];
-            buffers[start] = null;
-            start = next(start);
-            count--;
-            return buf;
-        }
-    }
-
-    /**
-     * Returns a temporary buffer of at least the given size
-     */
-    public static ByteBuffer getTemporaryDirectBuffer(int size) {
-        // If a buffer of this size is too large for the cache, there
-        // should not be a buffer in the cache that is at least as
-        // large. So we'll just create a new one. Also, we don't have
-        // to remove the buffer from the cache (as this method does
-        // below) given that we won't put the new buffer in the cache.
-        if (isBufferTooLarge(size)) {
-            return ByteBuffer.allocateDirect(size);
-        }
-
-        BufferCache cache = bufferCache.get();
-        ByteBuffer buf = cache.get(size);
-        if (buf != null) {
-            return buf;
-        } else {
-            // No suitable buffer in the cache so we need to allocate a new
-            // one. To avoid the cache growing then we remove the first
-            // buffer from the cache and free it.
-            if (!cache.isEmpty()) {
-                buf = cache.removeFirst();
-                free(buf);
-            }
-            return ByteBuffer.allocateDirect(size);
-        }
-    }
-
-    /**
-     * Releases a temporary buffer by returning to the cache or freeing it.
-     */
-    public static void releaseTemporaryDirectBuffer(ByteBuffer buf) {
-        offerFirstTemporaryDirectBuffer(buf);
-    }
-
-    /**
-     * Releases a temporary buffer by returning to the cache or freeing it. If
-     * returning to the cache then insert it at the start so that it is
-     * likely to be returned by a subsequent call to getTemporaryDirectBuffer.
-     */
-    static void offerFirstTemporaryDirectBuffer(ByteBuffer buf) {
-        // If the buffer is too large for the cache we don't have to
-        // check the cache. We'll just free it.
-        if (isBufferTooLarge(buf)) {
-            free(buf);
-            return;
-        }
-
-        assert buf != null;
-        BufferCache cache = bufferCache.get();
-        if (!cache.offerFirst(buf)) {
-            // cache is full
-            free(buf);
-        }
-    }
-
-    /**
-     * Releases a temporary buffer by returning to the cache or freeing it. If
-     * returning to the cache then insert it at the end. This makes it
-     * suitable for scatter/gather operations where the buffers are returned to
-     * cache in same order that they were obtained.
-     */
-    static void offerLastTemporaryDirectBuffer(ByteBuffer buf) {
-        // If the buffer is too large for the cache we don't have to
-        // check the cache. We'll just free it.
-        if (isBufferTooLarge(buf)) {
-            free(buf);
-            return;
-        }
-
-        assert buf != null;
-        BufferCache cache = bufferCache.get();
-        if (!cache.offerLast(buf)) {
-            // cache is full
-            free(buf);
-        }
-    }
-
-    /**
-     * Frees the memory for the given direct buffer
-     */
-    private static void free(ByteBuffer buf) {
-        ((DirectBuffer)buf).cleaner().clean();
-    }
-
 
     // -- Random stuff --
 
@@ -400,27 +192,6 @@ public class Util {
                 }});
     }
 
-    static MappedByteBuffer newMappedByteBuffer(int size, long addr,
-                                                FileDescriptor fd,
-                                                Runnable unmapper)
-    {
-        MappedByteBuffer dbb;
-        if (directByteBufferConstructor == null)
-            initDBBConstructor();
-        try {
-            dbb = (MappedByteBuffer)directByteBufferConstructor.newInstance(
-              new Object[] { new Integer(size),
-                             new Long(addr),
-                             fd,
-                             unmapper });
-        } catch (InstantiationException |
-                 IllegalAccessException |
-                 InvocationTargetException e) {
-            throw new InternalError(e);
-        }
-        return dbb;
-    }
-
     private static volatile Constructor<?> directByteBufferRConstructor = null;
 
     private static void initDBBRConstructor() {
@@ -444,28 +215,6 @@ public class Util {
                     return null;
                 }});
     }
-
-    static MappedByteBuffer newMappedByteBufferR(int size, long addr,
-                                                 FileDescriptor fd,
-                                                 Runnable unmapper)
-    {
-        MappedByteBuffer dbb;
-        if (directByteBufferRConstructor == null)
-            initDBBRConstructor();
-        try {
-            dbb = (MappedByteBuffer)directByteBufferRConstructor.newInstance(
-              new Object[] { new Integer(size),
-                             new Long(addr),
-                             fd,
-                             unmapper });
-        } catch (InstantiationException |
-                 IllegalAccessException |
-                 InvocationTargetException e) {
-            throw new InternalError(e);
-        }
-        return dbb;
-    }
-
 
     // -- Bug compatibility --
 
