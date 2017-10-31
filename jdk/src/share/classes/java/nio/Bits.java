@@ -732,31 +732,6 @@ class Bits {                            // package-private
         sun.misc.SharedSecrets.setJavaNioAccess(
             new sun.misc.JavaNioAccess() {
                 @Override
-                public sun.misc.JavaNioAccess.BufferPool getDirectBufferPool() {
-                    return new sun.misc.JavaNioAccess.BufferPool() {
-                        @Override
-                        public String getName() {
-                            return "direct";
-                        }
-                        @Override
-                        public long getCount() {
-                            return Bits.count.get();
-                        }
-                        @Override
-                        public long getTotalCapacity() {
-                            return Bits.totalCapacity.get();
-                        }
-                        @Override
-                        public long getMemoryUsed() {
-                            return Bits.reservedMemory.get();
-                        }
-                    };
-                }
-                @Override
-                public ByteBuffer newDirectByteBuffer(long addr, int cap, Object ob) {
-                    return new DirectByteBuffer(addr, cap, ob);
-                }
-                @Override
                 public void truncate(Buffer buf) {
                     buf.truncate();
                 }

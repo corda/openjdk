@@ -94,41 +94,6 @@ import java.util.stream.$Streamtype$Stream;
  *
 #if[byte]
  *
- * <a name="direct"></a>
- * <h2> Direct <i>vs.</i> non-direct buffers </h2>
- *
- * <p> A byte buffer is either <i>direct</i> or <i>non-direct</i>.  Given a
- * direct byte buffer, the Java virtual machine will make a best effort to
- * perform native I/O operations directly upon it.  That is, it will attempt to
- * avoid copying the buffer's content to (or from) an intermediate buffer
- * before (or after) each invocation of one of the underlying operating
- * system's native I/O operations.
- *
- * <p> A direct byte buffer may be created by invoking the {@link
- * #allocateDirect(int) allocateDirect} factory method of this class.  The
- * buffers returned by this method typically have somewhat higher allocation
- * and deallocation costs than non-direct buffers.  The contents of direct
- * buffers may reside outside of the normal garbage-collected heap, and so
- * their impact upon the memory footprint of an application might not be
- * obvious.  It is therefore recommended that direct buffers be allocated
- * primarily for large, long-lived buffers that are subject to the underlying
- * system's native I/O operations.  In general it is best to allocate direct
- * buffers only when they yield a measureable gain in program performance.
- *
- * <p> A direct byte buffer may also be created by {@link
- * java.nio.channels.FileChannel#map mapping} a region of a file
- * directly into memory.  An implementation of the Java platform may optionally
- * support the creation of direct byte buffers from native code via JNI.  If an
- * instance of one of these kinds of buffers refers to an inaccessible region
- * of memory then an attempt to access that region will not change the buffer's
- * content and will cause an unspecified exception to be thrown either at the
- * time of the access or at some later time.
- *
- * <p> Whether a byte buffer is direct or non-direct may be determined by
- * invoking its {@link #isDirect isDirect} method.  This method is provided so
- * that explicit buffer management can be done in performance-critical code.
- *
- *
  * <a name="bin"></a>
  * <h2> Access to binary data </h2>
  *
@@ -288,30 +253,6 @@ public abstract class $Type$Buffer
     $Type$Buffer(int mark, int pos, int lim, int cap) { // package-private
         this(mark, pos, lim, cap, null, 0);
     }
-
-#if[byte]
-
-    /**
-     * Allocates a new direct $type$ buffer.
-     *
-     * <p> The new buffer's position will be zero, its limit will be its
-     * capacity, its mark will be undefined, and each of its elements will be
-     * initialized to zero.  Whether or not it has a
-     * {@link #hasArray backing array} is unspecified.
-     *
-     * @param  capacity
-     *         The new buffer's capacity, in $type$s
-     *
-     * @return  The new $type$ buffer
-     *
-     * @throws  IllegalArgumentException
-     *          If the <tt>capacity</tt> is a negative integer
-     */
-    public static $Type$Buffer allocateDirect(int capacity) {
-        return new Direct$Type$Buffer(capacity);
-    }
-
-#end[byte]
 
     /**
      * Allocates a new $type$ buffer.
@@ -500,8 +441,8 @@ public abstract class $Type$Buffer
      *
      * <p> The new buffer's position will be zero, its capacity and its limit
      * will be the number of $type$s remaining in this buffer, and its mark
-     * will be undefined.  The new buffer will be direct if, and only if, this
-     * buffer is direct, and it will be read-only if, and only if, this buffer
+     * will be undefined.  The new buffer
+     * will be read-only if, and only if, this buffer
      * is read-only.  </p>
      *
      * @return  The new $type$ buffer
