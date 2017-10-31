@@ -383,7 +383,7 @@ public class Package implements java.lang.reflect.AnnotatedElement {
     }
 
     /**
-     * @throws NullPointerException {@inheritDoc}
+     * @throws NullPointerException
      * @since 1.5
      */
     public <A extends Annotation> A getAnnotation(Class<A> annotationClass) {
@@ -391,8 +391,7 @@ public class Package implements java.lang.reflect.AnnotatedElement {
     }
 
     /**
-     * {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
+     * @throws NullPointerException
      * @since 1.5
      */
     @Override
@@ -401,7 +400,7 @@ public class Package implements java.lang.reflect.AnnotatedElement {
     }
 
     /**
-     * @throws NullPointerException {@inheritDoc}
+     * @throws NullPointerException
      * @since 1.8
      */
     @Override
@@ -417,7 +416,7 @@ public class Package implements java.lang.reflect.AnnotatedElement {
     }
 
     /**
-     * @throws NullPointerException {@inheritDoc}
+     * @throws NullPointerException
      * @since 1.8
      */
     @Override
@@ -426,7 +425,7 @@ public class Package implements java.lang.reflect.AnnotatedElement {
     }
 
     /**
-     * @throws NullPointerException {@inheritDoc}
+     * @throws NullPointerException
      * @since 1.8
      */
     @Override

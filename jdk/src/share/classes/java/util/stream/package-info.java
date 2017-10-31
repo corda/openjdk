@@ -83,8 +83,6 @@
  *     {@link java.util.stream.IntStream#range(int, int)}
  *     or {@link java.util.stream.Stream#iterate(Object, UnaryOperator)};</li>
  *     <li>The lines of a file can be obtained from {@link java.io.BufferedReader#lines()};</li>
- *     <li>Streams of file paths can be obtained from methods in {@link java.nio.file.Files};</li>
- *     <li>Streams of random numbers can be obtained from {@link java.util.Random#ints()};</li>
  *     <li>Numerous other stream-bearing methods in the JDK, including
  *     {@link java.util.BitSet#stream()},
  *     {@link java.util.regex.Pattern#splitAsStream(java.lang.CharSequence)},

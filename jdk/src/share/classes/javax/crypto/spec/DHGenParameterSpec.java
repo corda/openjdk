@@ -52,10 +52,7 @@ public class DHGenParameterSpec implements AlgorithmParameterSpec {
 
     /**
      * Constructs a parameter set for the generation of Diffie-Hellman
-     * (system) parameters. The constructed parameter set can be used to
-     * initialize an
-     * {@link java.security.AlgorithmParameterGenerator AlgorithmParameterGenerator}
-     * object for the generation of Diffie-Hellman parameters.
+     * (system) parameters.
      *
      * @param primeSize the size (in bits) of the prime modulus.
      * @param exponentSize the size (in bits) of the random exponent.

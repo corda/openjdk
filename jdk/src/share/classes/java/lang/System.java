@@ -222,6 +222,7 @@ public final class System {
      *          If a security manager is present and it does not
      *          permit access to the channel.
      *
+     * @exclude Not supported.
      * @since 1.5
      */
     public static Channel inheritedChannel() throws IOException {
@@ -787,7 +788,6 @@ public final class System {
      * @throws  SecurityException
      *        if a security manager exists and its <code>checkExit</code>
      *        method doesn't allow exit with the specified status.
-     * @see        java.lang.Runtime#exit(int)
      * @exclude Not supported.
      */
     public static void exit(int status) {

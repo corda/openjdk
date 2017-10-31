@@ -1604,7 +1604,6 @@ public class KeyStore {
      * needed.
      *
      * @see KeyStore
-     * @see javax.net.ssl.KeyStoreBuilderParameters
      * @since 1.5
      */
     public static abstract class Builder {

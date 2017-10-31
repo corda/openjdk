@@ -3384,7 +3384,7 @@ public final class Class<T> implements java.io.Serializable,
     }
 
     /**
-     * @throws NullPointerException {@inheritDoc}
+     * @throws NullPointerException
      * @since 1.5
      */
     @SuppressWarnings("unchecked")
@@ -3395,8 +3395,7 @@ public final class Class<T> implements java.io.Serializable,
     }
 
     /**
-     * {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
+     * @throws NullPointerException
      * @since 1.5
      */
     @Override
@@ -3405,7 +3404,7 @@ public final class Class<T> implements java.io.Serializable,
     }
 
     /**
-     * @throws NullPointerException {@inheritDoc}
+     * @throws NullPointerException
      * @since 1.8
      */
     @Override
@@ -3426,7 +3425,7 @@ public final class Class<T> implements java.io.Serializable,
     }
 
     /**
-     * @throws NullPointerException {@inheritDoc}
+     * @throws NullPointerException
      * @since 1.8
      */
     @Override
@@ -3438,7 +3437,7 @@ public final class Class<T> implements java.io.Serializable,
     }
 
     /**
-     * @throws NullPointerException {@inheritDoc}
+     * @throws NullPointerException
      * @since 1.8
      */
     @Override

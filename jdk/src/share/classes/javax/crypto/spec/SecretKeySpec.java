@@ -44,7 +44,6 @@ import javax.crypto.SecretKey;
  * @author Jan Luehe
  *
  * @see javax.crypto.SecretKey
- * @see javax.crypto.SecretKeyFactory
  * @since 1.4
  */
 public class SecretKeySpec implements KeySpec, SecretKey {

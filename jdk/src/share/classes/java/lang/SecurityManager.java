@@ -211,7 +211,6 @@ import sun.security.util.SecurityConstants;
  * @see     java.security.Permission
  * @see     java.security.BasicPermission
  * @see     java.io.FilePermission
- * @see     java.net.SocketPermission
  * @see     java.util.PropertyPermission
  * @see     java.lang.RuntimePermission
  * @see     java.awt.AWTPermission
@@ -518,8 +517,6 @@ class SecurityManager {
      * @return  an implementation-dependent object that encapsulates
      *          sufficient information about the current execution environment
      *          to perform some security checks later.
-     * @see     java.lang.SecurityManager#checkConnect(java.lang.String, int,
-     *   java.lang.Object) checkConnect
      * @see     java.lang.SecurityManager#checkRead(java.lang.String,
      *   java.lang.Object) checkRead
      * @see     java.security.AccessControlContext AccessControlContext
@@ -752,7 +749,6 @@ class SecurityManager {
      * @exception SecurityException if the calling thread does not have
      *              permission to halt the Java Virtual Machine with
      *              the specified status.
-     * @see        java.lang.Runtime#exit(int) exit
      * @see        #checkPermission(java.security.Permission) checkPermission
      */
     public void checkExit(int status) {
@@ -782,10 +778,6 @@ class SecurityManager {
      *             permission to create a subprocess.
      * @exception  NullPointerException if the <code>cmd</code> argument is
      *             <code>null</code>.
-     * @see     java.lang.Runtime#exec(java.lang.String)
-     * @see     java.lang.Runtime#exec(java.lang.String, java.lang.String[])
-     * @see     java.lang.Runtime#exec(java.lang.String[])
-     * @see     java.lang.Runtime#exec(java.lang.String[], java.lang.String[])
      * @see     #checkPermission(java.security.Permission) checkPermission
      */
     public void checkExec(String cmd) {
@@ -852,8 +844,8 @@ class SecurityManager {
      *             permission to access the specified file descriptor.
      * @exception  NullPointerException if the file descriptor argument is
      *             <code>null</code>.
-     * @see        java.io.FileDescriptor
      * @see        #checkPermission(java.security.Permission) checkPermission
+     * @exclude    FileDescriptor is not available
      */
     public void checkRead(FileDescriptor fd) {
         if (fd == null) {
@@ -998,7 +990,6 @@ class SecurityManager {
      *             have permission to delete the file.
      * @exception  NullPointerException if the <code>file</code> argument is
      *             <code>null</code>.
-     * @see        java.io.File#delete()
      * @see        #checkPermission(java.security.Permission) checkPermission
      */
     public void checkDelete(String file) {
@@ -1105,7 +1096,6 @@ class SecurityManager {
      *             {@link #checkPermission} directly.
      *             This method will be changed in a future release to check
      *             the permission {@code java.security.AllPermission}.
-     * @see        java.awt.Window
      * @see        #checkPermission(java.security.Permission) checkPermission
      */
     @Deprecated
@@ -1426,8 +1416,6 @@ class SecurityManager {
      *             permission to specify a socket factory or a stream
      *             handler factory.
      *
-     * @see        java.net.ServerSocket#setSocketFactory(java.net.SocketImplFactory) setSocketFactory
-     * @see        java.net.Socket#setSocketImplFactory(java.net.SocketImplFactory) setSocketImplFactory
      * @see        java.net.URL#setURLStreamHandlerFactory(java.net.URLStreamHandlerFactory) setURLStreamHandlerFactory
      * @see        #checkPermission(java.security.Permission) checkPermission
      */

@@ -43,9 +43,6 @@ import java.util.Set;
  * certificate in the certification path contains the required algorithm
  * constraints.
  *
- * @see javax.net.ssl.SSLParameters#getAlgorithmConstraints
- * @see javax.net.ssl.SSLParameters#setAlgorithmConstraints(AlgorithmConstraints)
- *
  * @since 1.7
  */
 

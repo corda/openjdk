@@ -61,7 +61,6 @@ import java.util.stream.StreamSupport;
  *
  * @see FileReader
  * @see InputStreamReader
- * @see java.nio.file.Files#newBufferedReader
  *
  * @author      Mark Reinhold
  * @since       JDK1.1

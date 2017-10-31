@@ -75,9 +75,7 @@ import static java.lang.annotation.RetentionPolicy.*;
  *            {@link XmlList},
  *            {@link XmlSchemaType},
  *            {@link XmlValue},
- *            {@link XmlAttachmentRef},
  *            {@link XmlMimeType},
- *            {@link XmlInlineBinaryData},
  *            {@link javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter}.</li>
  * </ul>
  * </p>

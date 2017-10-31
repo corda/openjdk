@@ -56,9 +56,7 @@ import static java.lang.annotation.RetentionPolicy.*;
  *            {@link XmlList},
  *            {@link XmlSchemaType},
  *            {@link XmlValue},
- *            {@link XmlAttachmentRef},
  *            {@link XmlMimeType},
- *            {@link XmlInlineBinaryData},
  *            {@link XmlElementWrapper},
  *            {@link XmlJavaTypeAdapter}</li>
  *   <li> if the type of JavaBean property is a collection type of

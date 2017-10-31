@@ -37,7 +37,6 @@ package java.io;
  * @see   CharArrayWriter
  * @see   FilterWriter
  * @see   OutputStreamWriter
- * @see     FileWriter
  * @see   PipedWriter
  * @see   PrintWriter
  * @see   StringWriter
