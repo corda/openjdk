@@ -63,8 +63,8 @@ $(JAXWS_OUTPUTDIR)/jaxws_classes/META-INF/services/com.sun.tools.internal.xjc.Pl
 	cp $< $@
 
 # There are two META-INF services files that are needed, add these to the list of goals
-BUILD_JAXWS += $(JAXWS_OUTPUTDIR)/jaxws_classes/META-INF/services/com.sun.tools.internal.ws.wscompile.Plugin \
-               $(JAXWS_OUTPUTDIR)/jaxws_classes/META-INF/services/com.sun.tools.internal.xjc.Plugin
+#BUILD_JAXWS += $(JAXWS_OUTPUTDIR)/jaxws_classes/META-INF/services/com.sun.tools.internal.ws.wscompile.Plugin \
+#               $(JAXWS_OUTPUTDIR)/jaxws_classes/META-INF/services/com.sun.tools.internal.xjc.Plugin
 
 # Imitate the property cleaning mechanism in the old build. This will likely be replaced
 # by the unified functionality in JavaCompilation.gmk, but keep it the same as old build
