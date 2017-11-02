@@ -89,7 +89,6 @@ package java.security;
  * @see PublicKey
  * @see PrivateKey
  * @see KeyPair
- * @see KeyPairGenerator
  * @see KeyFactory
  * @see KeyRep
  * @see java.security.spec.KeySpec

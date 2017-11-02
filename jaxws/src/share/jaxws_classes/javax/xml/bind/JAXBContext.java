@@ -256,7 +256,6 @@ import java.io.InputStream;
  * @author <ul><li>Ryan Shoemaker, Sun Microsystems, Inc.</li><li>Kohsuke Kawaguchi, Sun Microsystems, Inc.</li><li>Joe Fialli, Sun Microsystems, Inc.</li></ul>
  * @see Marshaller
  * @see Unmarshaller
- * @see S 7.4.1 "Named Packages" in Java Language Specification</a>
  * @since JAXB1.0
  */
 public abstract class JAXBContext {

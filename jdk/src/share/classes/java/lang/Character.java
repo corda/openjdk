@@ -5990,7 +5990,6 @@ class Character implements java.io.Serializable, Comparable<Character> {
      * @see     Character#isJavaIdentifierPart(char)
      * @see     Character#isLetter(char)
      * @see     Character#isUnicodeIdentifierStart(char)
-     * @see     javax.lang.model.SourceVersion#isIdentifier(CharSequence)
      * @since   1.1
      */
     public static boolean isJavaIdentifierStart(char ch) {
@@ -6019,7 +6018,6 @@ class Character implements java.io.Serializable, Comparable<Character> {
      * @see     Character#isJavaIdentifierPart(int)
      * @see     Character#isLetter(int)
      * @see     Character#isUnicodeIdentifierStart(int)
-     * @see     javax.lang.model.SourceVersion#isIdentifier(CharSequence)
      * @since   1.5
      */
     public static boolean isJavaIdentifierStart(int codePoint) {
@@ -6056,7 +6054,6 @@ class Character implements java.io.Serializable, Comparable<Character> {
      * @see     Character#isJavaIdentifierStart(char)
      * @see     Character#isLetterOrDigit(char)
      * @see     Character#isUnicodeIdentifierPart(char)
-     * @see     javax.lang.model.SourceVersion#isIdentifier(CharSequence)
      * @since   1.1
      */
     public static boolean isJavaIdentifierPart(char ch) {
@@ -6089,7 +6086,6 @@ class Character implements java.io.Serializable, Comparable<Character> {
      * @see     Character#isJavaIdentifierStart(int)
      * @see     Character#isLetterOrDigit(int)
      * @see     Character#isUnicodeIdentifierPart(int)
-     * @see     javax.lang.model.SourceVersion#isIdentifier(CharSequence)
      * @since   1.5
      */
     public static boolean isJavaIdentifierPart(int codePoint) {

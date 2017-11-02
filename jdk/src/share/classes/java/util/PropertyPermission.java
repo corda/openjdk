@@ -404,8 +404,6 @@ final class PropertyPermissionCollection extends PermissionCollection
 
     /**
      * Boolean saying if "*" is in the collection.
-     *
-     * @see #serialPersistentFields
      */
     // No sync access; OK for this to be stale.
     private boolean all_allowed;

@@ -67,7 +67,6 @@ import java.security.spec.InvalidParameterSpecException;
  *
  * @see java.security.spec.AlgorithmParameterSpec
  * @see java.security.spec.DSAParameterSpec
- * @see KeyPairGenerator
  *
  * @since 1.2
  */

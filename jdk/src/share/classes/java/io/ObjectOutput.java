@@ -30,6 +30,7 @@ package java.io;
  * DataOutput includes methods for output of primitive types, ObjectOutput
  * extends that interface to include objects, arrays, and Strings.
  *
+ * @exclude Not supported.
  * @author  unascribed
  * @see java.io.InputStream
  * @see java.io.ObjectOutputStream

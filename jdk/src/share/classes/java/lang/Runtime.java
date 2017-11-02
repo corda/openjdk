@@ -70,8 +70,8 @@ public class Runtime {
      *   <ul>
      *
      *   <li> The program <i>exits</i> normally, when the last non-daemon
-     *   thread exits or when the <tt>{@link #exit exit}</tt> (equivalently,
-     *   {@link System#exit(int) System.exit}) method is invoked, or
+     *   thread exits,
+     *   or
      *
      *   <li> The virtual machine is <i>terminated</i> in response to a
      *   user interrupt, such as typing <tt>^C</tt>, or a system-wide event,
@@ -152,8 +152,6 @@ public class Runtime {
      *
      * @exclude Not implemented.
      * @see #removeShutdownHook
-     * @see #halt(int)
-     * @see #exit(int)
      * @since 1.3
      */
     public void addShutdownHook(Thread hook) {
@@ -178,7 +176,6 @@ public class Runtime {
      *
      * @exclude Not implemented.
      * @see #addShutdownHook
-     * @see #exit(int)
      * @since 1.3
      */
     public boolean removeShutdownHook(Thread hook) {

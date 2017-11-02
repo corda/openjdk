@@ -71,8 +71,6 @@ implementations.
           <br>clear, flip, rewind, and mark/reset</td></tr>
   <tr><td valign=top><tt>&nbsp;&nbsp;{@link java.nio.ByteBuffer}</tt></td>
       <td>Get/put, compact, views; allocate,&nbsp;wrap</td></tr>
-  <tr><td valign=top><tt>&nbsp;&nbsp;&nbsp;&nbsp;{@link java.nio.MappedByteBuffer}&nbsp;&nbsp;</tt></td>
-      <td>A byte buffer mapped to a file</td></tr>
   <tr><td valign=top><tt>&nbsp;&nbsp;{@link java.nio.CharBuffer}</tt></td>
       <td>Get/put, compact; allocate,&nbsp;wrap</td></tr>
   <tr><td valign=top><tt>&nbsp;&nbsp;{@link java.nio.DoubleBuffer}</tt></td>
@@ -113,12 +111,6 @@ other buffer classes:
   <li><p> A byte buffer can be allocated as a <a href="ByteBuffer.html#direct">
   <i>direct</i></a> buffer, in which case the Java virtual machine will make a
   best effort to perform native I/O operations directly upon it.  </p></li>
-
-  <li><p> A byte buffer can be created by {@link
-  java.nio.channels.FileChannel#map <i>mapping</i>} a region of a
-  file directly into memory, in which case a few additional file-related
-  operations defined in the {@link java.nio.MappedByteBuffer} class are
-  available.  </p></li>
 
   <li><p> A byte buffer provides access to its content as either a heterogeneous
   or homogeneous sequence of <a href="ByteBuffer.html#bin">binary data</i></a>

@@ -56,7 +56,6 @@ import java.security.spec.KeySpec;
  * @author Jan Luehe
  * @author Valerie Peng
  *
- * @see javax.crypto.SecretKeyFactory
  * @see PBEParameterSpec
  * @since 1.4
  */

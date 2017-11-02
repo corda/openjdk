@@ -39,10 +39,6 @@ package java.security;
  * {@link javax.security.auth.Destroyable} interface to enable
  * sensitive key information to be destroyed, cleared, or in the case
  * where such information is immutable, unreferenced.
- * Finally, since {@code PrivateKey} is {@code Serializable}, implementations
- * should also override
- * {@link java.io.ObjectOutputStream#writeObject(java.lang.Object)}
- * to prevent keys that have been destroyed from being serialized.
  *
  * @see Key
  * @see PublicKey

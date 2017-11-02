@@ -61,7 +61,6 @@ import java.util.stream.StreamSupport;
  *
  * @see FileReader
  * @see InputStreamReader
- * @see java.nio.file.Files#newBufferedReader
  *
  * @author      Mark Reinhold
  * @since       JDK1.1
@@ -382,8 +381,6 @@ public class BufferedReader extends Reader {
      *             stream has been reached
      *
      * @exception  IOException  If an I/O error occurs
-     *
-     * @see java.nio.file.Files#readAllLines
      */
     public String readLine() throws IOException {
         return readLine(false);

@@ -31,19 +31,6 @@ import java.util.concurrent.Future;
 /**
  * An asynchronous channel that can read and write bytes.
  *
- * <p> Some channels may not allow more than one read or write to be outstanding
- * at any given time. If a thread invokes a read method before a previous read
- * operation has completed then a {@link ReadPendingException} will be thrown.
- * Similarly, if a write method is invoked before a previous write has completed
- * then {@link WritePendingException} is thrown. Whether or not other kinds of
- * I/O operations may proceed concurrently with a read operation depends upon
- * the type of the channel.
- *
- * <p> Note that {@link java.nio.ByteBuffer ByteBuffers} are not safe for use by
- * multiple concurrent threads. When a read or write operation is initiated then
- * care must be taken to ensure that the buffer is not accessed until the
- * operation completes.
- *
  * @see Channels#newInputStream(AsynchronousByteChannel)
  * @see Channels#newOutputStream(AsynchronousByteChannel)
  *
@@ -82,11 +69,6 @@ public interface AsynchronousByteChannel
      * should be taken to not access the buffer until the operation has
      * completed.
      *
-     * <p> This method may be invoked at any time. Some channel types may not
-     * allow more than one read to be outstanding at any given time. If a thread
-     * initiates a read operation before a previous read operation has
-     * completed then a {@link ReadPendingException} will be thrown.
-     *
      * @param   <A>
      *          The type of the attachment
      * @param   dst
@@ -98,12 +80,7 @@ public interface AsynchronousByteChannel
      *
      * @throws  IllegalArgumentException
      *          If the buffer is read-only
-     * @throws  ReadPendingException
-     *          If the channel does not allow more than one read to be outstanding
-     *          and a previous read has not completed
      * @throws  ShutdownChannelGroupException
-     *          If the channel is associated with a {@link AsynchronousChannelGroup
-     *          group} that has terminated
      */
     <A> void read(ByteBuffer dst,
                   A attachment,
@@ -129,9 +106,6 @@ public interface AsynchronousByteChannel
      *
      * @throws  IllegalArgumentException
      *          If the buffer is read-only
-     * @throws  ReadPendingException
-     *          If the channel does not allow more than one read to be outstanding
-     *          and a previous read has not completed
      */
     Future<Integer> read(ByteBuffer dst);
 
@@ -159,15 +133,6 @@ public interface AsynchronousByteChannel
      * Upon completion the buffer's position will be equal to
      * <i>p</i>&nbsp;<tt>+</tt>&nbsp;<i>n</i>; its limit will not have changed.
      *
-     * <p> Buffers are not safe for use by multiple concurrent threads so care
-     * should be taken to not access the buffer until the operation has
-     * completed.
-     *
-     * <p> This method may be invoked at any time. Some channel types may not
-     * allow more than one write to be outstanding at any given time. If a thread
-     * initiates a write operation before a previous write operation has
-     * completed then a {@link WritePendingException} will be thrown.
-     *
      * @param   <A>
      *          The type of the attachment
      * @param   src
@@ -177,12 +142,7 @@ public interface AsynchronousByteChannel
      * @param   handler
      *          The completion handler object
      *
-     * @throws  WritePendingException
-     *          If the channel does not allow more than one write to be outstanding
-     *          and a previous write has not completed
      * @throws  ShutdownChannelGroupException
-     *          If the channel is associated with a {@link AsynchronousChannelGroup
-     *          group} that has terminated
      */
     <A> void write(ByteBuffer src,
                    A attachment,
@@ -205,9 +165,6 @@ public interface AsynchronousByteChannel
      *
      * @return A Future representing the result of the operation
      *
-     * @throws  WritePendingException
-     *          If the channel does not allow more than one write to be outstanding
-     *          and a previous write has not completed
      */
     Future<Integer> write(ByteBuffer src);
 }

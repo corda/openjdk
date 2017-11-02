@@ -298,16 +298,12 @@ final class BasicPermissionCollection
     /**
      * This is set to {@code true} if this BasicPermissionCollection
      * contains a BasicPermission with '*' as its permission name.
-     *
-     * @see #serialPersistentFields
      */
     private boolean all_allowed;
 
     /**
      * The class to which all BasicPermissions in this
      * BasicPermissionCollection belongs.
-     *
-     * @see #serialPersistentFields
      */
     private Class<?> permClass;
 

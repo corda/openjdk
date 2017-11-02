@@ -39,10 +39,6 @@ package javax.crypto;
  * {@link javax.security.auth.Destroyable} interface to enable
  * sensitive key information to be destroyed, cleared, or in the case
  * where such information is immutable, unreferenced.
- * Finally, since {@code SecretKey} is {@code Serializable}, implementations
- * should also override
- * {@link java.io.ObjectOutputStream#writeObject(java.lang.Object)}
- * to prevent keys that have been destroyed from being serialized.
  *
  * <p>Keys that implement this interface return the string {@code RAW}
  * as their encoding format (see {@code getFormat}), and return the
@@ -52,7 +48,6 @@ package javax.crypto;
  *
  * @author Jan Luehe
  *
- * @see SecretKeyFactory
  * @see Cipher
  * @since 1.4
  */
