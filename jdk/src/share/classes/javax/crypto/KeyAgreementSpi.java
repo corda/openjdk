@@ -55,7 +55,6 @@ import java.security.spec.*;
  *
  * @author Jan Luehe
  *
- * @see KeyGenerator
  * @see SecretKey
  * @since 1.4
  */

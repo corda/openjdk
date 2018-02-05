@@ -68,7 +68,6 @@ import sun.security.jca.GetInstance.Instance;
  *
  * @author Jan Luehe
  *
- * @see KeyGenerator
  * @see SecretKey
  * @since 1.4
  */
