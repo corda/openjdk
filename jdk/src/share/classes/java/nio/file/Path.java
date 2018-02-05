@@ -56,10 +56,6 @@ import java.util.Iterator;
  * Paths can be {@link #compareTo compared}, and tested against each other using
  * the {@link #startsWith startsWith} and {@link #endsWith endsWith} methods.
  *
- * <p> This interface extends {@link Watchable} interface so that a directory
- * located by a path can be {@link #register registered} with a {@link
- * WatchService} and entries in the directory watched. </p>
- *
  * <p> <b>WARNING:</b> This interface is only intended to be implemented by
  * those developing custom file system implementations. Methods may be added to
  * this interface in future releases. </p>
@@ -96,7 +92,7 @@ import java.util.Iterator;
  */
 
 public interface Path
-    extends Comparable<Path>, Iterable<Path>, Watchable
+    extends Comparable<Path>, Iterable<Path>
 {
     /**
      * Tells whether or not this path is absolute.
@@ -543,121 +539,6 @@ public interface Path
      *          if this {@code Path} is not associated with the default provider
      */
     File toFile();
-
-    // -- watchable --
-
-    /**
-     * Registers the file located by this path with a watch service.
-     *
-     * <p> In this release, this path locates a directory that exists. The
-     * directory is registered with the watch service so that entries in the
-     * directory can be watched. The {@code events} parameter is the events to
-     * register and may contain the following events:
-     * <ul>
-     *   <li>{@link StandardWatchEventKinds#ENTRY_CREATE ENTRY_CREATE} -
-     *       entry created or moved into the directory</li>
-     *   <li>{@link StandardWatchEventKinds#ENTRY_DELETE ENTRY_DELETE} -
-     *        entry deleted or moved out of the directory</li>
-     *   <li>{@link StandardWatchEventKinds#ENTRY_MODIFY ENTRY_MODIFY} -
-     *        entry in directory was modified</li>
-     * </ul>
-     *
-     * <p> The {@link WatchEvent#context context} for these events is the
-     * relative path between the directory located by this path, and the path
-     * that locates the directory entry that is created, deleted, or modified.
-     *
-     * <p> The set of events may include additional implementation specific
-     * event that are not defined by the enum {@link StandardWatchEventKinds}
-     *
-     * <p> The {@code modifiers} parameter specifies <em>modifiers</em> that
-     * qualify how the directory is registered. This release does not define any
-     * <em>standard</em> modifiers. It may contain implementation specific
-     * modifiers.
-     *
-     * <p> Where a file is registered with a watch service by means of a symbolic
-     * link then it is implementation specific if the watch continues to depend
-     * on the existence of the symbolic link after it is registered.
-     *
-     * @param   watcher
-     *          the watch service to which this object is to be registered
-     * @param   events
-     *          the events for which this object should be registered
-     * @param   modifiers
-     *          the modifiers, if any, that modify how the object is registered
-     *
-     * @return  a key representing the registration of this object with the
-     *          given watch service
-     *
-     * @throws  UnsupportedOperationException
-     *          if unsupported events or modifiers are specified
-     * @throws  IllegalArgumentException
-     *          if an invalid combination of events or modifiers is specified
-     * @throws  ClosedWatchServiceException
-     *          if the watch service is closed
-     * @throws  NotDirectoryException
-     *          if the file is registered to watch the entries in a directory
-     *          and the file is not a directory  <i>(optional specific exception)</i>
-     * @throws  IOException
-     *          if an I/O error occurs
-     * @throws  SecurityException
-     *          In the case of the default provider, and a security manager is
-     *          installed, the {@link SecurityManager#checkRead(String) checkRead}
-     *          method is invoked to check read access to the file.
-     */
-    @Override
-    WatchKey register(WatchService watcher,
-                      WatchEvent.Kind<?>[] events,
-                      WatchEvent.Modifier... modifiers)
-        throws IOException;
-
-    /**
-     * Registers the file located by this path with a watch service.
-     *
-     * <p> An invocation of this method behaves in exactly the same way as the
-     * invocation
-     * <pre>
-     *     watchable.{@link #register(WatchService,WatchEvent.Kind[],WatchEvent.Modifier[]) register}(watcher, events, new WatchEvent.Modifier[0]);
-     * </pre>
-     *
-     * <p> <b>Usage Example:</b>
-     * Suppose we wish to register a directory for entry create, delete, and modify
-     * events:
-     * <pre>
-     *     Path dir = ...
-     *     WatchService watcher = ...
-     *
-     *     WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-     * </pre>
-     * @param   watcher
-     *          The watch service to which this object is to be registered
-     * @param   events
-     *          The events for which this object should be registered
-     *
-     * @return  A key representing the registration of this object with the
-     *          given watch service
-     *
-     * @throws  UnsupportedOperationException
-     *          If unsupported events are specified
-     * @throws  IllegalArgumentException
-     *          If an invalid combination of events is specified
-     * @throws  ClosedWatchServiceException
-     *          If the watch service is closed
-     * @throws  NotDirectoryException
-     *          If the file is registered to watch the entries in a directory
-     *          and the file is not a directory  <i>(optional specific exception)</i>
-     * @throws  IOException
-     *          If an I/O error occurs
-     * @throws  SecurityException
-     *          In the case of the default provider, and a security manager is
-     *          installed, the {@link SecurityManager#checkRead(String) checkRead}
-     *          method is invoked to check read access to the file.
-     */
-    @Override
-    WatchKey register(WatchService watcher,
-                      WatchEvent.Kind<?>... events)
-        throws IOException;
-
-    // -- Iterable --
 
     /**
      * Returns an iterator over the name elements of this path.
