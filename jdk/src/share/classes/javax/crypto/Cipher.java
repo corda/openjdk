@@ -157,7 +157,6 @@ import sun.security.jca.*;
  * other transformations are supported.
  *
  * @author Jan Luehe
- * @see KeyGenerator
  * @see SecretKey
  * @since 1.4
  */

@@ -222,7 +222,6 @@ import java.nio.ByteBuffer;
  * </ol>
  *
  * @author Jan Luehe
- * @see KeyGenerator
  * @see SecretKey
  * @since 1.4
  */
