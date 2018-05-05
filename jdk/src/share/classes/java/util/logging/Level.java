@@ -241,10 +241,17 @@ public class Level implements java.io.Serializable {
         return name;
     }
 
-    // package-private getLevelName() is used by the implementation
-    // instead of getName() to avoid calling the subclass's version
-    final String getLevelName() {
-        return this.name;
+    /**
+     * Return the localized string name of the Level, for
+     * the current default locale.
+     * <p>
+     * If no localization information is available, the
+     * non-localized name is returned.
+     *
+     * @return localized name
+     */
+    public String getLocalizedName() {
+        return name;
     }
 
     // Returns a mirrored Level object that matches the given name as
