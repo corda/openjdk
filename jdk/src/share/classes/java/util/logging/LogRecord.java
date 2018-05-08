@@ -25,8 +25,6 @@
 
 package java.util.logging;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.io.*;
 
 import sun.misc.JavaLangAccess;
@@ -69,33 +67,10 @@ import sun.misc.SharedSecrets;
  */
 
 public class LogRecord implements java.io.Serializable {
-    private static final AtomicLong globalSequenceNumber
-        = new AtomicLong(0);
-
-    /**
-     * The default value of threadID will be the current thread's
-     * thread id, for ease of correlation, unless it is greater than
-     * MIN_SEQUENTIAL_THREAD_ID, in which case we try harder to keep
-     * our promise to keep threadIDs unique by avoiding collisions due
-     * to 32-bit wraparound.  Unfortunately, LogRecord.getThreadID()
-     * returns int, while Thread.getId() returns long.
-     */
-    private static final int MIN_SEQUENTIAL_THREAD_ID = Integer.MAX_VALUE / 2;
-
-    private static final AtomicInteger nextThreadId
-        = new AtomicInteger(MIN_SEQUENTIAL_THREAD_ID);
-
-    private static final ThreadLocal<Integer> threadIds = new ThreadLocal<>();
-
     /**
      * @serial Logging message level
      */
     private Level level;
-
-    /**
-     * @serial Sequence number
-     */
-    private long sequenceNumber;
 
     /**
      * @serial Class that issued logging call
@@ -111,16 +86,6 @@ public class LogRecord implements java.io.Serializable {
      * @serial Non-localized raw message text
      */
     private String message;
-
-    /**
-     * @serial Thread ID for thread that issued logging call.
-     */
-    private int threadID;
-
-    /**
-     * @serial Event time in milliseconds since 1970
-     */
-    private long millis;
 
     /**
      * @serial The Throwable (if any) associated with log message
@@ -142,32 +107,7 @@ public class LogRecord implements java.io.Serializable {
     private transient ResourceBundle resourceBundle;
 
     /**
-     * Returns the default value for a new LogRecord's threadID.
-     */
-    private int defaultThreadID() {
-        long tid = Thread.currentThread().getId();
-        if (tid < MIN_SEQUENTIAL_THREAD_ID) {
-            return (int) tid;
-        } else {
-            Integer id = threadIds.get();
-            if (id == null) {
-                id = nextThreadId.getAndIncrement();
-                threadIds.set(id);
-            }
-            return id;
-        }
-    }
-
-    /**
      * Construct a LogRecord with the given level and message values.
-     * <p>
-     * The sequence property will be initialized with a new unique value.
-     * These sequence values are allocated in increasing order within a VM.
-     * <p>
-     * The millis property will be initialized to the current time.
-     * <p>
-     * The thread ID property will be initialized with a unique ID for
-     * the current thread.
      * <p>
      * All other properties will be initialized to "null".
      *
@@ -179,11 +119,6 @@ public class LogRecord implements java.io.Serializable {
         level.getClass();
         this.level = level;
         message = msg;
-        // Assign a thread ID and a unique sequence number.
-        sequenceNumber = globalSequenceNumber.getAndIncrement();
-        threadID = defaultThreadID();
-        millis = System.currentTimeMillis();
-        needToInferCaller = true;
    }
 
     /**
@@ -264,29 +199,6 @@ public class LogRecord implements java.io.Serializable {
             throw new NullPointerException();
         }
         this.level = level;
-    }
-
-    /**
-     * Get the sequence number.
-     * <p>
-     * Sequence numbers are normally assigned in the LogRecord
-     * constructor, which assigns unique sequence numbers to
-     * each new LogRecord in increasing order.
-     * @return the sequence number
-     */
-    public long getSequenceNumber() {
-        return sequenceNumber;
-    }
-
-    /**
-     * Set the sequence number.
-     * <p>
-     * Sequence numbers are normally assigned in the LogRecord constructor,
-     * so it should not normally be necessary to use this method.
-     * @param seq the sequence number
-     */
-    public void setSequenceNumber(long seq) {
-        sequenceNumber = seq;
     }
 
     /**
@@ -395,44 +307,6 @@ public class LogRecord implements java.io.Serializable {
      */
     public void setParameters(Object parameters[]) {
         this.parameters = parameters;
-    }
-
-    /**
-     * Get an identifier for the thread where the message originated.
-     * <p>
-     * This is a thread identifier within the Java VM and may or
-     * may not map to any operating system ID.
-     *
-     * @return thread ID
-     */
-    public int getThreadID() {
-        return threadID;
-    }
-
-    /**
-     * Set an identifier for the thread where the message originated.
-     * @param threadID  the thread ID
-     */
-    public void setThreadID(int threadID) {
-        this.threadID = threadID;
-    }
-
-    /**
-     * Get event time in milliseconds since 1970.
-     *
-     * @return event time in millis since 1970
-     */
-    public long getMillis() {
-        return millis;
-    }
-
-    /**
-     * Set event time.
-     *
-     * @param millis event time in millis since 1970
-     */
-    public void setMillis(long millis) {
-        this.millis = millis;
     }
 
     /**
