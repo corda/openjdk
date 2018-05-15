@@ -147,10 +147,6 @@ public final class SecurityConstants {
             newAWTPermission("accessSystemTray");
     }
 
-    // java.net.URL
-    public static final NetPermission SPECIFY_HANDLER_PERMISSION =
-       new NetPermission("specifyStreamHandler");
-
     // java.net.ProxySelector
     public static final NetPermission SET_PROXYSELECTOR_PERMISSION =
        new NetPermission("setProxySelector");
