@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
-import sun.security.util.SecurityConstants;
 
 /**
  * Class {@code URL} represents a Uniform Resource
@@ -650,7 +649,6 @@ public final class URL implements java.io.Serializable {
      * Checks for permission to specify a stream handler.
      */
     private void checkSpecifyHandler(SecurityManager sm) {
-        sm.checkPermission(SecurityConstants.SPECIFY_HANDLER_PERMISSION);
     }
 
     /**

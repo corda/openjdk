@@ -27,11 +27,9 @@ package java.net;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.File;
 import java.io.OutputStream;
 import java.util.Hashtable;
 import sun.net.util.IPAddressUtil;
-import sun.net.www.ParseUtil;
 
 /**
  * The abstract class {@code URLStreamHandler} is the common
