@@ -48,8 +48,7 @@ $(eval $(call SetupJavaCompilation,BUILD_JAXWS, \
     BIN := $(JAXWS_OUTPUTDIR)/jaxws_classes, \
     COPY := .xsd, \
     COPY_FILES := $(JAXWS_TOPDIR)/src/share/jaxws_classes/com/sun/tools/internal/xjc/runtime/JAXBContextFactory.java \
-        $(JAXWS_TOPDIR)/src/share/jaxws_classes/com/sun/tools/internal/xjc/runtime/ZeroOneBooleanAdapter.java \
-        $(JAXWS_TOPDIR)/src/share/jaxws_classes/com/sun/xml/internal/ws/assembler/jaxws-tubes-default.xml, \
+        $(JAXWS_TOPDIR)/src/share/jaxws_classes/com/sun/tools/internal/xjc/runtime/ZeroOneBooleanAdapter.java, \
     ADD_JAVAC_FLAGS = -Xbootclasspath/p:$(OUTPUT_ROOT)/jaxp/dist/lib/classes.jar))
 
 $(JAXWS_OUTPUTDIR)/jaxws_classes/META-INF/services/com.sun.tools.internal.ws.wscompile.Plugin: \

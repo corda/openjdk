@@ -254,37 +254,6 @@ public class JavaClass extends AccessFlags implements Cloneable, Node {
   }
 
   /**
-   * Dump class to a file.
-   *
-   * @param file Output file
-   * @throws IOException
-   */
-  public void dump(File file) throws IOException
-  {
-    String parent = file.getParent();
-
-    if(parent != null) {
-      File dir = new File(parent);
-
-      if(dir != null)
-        dir.mkdirs();
-    }
-
-    dump(new DataOutputStream(new FileOutputStream(file)));
-  }
-
-  /**
-   * Dump class to a file named file_name.
-   *
-   * @param file_name Output file name
-   * @exception IOException
-   */
-  public void dump(String file_name) throws IOException
-  {
-    dump(new File(file_name));
-  }
-
-  /**
    * @return class in binary format
    */
   public byte[] getBytes() {
