@@ -28,14 +28,12 @@ package com.sun.xml.internal.stream.buffer;
 import com.sun.xml.internal.stream.buffer.sax.Properties;
 import com.sun.xml.internal.stream.buffer.sax.SAXBufferCreator;
 import com.sun.xml.internal.stream.buffer.stax.StreamReaderBufferCreator;
-import com.sun.xml.internal.stream.buffer.stax.StreamWriterBufferCreator;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -117,21 +115,6 @@ public class MutableXMLStreamBuffer extends XMLStreamBuffer {
         reset();
         StreamReaderBufferCreator c = new StreamReaderBufferCreator(this);
         c.create(reader);
-    }
-
-    /**
-     * Create contents of a buffer from a XMLStreamWriter.
-     *
-     * <p>
-     * The MutableXMLStreamBuffer is reset (see {@link #reset}) before creation.
-     *
-     * <p>
-     * The MutableXMLStreamBuffer is created by consuming events on a XMLStreamWriter using
-     * an instance of {@link StreamWriterBufferCreator}.
-     */
-    public XMLStreamWriter createFromXMLStreamWriter() {
-        reset();
-        return new StreamWriterBufferCreator(this);
     }
 
     /**

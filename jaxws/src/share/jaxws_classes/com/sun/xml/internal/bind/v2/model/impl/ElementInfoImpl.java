@@ -32,7 +32,6 @@ import java.util.List;
 
 import javax.activation.MimeType;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlAttachmentRef;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
@@ -260,13 +259,6 @@ class ElementInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M> implements ElementI
             XmlJavaTypeAdapter adapter = reader().getMethodAnnotation(XmlJavaTypeAdapter.class,m,this);
             if(adapter!=null)
                 a = new Adapter<T,C>(adapter,reader(),nav());
-            else {
-                XmlAttachmentRef xsa = reader().getMethodAnnotation(XmlAttachmentRef.class,m,this);
-                if(xsa!=null) {
-                    TODO.prototype("in Annotation Processing swaRefAdapter isn't avaialble, so this returns null");
-                    a = new Adapter<T,C>(owner.nav.asDecl(SwaRefAdapter.class),owner.nav);
-                }
-            }
         }
         this.adapter = a;
 

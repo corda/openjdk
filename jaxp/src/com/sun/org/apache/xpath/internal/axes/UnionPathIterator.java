@@ -249,28 +249,6 @@ public class UnionPathIterator extends LocPathIterator
   }
 
   /**
-   * Read the object from a serialization stream.
-   *
-   * @param stream Input stream to read from
-   *
-   * @throws java.io.IOException
-   * @throws javax.xml.transform.TransformerException
-   */
-  private void readObject(java.io.ObjectInputStream stream)
-          throws java.io.IOException, javax.xml.transform.TransformerException
-  {
-    try
-    {
-      stream.defaultReadObject();
-      m_clones =  new IteratorPool(this);
-    }
-    catch (ClassNotFoundException cnfe)
-    {
-      throw new javax.xml.transform.TransformerException(cnfe);
-    }
-  }
-
-  /**
    * Get a cloned LocPathIterator that holds the same
    * position as this iterator.
    *

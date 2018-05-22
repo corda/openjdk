@@ -46,7 +46,6 @@ import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyAttribute;
 import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlAttachmentRef;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
@@ -592,7 +591,7 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
     private static enum SecondaryAnnotation {
         JAVA_TYPE       (0x01, XmlJavaTypeAdapter.class),
         ID_IDREF        (0x02, XmlID.class, XmlIDREF.class),
-        BINARY          (0x04, XmlInlineBinaryData.class, XmlMimeType.class, XmlAttachmentRef.class),
+        BINARY          (0x04, XmlInlineBinaryData.class, XmlMimeType.class),
         ELEMENT_WRAPPER (0x08, XmlElementWrapper.class),
         LIST            (0x10, XmlList.class),
         SCHEMA_TYPE     (0x20, XmlSchemaType.class);

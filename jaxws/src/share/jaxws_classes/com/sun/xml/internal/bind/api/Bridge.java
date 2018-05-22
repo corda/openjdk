@@ -31,8 +31,6 @@ import java.io.OutputStream;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.attachment.AttachmentMarshaller;
-import javax.xml.bind.attachment.AttachmentUnmarshaller;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -88,13 +86,8 @@ public abstract class Bridge<T> {
      * @since 2.0 EA1
      */
     public final void marshal(T object,XMLStreamWriter output) throws JAXBException {
-        marshal(object,output,null);
-    }
-    public final void marshal(T object,XMLStreamWriter output, AttachmentMarshaller am) throws JAXBException {
         Marshaller m = context.marshallerPool.take();
-        m.setAttachmentMarshaller(am);
         marshal(m,object,output);
-        m.setAttachmentMarshaller(null);
         context.marshallerPool.recycle(m);
     }
 
@@ -119,16 +112,8 @@ public abstract class Bridge<T> {
      * @since 2.0 EA1
      */
     public void marshal(T object,OutputStream output, NamespaceContext nsContext) throws JAXBException {
-        marshal(object,output,nsContext,null);
-    }
-    /**
-     * @since 2.0.2
-     */
-    public void marshal(T object,OutputStream output, NamespaceContext nsContext, AttachmentMarshaller am) throws JAXBException {
         Marshaller m = context.marshallerPool.take();
-        m.setAttachmentMarshaller(am);
         marshal(m,object,output,nsContext);
-        m.setAttachmentMarshaller(null);
         context.marshallerPool.recycle(m);
     }
 
@@ -156,16 +141,8 @@ public abstract class Bridge<T> {
      * @since 2.0 EA4
      */
     public final void marshal(T object, ContentHandler contentHandler) throws JAXBException {
-        marshal(object,contentHandler,null);
-    }
-    /**
-     * @since 2.0.2
-     */
-    public final void marshal(T object, ContentHandler contentHandler, AttachmentMarshaller am) throws JAXBException {
         Marshaller m = context.marshallerPool.take();
-        m.setAttachmentMarshaller(am);
         marshal(m,object,contentHandler);
-        m.setAttachmentMarshaller(null);
         context.marshallerPool.recycle(m);
     }
     public final void marshal(@NotNull BridgeContext context,T object, ContentHandler contentHandler) throws JAXBException {
@@ -189,7 +166,6 @@ public abstract class Bridge<T> {
 
 
     private T exit(T r, Unmarshaller u) {
-        u.setAttachmentUnmarshaller(null);
         context.unmarshallerPool.recycle(u);
         return r;
     }
@@ -211,14 +187,7 @@ public abstract class Bridge<T> {
      * @since 2.0 EA1
      */
     public final @NotNull T unmarshal(@NotNull XMLStreamReader in) throws JAXBException {
-        return unmarshal(in,null);
-    }
-    /**
-     * @since 2.0.3
-     */
-    public final @NotNull T unmarshal(@NotNull XMLStreamReader in, @Nullable AttachmentUnmarshaller au) throws JAXBException {
         Unmarshaller u = context.unmarshallerPool.take();
-        u.setAttachmentUnmarshaller(au);
         return exit(unmarshal(u,in),u);
     }
     public final @NotNull T unmarshal(@NotNull BridgeContext context, @NotNull XMLStreamReader in) throws JAXBException {
@@ -243,14 +212,7 @@ public abstract class Bridge<T> {
      * @since 2.0 EA1
      */
     public final @NotNull T unmarshal(@NotNull Source in) throws JAXBException {
-        return unmarshal(in,null);
-    }
-    /**
-     * @since 2.0.3
-     */
-    public final @NotNull T unmarshal(@NotNull Source in, @Nullable AttachmentUnmarshaller au) throws JAXBException {
         Unmarshaller u = context.unmarshallerPool.take();
-        u.setAttachmentUnmarshaller(au);
         return exit(unmarshal(u,in),u);
     }
     public final @NotNull T unmarshal(@NotNull BridgeContext context, @NotNull Source in) throws JAXBException {
@@ -298,14 +260,7 @@ public abstract class Bridge<T> {
      * @since 2.0 FCS
      */
     public final @NotNull T unmarshal(@NotNull Node n) throws JAXBException {
-        return unmarshal(n,null);
-    }
-    /**
-     * @since 2.0.3
-     */
-    public final @NotNull T unmarshal(@NotNull Node n, @Nullable AttachmentUnmarshaller au) throws JAXBException {
         Unmarshaller u = context.unmarshallerPool.take();
-        u.setAttachmentUnmarshaller(au);
         return exit(unmarshal(u,n),u);
     }
     public final @NotNull T unmarshal(@NotNull BridgeContext context, @NotNull Node n) throws JAXBException {

@@ -21,8 +21,6 @@
 package com.sun.org.apache.xerces.internal.dom;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
 import org.w3c.dom.TypeInfo;
 import org.w3c.dom.Attr;
@@ -1204,36 +1202,5 @@ public class AttrImpl
             }
         }
     } // checkNormalizationAfterRemove(ChildNode)
-
-    //
-    // Serialization methods
-    //
-
-    /** Serialize object. */
-    private void writeObject(ObjectOutputStream out) throws IOException {
-
-        // synchronize chilren
-        if (needsSyncChildren()) {
-            synchronizeChildren();
-        }
-        // write object
-        out.defaultWriteObject();
-
-    } // writeObject(ObjectOutputStream)
-
-    /** Deserialize object. */
-    private void readObject(ObjectInputStream ois)
-        throws ClassNotFoundException, IOException {
-
-        // perform default deseralization
-        ois.defaultReadObject();
-
-        // hardset synchildren - so we don't try to sync -
-        // it does not make any sense to try to synchildren when we just
-        // deserialize object.
-        needsSyncChildren(false);
-
-    } // readObject(ObjectInputStream)
-
 
 } // class AttrImpl

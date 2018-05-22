@@ -29,7 +29,6 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import java.io.BufferedInputStream;
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -51,14 +50,6 @@ import java.net.URL;
  * @author Jitendra Kotamraju
  */
 public abstract class StreamingDataHandler extends DataHandler implements Closeable {
-
-    public StreamingDataHandler(Object o, String s) {
-        super(o, s);
-    }
-
-    public StreamingDataHandler(URL url) {
-        super(url);
-    }
 
     public StreamingDataHandler(DataSource dataSource) {
         super(dataSource);
@@ -95,44 +86,6 @@ public abstract class StreamingDataHandler extends DataHandler implements Closea
      *      if any i/o error
      */
     public abstract InputStream readOnce() throws IOException;
-
-    /**
-     * Obtains the BLOB into a specified file.
-     *
-     * <p>
-     * Semantically, this method is roughly equivalent to the following
-     * code, except that the actual implementation is likely to be a lot faster.
-     *
-     * <pre>
-     * InputStream i = getInputStream();
-     * OutputStream o = new FileOutputStream(dst);
-     * int ch;
-     * while((ch=i.read())!=-1)  o.write(ch);
-     * i.close();
-     * o.close();
-     * </pre>
-     *
-     * <p>
-     * The main motivation behind this method is that often
-     * {@link DataHandler} that reads data from a streaming source
-     * will use a temporary file as a data store to hold data
-     * (think of commons-fileupload.) In such case this method
-     * can be as fast as calling {@link File#renameTo(File)}.
-     *
-     * <p>
-     * This method shouldn't be called when there are any
-     * open streams.
-     *
-     * <p>
-     * After this method is invoked, {@link #readOnce()} and
-     * {@link #getInputStream()} will simply open the destination
-     * file you've specified as an argument. So if you further
-     * move the file or delete this file, those methods will
-     * behave in undefined fashion. For a simliar reason,
-     * calling this method multiple times will cause
-     * undefined behavior.
-     */
-    public abstract void moveTo(File dst) throws IOException;
 
     /**
      * Releases any resources associated with this DataHandler.

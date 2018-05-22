@@ -21,8 +21,6 @@
 package com.sun.org.apache.xerces.internal.dom;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -601,29 +599,6 @@ public class NamedNodeMapImpl
     public void removeAll (){
         if (nodes != null) {
             nodes.clear();
-        }
-    }
-
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        if (nodes != null) {
-            nodes = new ArrayList(nodes);
-        }
-    }
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        List oldNodes = this.nodes;
-        try {
-            if (oldNodes != null) {
-                this.nodes = new Vector(oldNodes);
-            }
-            out.defaultWriteObject();
-        }
-        // If the write fails for some reason ensure
-        // that we restore the original object.
-        finally {
-            this.nodes = oldNodes;
         }
     }
 

@@ -21,9 +21,6 @@
 package com.sun.org.apache.xerces.internal.dom;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamField;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -102,31 +99,6 @@ public class DocumentTypeImpl
     private int doctypeNumber=0;
 
     private Map<String, UserDataRecord> userData =  null;
-
-
-    /**
-     * @serialField name String document type name
-     * @serialField entities NamedNodeMapImpl entities
-     * @serialField notations NamedNodeMapImpl notations
-     * @serialField elements NamedNodeMapImpl elements
-     * @serialField publicID String support public ID
-     * @serialField systemID String support system ID
-     * @serialField internalSubset String support internal subset
-     * @serialField doctypeNumber int Doctype number
-     * @serialField userData Hashtable user data
-     */
-    private static final ObjectStreamField[] serialPersistentFields =
-        new ObjectStreamField[] {
-            new ObjectStreamField("name", String.class),
-            new ObjectStreamField("entities", NamedNodeMapImpl.class),
-            new ObjectStreamField("notations", NamedNodeMapImpl.class),
-            new ObjectStreamField("elements", NamedNodeMapImpl.class),
-            new ObjectStreamField("publicID", String.class),
-            new ObjectStreamField("systemID", String.class),
-            new ObjectStreamField("internalSubset", String.class),
-            new ObjectStreamField("doctypeNumber", int.class),
-            new ObjectStreamField("userData", Hashtable.class),
-        };
 
     //
     // Constructors
@@ -511,48 +483,5 @@ public class DocumentTypeImpl
     @Override
     protected Map<String, UserDataRecord> getUserDataRecord(){
         return userData;
-    }
-
-    /**
-     * @serialData Serialized fields. Convert Map to Hashtable for backward
-     * compatibility.
-     */
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        // Convert the HashMap to Hashtable
-        Hashtable<String, UserDataRecord> ud = (userData == null)? null : new Hashtable<>(userData);
-
-        // Write serialized fields
-        ObjectOutputStream.PutField pf = out.putFields();
-        pf.put("name", name);
-        pf.put("entities", entities);
-        pf.put("notations", notations);
-        pf.put("elements", elements);
-        pf.put("publicID", publicID);
-        pf.put("systemID", systemID);
-        pf.put("internalSubset", internalSubset);
-        pf.put("doctypeNumber", doctypeNumber);
-        pf.put("userData", ud);
-        out.writeFields();
-    }
-
-    @SuppressWarnings("unchecked")
-    private void readObject(ObjectInputStream in)
-                        throws IOException, ClassNotFoundException {
-        // We have to read serialized fields first.
-        ObjectInputStream.GetField gf = in.readFields();
-        name = (String)gf.get("name", null);
-        entities = (NamedNodeMapImpl)gf.get("entities", null);
-        notations = (NamedNodeMapImpl)gf.get("notations", null);
-        elements = (NamedNodeMapImpl)gf.get("elements", null);
-        publicID = (String)gf.get("publicID", null);
-        systemID = (String)gf.get("systemID", null);
-        internalSubset = (String)gf.get("internalSubset", null);
-        doctypeNumber = gf.get("doctypeNumber", 0);
-
-        Hashtable<String, UserDataRecord> ud =
-                (Hashtable<String, UserDataRecord>)gf.get("userData", null);
-
-        //convert the Hashtable back to HashMap
-        if (ud != null) userData = new HashMap<>(ud);
     }
 } // class DocumentTypeImpl

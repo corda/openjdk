@@ -51,7 +51,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.SchemaOutputResolver;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Validator;
-import javax.xml.bind.annotation.XmlAttachmentRef;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlNs;
 import javax.xml.bind.annotation.XmlSchema;
@@ -228,7 +227,6 @@ public final class JAXBContextImpl extends JAXBRIContext {
 
     private @NotNull RuntimeAnnotationReader annotationReader;
 
-    private /*almost final*/ boolean hasSwaRef;
     private final @NotNull Map<Class,Class> subclassReplacements;
 
     /**
@@ -365,10 +363,6 @@ public final class JAXBContextImpl extends JAXBRIContext {
             if(xjta!=null) {
                 a = new Adapter<Type,Class>(xjta.value(),nav);
             }
-            if(tr.get(XmlAttachmentRef.class)!=null) {
-                a = new Adapter<Type,Class>(SwaRefAdapter.class,nav);
-                hasSwaRef = true;
-            }
 
             if(a!=null) {
                 erasedType = (Class) nav.erasure(a.defaultType);
@@ -402,7 +396,7 @@ public final class JAXBContextImpl extends JAXBRIContext {
      * True if this JAXBContext has {@link XmlAttachmentRef}.
      */
     public boolean hasSwaRef() {
-        return hasSwaRef;
+        return false;
     }
 
     public RuntimeTypeInfoSet getRuntimeTypeInfoSet() {
@@ -439,7 +433,6 @@ public final class JAXBContextImpl extends JAXBRIContext {
             builder.getTypeInfo(new Ref<Type,Class>(c));
         }
 
-        this.hasSwaRef |= builder.hasSwaRef;
         RuntimeTypeInfoSet r = builder.link();
 
         errorHandler.check();
