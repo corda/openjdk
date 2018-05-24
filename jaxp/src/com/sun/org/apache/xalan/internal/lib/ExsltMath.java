@@ -298,16 +298,6 @@ public class ExsltMath extends ExsltBase
    }
 
   /**
-   * The math:random function returns a random number from 0 to 1.
-   *
-   * @return A random double from 0 to 1
-   */
-   public static double random()
-   {
-     return Math.random();
-   }
-
-  /**
    * The math:sin function returns the sine of the number.
    *
    * @param num A number

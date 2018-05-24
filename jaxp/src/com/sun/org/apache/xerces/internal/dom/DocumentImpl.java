@@ -23,9 +23,6 @@ package com.sun.org.apache.xerces.internal.dom;
 import com.sun.org.apache.xerces.internal.dom.events.EventImpl;
 import com.sun.org.apache.xerces.internal.dom.events.MutationEventImpl;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamField;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,21 +111,6 @@ public class DocumentImpl
 
     /** Bypass mutation events firing. */
     protected boolean mutationEvents = false;
-
-
-    /**
-     * @serialField iterators Vector Node iterators
-     * @serialField ranges Vector ranges
-     * @serialField eventListeners Hashtable Event listeners
-     * @serialField mutationEvents boolean Bypass mutation events firing
-     */
-    private static final ObjectStreamField[] serialPersistentFields =
-        new ObjectStreamField[] {
-            new ObjectStreamField("iterators", Vector.class),
-            new ObjectStreamField("ranges", Vector.class),
-            new ObjectStreamField("eventListeners", Hashtable.class),
-            new ObjectStreamField("mutationEvents", boolean.class),
-        };
 
     //
     // Constructors
@@ -1325,55 +1307,5 @@ public class DocumentImpl
      */
     void renamedElement(Element oldEl, Element newEl) {
         // REVISIT: To be implemented!!!
-    }
-
-
-    /**
-     * @serialData Serialized fields. Convert Maps to Hashtables and Lists
-     * to Vectors for backward compatibility.
-     */
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        // Convert Maps to Hashtables, Lists to Vectors
-        Vector<NodeIterator> it = (iterators == null)? null : new Vector<>(iterators);
-        Vector<Range> r = (ranges == null)? null : new Vector<>(ranges);
-
-        Hashtable<NodeImpl, Vector<LEntry>> el = null;
-        if (eventListeners != null) {
-            el = new Hashtable<>();
-            for (Map.Entry<NodeImpl, List<LEntry>> e : eventListeners.entrySet()) {
-                 el.put(e.getKey(), new Vector<>(e.getValue()));
-            }
-        }
-
-        // Write serialized fields
-        ObjectOutputStream.PutField pf = out.putFields();
-        pf.put("iterators", it);
-        pf.put("ranges", r);
-        pf.put("eventListeners", el);
-        pf.put("mutationEvents", mutationEvents);
-        out.writeFields();
-    }
-
-    @SuppressWarnings("unchecked")
-    private void readObject(ObjectInputStream in)
-                        throws IOException, ClassNotFoundException {
-        // We have to read serialized fields first.
-        ObjectInputStream.GetField gf = in.readFields();
-        Vector<NodeIterator> it = (Vector<NodeIterator>)gf.get("iterators", null);
-        Vector<Range> r = (Vector<Range>)gf.get("ranges", null);
-        Hashtable<NodeImpl, Vector<LEntry>> el =
-                (Hashtable<NodeImpl, Vector<LEntry>>)gf.get("eventListeners", null);
-
-        mutationEvents = gf.get("mutationEvents", false);
-
-        //convert Hashtables back to HashMaps and Vectors to Lists
-        if (it != null) iterators = new ArrayList<>(it);
-        if (r != null) ranges = new ArrayList<>(r);
-        if (el != null) {
-            eventListeners = new HashMap<>();
-            for (Map.Entry<NodeImpl, Vector<LEntry>> e : el.entrySet()) {
-                 eventListeners.put(e.getKey(), new ArrayList<>(e.getValue()));
-            }
-        }
     }
 } // class DocumentImpl

@@ -26,7 +26,6 @@ import com.sun.org.apache.xerces.internal.parsers.XIncludeAwareParserConfigurati
 import com.sun.org.apache.xerces.internal.util.XMLChar;
 import com.sun.org.apache.xerces.internal.utils.ObjectFactory;
 import com.sun.org.apache.xerces.internal.xni.grammars.XMLGrammarDescription;
-import com.sun.org.apache.xml.internal.serialize.DOMSerializerImpl;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
@@ -386,7 +385,7 @@ public class CoreDOMImplementationImpl
          * reference to the default error handler.
          */
         public LSSerializer createLSSerializer() {
-        return new DOMSerializerImpl();
+            throw new UnsupportedOperationException("Output not supported");
     }
         /**
          * DOM Level 3 LS CR - Experimental.

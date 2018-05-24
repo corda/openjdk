@@ -21,9 +21,6 @@
 package com.sun.org.apache.xerces.internal.impl.xpath.regex;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamField;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1430,14 +1427,6 @@ class Token implements java.io.Serializable {
 
         List<Token> children;
 
-        /**
-         * @serialField children Vector children
-         */
-        private static final ObjectStreamField[] serialPersistentFields =
-            new ObjectStreamField[] {
-                new ObjectStreamField("children", Vector.class),
-            };
-
         UnionToken(int type) {
             super(type);
         }
@@ -1545,30 +1534,6 @@ class Token implements java.io.Serializable {
                 ret = new String(sb);
             }
             return ret;
-        }
-
-        /**
-         * @serialData Serialized fields. Convert the List to Vector for backward compatibility.
-         */
-        private void writeObject(ObjectOutputStream out) throws IOException {
-            // Convert List to Vector
-            Vector<Token> vChildren = (children == null)? null : new Vector<>(children);
-
-            // Write serialized fields
-            ObjectOutputStream.PutField pf = out.putFields();
-            pf.put("children", vChildren);
-            out.writeFields();
-        }
-
-        @SuppressWarnings("unchecked")
-        private void readObject(ObjectInputStream in)
-                            throws IOException, ClassNotFoundException {
-            // We have to read serialized fields first.
-            ObjectInputStream.GetField gf = in.readFields();
-            Vector<Token> vChildren = (Vector<Token>)gf.get("children", null);
-
-            //convert Vector back to List
-            if (vChildren != null) children = new ArrayList<>(vChildren);
         }
     }
 }

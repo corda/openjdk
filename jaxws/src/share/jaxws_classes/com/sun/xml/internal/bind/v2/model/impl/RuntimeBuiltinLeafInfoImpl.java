@@ -25,11 +25,6 @@
 
 package com.sun.xml.internal.bind.v2.model.impl;
 
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.MediaTracker;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -56,13 +51,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.ImageOutputStream;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.helpers.ValidationEventImpl;
 import javax.xml.datatype.DatatypeConstants;
@@ -365,182 +353,6 @@ public abstract class RuntimeBuiltinLeafInfoImpl<T> extends BuiltinLeafInfoImpl<
                 classes that map to base64Binary / MTOM related classes.
                 a part of the secondary binding.
             */
-        secondaryList.add(
-            new PcdataImpl<Image>(Image.class, createXS("base64Binary")) {
-                public Image parse(CharSequence text) throws SAXException  {
-                    try {
-                        InputStream is;
-                        if(text instanceof Base64Data)
-                            is = ((Base64Data)text).getInputStream();
-                        else
-                            is = new ByteArrayInputStream(decodeBase64(text)); // TODO: buffering is inefficient
-
-                        // technically we should check the MIME type here, but
-                        // normally images can be content-sniffed.
-                        // so the MIME type check will only make us slower and draconian, both of which
-                        // JAXB 2.0 isn't interested.
-                        try {
-                            return ImageIO.read(is);
-                        } finally {
-                            is.close();
-                        }
-                    } catch (IOException e) {
-                        UnmarshallingContext.getInstance().handleError(e);
-                        return null;
-                    }
-                }
-
-                private BufferedImage convertToBufferedImage(Image image) throws IOException {
-                    if (image instanceof BufferedImage) {
-                        return (BufferedImage)image;
-
-                    } else {
-                        MediaTracker tracker = new MediaTracker(new Component(){}); // not sure if this is the right thing to do.
-                        tracker.addImage(image, 0);
-                        try {
-                            tracker.waitForAll();
-                        } catch (InterruptedException e) {
-                            throw new IOException(e.getMessage());
-                        }
-                        BufferedImage bufImage = new BufferedImage(
-                                image.getWidth(null),
-                                image.getHeight(null),
-                                BufferedImage.TYPE_INT_ARGB);
-
-                        Graphics g = bufImage.createGraphics();
-                        g.drawImage(image, 0, 0, null);
-                        return bufImage;
-                    }
-                }
-
-                public Base64Data print(Image v) {
-                    ByteArrayOutputStreamEx imageData = new ByteArrayOutputStreamEx();
-                    XMLSerializer xs = XMLSerializer.getInstance();
-
-                    String mimeType = xs.getXMIMEContentType();
-                    if(mimeType==null || mimeType.startsWith("image/*"))
-                        // because PNG is lossless, it's a good default
-                        //
-                        // mime type can be a range, in which case we can't just pass that
-                        // to ImageIO.getImageWritersByMIMEType, so here I'm just assuming
-                        // the default of PNG. Not sure if this is complete.
-                        mimeType = "image/png";
-
-                    try {
-                        Iterator<ImageWriter> itr = ImageIO.getImageWritersByMIMEType(mimeType);
-                        if(itr.hasNext()) {
-                            ImageWriter w = itr.next();
-                            ImageOutputStream os = ImageIO.createImageOutputStream(imageData);
-                            w.setOutput(os);
-                            w.write(convertToBufferedImage(v));
-                            os.close();
-                            w.dispose();
-                        } else {
-                            // no encoder
-                            xs.handleEvent(new ValidationEventImpl(
-                                ValidationEvent.ERROR,
-                                Messages.NO_IMAGE_WRITER.format(mimeType),
-                                xs.getCurrentLocation(null) ));
-                            // TODO: proper error reporting
-                            throw new RuntimeException("no encoder for MIME type "+mimeType);
-                        }
-                    } catch (IOException e) {
-                        xs.handleError(e);
-                        // TODO: proper error reporting
-                        throw new RuntimeException(e);
-                    }
-                    Base64Data bd = new Base64Data();
-                    imageData.set(bd,mimeType);
-                    return bd;
-                }
-            });
-        secondaryList.add(
-            new PcdataImpl<DataHandler>(DataHandler.class, createXS("base64Binary")) {
-                public DataHandler parse(CharSequence text) {
-                    if(text instanceof Base64Data)
-                        return ((Base64Data)text).getDataHandler();
-                    else
-                        return new DataHandler(new ByteArrayDataSource(decodeBase64(text),
-                            UnmarshallingContext.getInstance().getXMIMEContentType()));
-                }
-
-                public Base64Data print(DataHandler v) {
-                    Base64Data bd = new Base64Data();
-                    bd.set(v);
-                    return bd;
-                }
-            });
-        secondaryList.add(
-            new PcdataImpl<Source>(Source.class, createXS("base64Binary")) {
-                public Source parse(CharSequence text) throws SAXException  {
-                    try {
-                        if(text instanceof Base64Data)
-                            return new DataSourceSource( ((Base64Data)text).getDataHandler() );
-                        else
-                            return new DataSourceSource(new ByteArrayDataSource(decodeBase64(text),
-                                UnmarshallingContext.getInstance().getXMIMEContentType()));
-                    } catch (MimeTypeParseException e) {
-                        UnmarshallingContext.getInstance().handleError(e);
-                        return null;
-                    }
-                }
-
-                public Base64Data print(Source v) {
-                    XMLSerializer xs = XMLSerializer.getInstance();
-                    Base64Data bd = new Base64Data();
-
-                    String contentType = xs.getXMIMEContentType();
-                    MimeType mt = null;
-                    if(contentType!=null)
-                        try {
-                            mt = new MimeType(contentType);
-                        } catch (MimeTypeParseException e) {
-                            xs.handleError(e);
-                            // recover by ignoring the content type specification
-                        }
-
-                    if( v instanceof DataSourceSource ) {
-                        // if so, we already have immutable DataSource so
-                        // this can be done efficiently
-                        DataSource ds = ((DataSourceSource)v).getDataSource();
-
-                        String dsct = ds.getContentType();
-                        if(dsct!=null && (contentType==null || contentType.equals(dsct))) {
-                            bd.set(new DataHandler(ds));
-                            return bd;
-                        }
-                    }
-
-                    // general case. slower.
-
-                    // find out the encoding
-                    String charset=null;
-                    if(mt!=null)
-                        charset = mt.getParameter("charset");
-                    if(charset==null)
-                        charset = "UTF-8";
-
-                    try {
-                        ByteArrayOutputStreamEx baos = new ByteArrayOutputStreamEx();
-                        Transformer tr = xs.getIdentityTransformer();
-                        String defaultEncoding = tr.getOutputProperty(OutputKeys.ENCODING);
-                        tr.setOutputProperty(OutputKeys.ENCODING, charset);
-                        tr.transform(v, new StreamResult(new OutputStreamWriter(baos,charset)));
-                        tr.setOutputProperty(OutputKeys.ENCODING, defaultEncoding);
-                        baos.set(bd,"application/xml; charset="+charset);
-                        return bd;
-                    } catch (TransformerException e) {
-                        // TODO: marshaller error handling
-                        xs.handleError(e);
-                    } catch (UnsupportedEncodingException e) {
-                        xs.handleError(e);
-                    }
-
-                    // error recoverly
-                    bd.set(new byte[0],"application/xml");
-                    return bd;
-                }
-            });
         secondaryList.add(
             new StringImpl<XMLGregorianCalendar>(XMLGregorianCalendar.class,
                     createXS("anySimpleType"),

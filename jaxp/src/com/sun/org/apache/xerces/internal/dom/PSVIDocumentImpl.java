@@ -22,8 +22,6 @@ package com.sun.org.apache.xerces.internal.dom;
 
 import java.io.IOException;
 import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.UserDataHandler;
 import org.w3c.dom.*;
@@ -132,19 +130,6 @@ public class PSVIDocumentImpl extends DocumentImpl {
     public DOMConfiguration getDomConfig(){
         super.getDomConfig();
         return fConfiguration;
-    }
-
-    // REVISIT: Forbid serialization of PSVI DOM until
-    // we support object serialization of grammars -- mrglavas
-
-    private void writeObject(ObjectOutputStream out)
-        throws IOException {
-        throw new NotSerializableException(getClass().getName());
-        }
-
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
-        throw new NotSerializableException(getClass().getName());
     }
 
 } // class PSVIDocumentImpl

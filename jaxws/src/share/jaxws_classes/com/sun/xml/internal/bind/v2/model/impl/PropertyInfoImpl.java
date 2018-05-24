@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.lang.annotation.Annotation;
 
 import javax.activation.MimeType;
-import javax.xml.bind.annotation.XmlAttachmentRef;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlID;
@@ -120,25 +119,18 @@ abstract class PropertyInfoImpl<T,C,F,M>
 
             xjta = getApplicableAdapter(getIndividualType());
             if(xjta==null) {
-                // ugly ugly hack, but we implement swaRef as adapter
-                XmlAttachmentRef xsa = seed.readAnnotation(XmlAttachmentRef.class);
-                if(xsa!=null) {
-                    parent.builder.hasSwaRef = true;
-                    adapter = new Adapter<T,C>(nav().asDecl(SwaRefAdapter.class),nav());
-                } else {
-                    adapter = null;
+                adapter = null;
 
-                    // if this field has adapter annotation but not applicable,
-                    // that must be an error of the user
-                    xjta = seed.readAnnotation(XmlJavaTypeAdapter.class);
-                    if(xjta!=null) {
-                        T ad = reader().getClassValue(xjta,"value");
-                        parent.builder.reportError(new IllegalAnnotationException(
-                            Messages.UNMATCHABLE_ADAPTER.format(
-                                    nav().getTypeName(ad), nav().getTypeName(t)),
-                            xjta
-                        ));
-                    }
+                // if this field has adapter annotation but not applicable,
+                // that must be an error of the user
+                xjta = seed.readAnnotation(XmlJavaTypeAdapter.class);
+                if(xjta!=null) {
+                    T ad = reader().getClassValue(xjta,"value");
+                    parent.builder.reportError(new IllegalAnnotationException(
+                        Messages.UNMATCHABLE_ADAPTER.format(
+                                nav().getTypeName(ad), nav().getTypeName(t)),
+                        xjta
+                    ));
                 }
             } else {
                 adapter = new Adapter<T,C>(xjta,reader(),nav());

@@ -40,7 +40,6 @@ import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.ValidationEventLocator;
 import javax.xml.bind.annotation.DomHandler;
 import javax.xml.bind.annotation.XmlNs;
-import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.bind.helpers.NotIdentifiableEventImpl;
 import javax.xml.bind.helpers.ValidationEventImpl;
 import javax.xml.bind.helpers.ValidationEventLocatorImpl;
@@ -58,7 +57,6 @@ import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
 import com.sun.xml.internal.bind.util.ValidationEventLocatorExImpl;
 import com.sun.xml.internal.bind.v2.WellKnownNamespace;
 import com.sun.xml.internal.bind.v2.model.runtime.RuntimeBuiltinLeafInfo;
-import com.sun.xml.internal.bind.v2.runtime.output.MTOMXmlOutput;
 import com.sun.xml.internal.bind.v2.runtime.output.NamespaceContextImpl;
 import com.sun.xml.internal.bind.v2.runtime.output.Pcdata;
 import com.sun.xml.internal.bind.v2.runtime.output.XmlOutput;
@@ -180,8 +178,6 @@ public final class XMLSerializer extends Coordinator {
      * Cached instance of {@link IntData}.
      */
     private final IntData intData = new IntData();
-
-    public AttachmentMarshaller attachmentMarshaller;
 
     /*package*/ XMLSerializer( MarshallerImpl _owner ) {
         this.marshaller = _owner;
@@ -815,8 +811,6 @@ public final class XMLSerializer extends Coordinator {
         pushCoordinator();
         nsContext.reset();
         nse = nsContext.getCurrent();
-        if(attachmentMarshaller!=null && attachmentMarshaller.isXOPPackage())
-            out = new MTOMXmlOutput(out);
         this.out = out;
         objectsWithId.clear();
         idReferencedObjects.clear();

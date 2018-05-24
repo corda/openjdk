@@ -27,14 +27,12 @@ package com.sun.xml.internal.stream.buffer;
 
 import com.sun.xml.internal.stream.buffer.sax.SAXBufferProcessor;
 import com.sun.xml.internal.stream.buffer.stax.StreamReaderBufferProcessor;
-import com.sun.xml.internal.stream.buffer.stax.StreamWriterBufferProcessor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -242,33 +240,6 @@ public abstract class XMLStreamBuffer {
     }
 
     /**
-     * Write the contents of the buffer to an XMLStreamWriter.
-     *
-     * <p>
-     * The XMLStreamBuffer will be written out to the XMLStreamWriter using
-     * an instance of {@link StreamWriterBufferProcessor}.
-     *
-     * @param writer
-     *      A XMLStreamWriter to write to.
-     * @param writeAsFragment
-     *      If true, {@link XMLStreamWriter} will not receive {@link XMLStreamWriter#writeStartDocument()}
-     *      nor {@link XMLStreamWriter#writeEndDocument()}. This is desirable behavior when
-     *      you are writing the contents of a buffer into a bigger document.
-     */
-    public final void writeToXMLStreamWriter(XMLStreamWriter writer, boolean writeAsFragment) throws XMLStreamException {
-        StreamWriterBufferProcessor p = new StreamWriterBufferProcessor(this,writeAsFragment);
-        p.process(writer);
-    }
-
-    /**
-     * @deprecated
-     *      Use {@link #writeToXMLStreamWriter(XMLStreamWriter, boolean)}
-     */
-    public final void writeToXMLStreamWriter(XMLStreamWriter writer) throws XMLStreamException {
-        writeToXMLStreamWriter(writer, this.isFragment());
-    }
-
-    /**
      * Reads the contents of the buffer from a {@link XMLReader}.
      *
      * @return
@@ -293,107 +264,12 @@ public abstract class XMLStreamBuffer {
         return new SAXBufferProcessor(this,produceFragmentEvent);
     }
 
-    /**
-     * Write the contents of the buffer to a {@link ContentHandler}.
-     *
-     * <p>
-     * If the <code>handler</code> is also an instance of other SAX-based
-     * handlers, such as {@link LexicalHandler}, than corresponding SAX events
-     * will be reported to those handlers.
-     *
-     * @param handler
-     *      The ContentHandler to receive SAX events.
-     * @param produceFragmentEvent
-     *      True to generate fragment SAX events without start/endDocument.
-     *      False to generate a full document SAX events.
-     *
-     * @throws SAXException
-     *      if a parsing fails, or if {@link ContentHandler} throws a {@link SAXException}.
-     */
-    public final void writeTo(ContentHandler handler, boolean produceFragmentEvent) throws SAXException {
-        SAXBufferProcessor p = readAsXMLReader(produceFragmentEvent);
-        p.setContentHandler(handler);
-        if (p instanceof LexicalHandler) {
-            p.setLexicalHandler((LexicalHandler)handler);
-        }
-        if (p instanceof DTDHandler) {
-            p.setDTDHandler((DTDHandler)handler);
-        }
-        if (p instanceof ErrorHandler) {
-            p.setErrorHandler((ErrorHandler)handler);
-        }
-        p.process();
-    }
-
-    /**
-     * @deprecated
-     *      Use {@link #writeTo(ContentHandler,boolean)}
-     */
-    public final void writeTo(ContentHandler handler) throws SAXException {
-        writeTo(handler,isFragment());
-    }
-
-    /**
-     * Write the contents of the buffer to a {@link ContentHandler} with errors
-     * report to a {@link ErrorHandler}.
-     *
-     * <p>
-     * If the <code>handler</code> is also an instance of other SAX-based
-     * handlers, such as {@link LexicalHandler}, than corresponding SAX events
-     * will be reported to those handlers.
-     *
-     * @param handler
-     * The ContentHandler to receive SAX events.
-     * @param errorHandler
-     * The ErrorHandler to receive error events.
-     *
-     * @throws SAXException
-     *      if a parsing fails and {@link ErrorHandler} throws a {@link SAXException},
-     *      or if {@link ContentHandler} throws a {@link SAXException}.
-     */
-    public final void writeTo(ContentHandler handler, ErrorHandler errorHandler, boolean produceFragmentEvent) throws SAXException {
-        SAXBufferProcessor p = readAsXMLReader(produceFragmentEvent);
-        p.setContentHandler(handler);
-        if (p instanceof LexicalHandler) {
-            p.setLexicalHandler((LexicalHandler)handler);
-        }
-        if (p instanceof DTDHandler) {
-            p.setDTDHandler((DTDHandler)handler);
-        }
-
-        p.setErrorHandler(errorHandler);
-
-        p.process();
-    }
-
-    public final void writeTo(ContentHandler handler, ErrorHandler errorHandler) throws SAXException {
-        writeTo(handler, errorHandler, isFragment());
-    }
-
     private static final ContextClassloaderLocal<TransformerFactory> trnsformerFactory = new ContextClassloaderLocal<TransformerFactory>() {
         @Override
         protected TransformerFactory initialValue() throws Exception {
             return TransformerFactory.newInstance();
         }
     };
-
-    /**
-     * Writes out the contents of this buffer as DOM node and append that to the given node.
-     *
-     * Faster implementation would be desirable.
-     *
-     * @return
-     *      The newly added child node.
-     */
-    public final Node writeTo(Node n) throws XMLStreamBufferException {
-        try {
-            Transformer t = trnsformerFactory.get().newTransformer();
-            t.transform(new XMLStreamBufferSource(this), new DOMResult(n));
-            return n.getLastChild();
-        } catch (TransformerException e) {
-            throw new XMLStreamBufferException(e);
-        }
-    }
 
     /**
      * Create a new buffer from a XMLStreamReader.

@@ -24,7 +24,6 @@ package com.sun.org.apache.xalan.internal.lib;
 
 import com.sun.org.apache.xalan.internal.extensions.ExpressionContext;
 import com.sun.org.apache.xalan.internal.utils.ObjectFactory;
-import com.sun.org.apache.xalan.internal.xslt.EnvironmentCheck;
 import com.sun.org.apache.xpath.internal.NodeSet;
 import com.sun.org.apache.xpath.internal.objects.XBoolean;
 import com.sun.org.apache.xpath.internal.objects.XNumber;
@@ -269,57 +268,6 @@ public class Extensions
   public static NodeList tokenize(String toTokenize)
   {
     return tokenize(toTokenize, " \t\n\r");
-  }
-
-  /**
-   * Return a Node of basic debugging information from the
-   * EnvironmentCheck utility about the Java environment.
-   *
-   * <p>Simply calls the {@link com.sun.org.apache.xalan.internal.xslt.EnvironmentCheck}
-   * utility to grab info about the Java environment and CLASSPATH,
-   * etc., and then returns the resulting Node.  Stylesheets can
-   * then maniuplate this data or simply xsl:copy-of the Node.  Note
-   * that we first attempt to load the more advanced
-   * org.apache.env.Which utility by reflection; only if that fails
-   * to we still use the internal version.  Which is available from
-   * <a href="http://xml.apache.org/commons/">http://xml.apache.org/commons/</a>.</p>
-   *
-   * <p>We throw a WrappedRuntimeException in the unlikely case
-   * that reading information from the environment throws us an
-   * exception. (Is this really the best thing to do?)</p>
-   *
-   * @param myContext an <code>ExpressionContext</code> passed in by the
-   *                  extension mechanism.  This must be an XPathContext.
-   * @return a Node as described above.
-   */
-  public static Node checkEnvironment(ExpressionContext myContext)
-  {
-
-    Document factoryDocument = getDocument();
-
-    Node resultNode = null;
-    try
-    {
-      // First use reflection to try to load Which, which is a
-      //  better version of EnvironmentCheck
-      resultNode = checkEnvironmentUsingWhich(myContext, factoryDocument);
-
-      if (null != resultNode)
-        return resultNode;
-
-      // If reflection failed, fallback to our internal EnvironmentCheck
-      EnvironmentCheck envChecker = new EnvironmentCheck();
-      Map<String, Object> h = envChecker.getEnvironmentHash();
-      resultNode = factoryDocument.createElement("checkEnvironmentExtension");
-      envChecker.appendEnvironmentReport(resultNode, factoryDocument, h);
-      envChecker = null;
-    }
-    catch(Exception e)
-    {
-      throw new com.sun.org.apache.xml.internal.utils.WrappedRuntimeException(e);
-    }
-
-    return resultNode;
   }
 
   /**

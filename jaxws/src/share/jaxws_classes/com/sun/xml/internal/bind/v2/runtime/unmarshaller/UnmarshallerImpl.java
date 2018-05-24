@@ -38,7 +38,6 @@ import javax.xml.bind.UnmarshallerHandler;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.attachment.AttachmentUnmarshaller;
 import javax.xml.bind.helpers.AbstractUnmarshallerImpl;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamConstants;
@@ -98,10 +97,6 @@ import org.xml.sax.helpers.DefaultHandler;
     /** Unmarshaller.Listener */
     private Listener externalListener;
 
-    /**
-     * The attachment unmarshaller used to support MTOM and swaRef.
-     */
-    private AttachmentUnmarshaller attachmentUnmarshaller;
     private IDResolver idResolver = new DefaultIDResolver();
 
     public UnmarshallerImpl( JAXBContextImpl context, AssociationMap assoc ) {
@@ -180,10 +175,6 @@ import org.xml.sax.helpers.DefaultHandler;
         // delegate to JAXP 1.3 for validation if the client provided a schema
         if (schema != null) {
             unmarshaller = new ValidatingUnmarshaller(schema,unmarshaller);
-        }
-
-        if(attachmentUnmarshaller!=null && attachmentUnmarshaller.isXOPPackage()) {
-            unmarshaller = new MTOMDecorator(this,unmarshaller,attachmentUnmarshaller);
         }
 
         return unmarshaller;

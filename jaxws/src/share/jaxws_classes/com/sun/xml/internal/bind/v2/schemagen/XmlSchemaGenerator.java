@@ -80,7 +80,6 @@ import com.sun.xml.internal.bind.v2.model.core.ValuePropertyInfo;
 import com.sun.xml.internal.bind.v2.model.core.WildcardMode;
 import com.sun.xml.internal.bind.v2.model.impl.ClassInfoImpl;
 import com.sun.xml.internal.bind.v2.model.nav.Navigator;
-import com.sun.xml.internal.bind.v2.runtime.SwaRefAdapter;
 import static com.sun.xml.internal.bind.v2.schemagen.Util.*;
 import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Any;
 import com.sun.xml.internal.bind.v2.schemagen.xmlschema.AttrDecls;
@@ -1479,11 +1478,7 @@ public final class XmlSchemaGenerator<T,C,F,M> {
      * Examine the specified element ref and determine if a swaRef attribute needs to be generated
      */
     private boolean generateSwaRefAdapter(PropertyInfo<T,C> prop) {
-        final Adapter<T,C> adapter = prop.getAdapter();
-        if (adapter == null) return false;
-        final Object o = navigator.asDecl(SwaRefAdapter.class);
-        if (o == null) return false;
-        return (o.equals(adapter.adapterType));
+        return false;
     }
 
     /**

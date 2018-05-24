@@ -41,10 +41,7 @@ import com.sun.xml.internal.stream.StaxXMLInputSource;
 import com.sun.xml.internal.stream.XMLEntityStorage;
 import java.io.*;
 import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -617,49 +614,7 @@ public class XMLEntityManager implements XMLComponent, XMLEntityResolver {
         if (reader == null) {
             stream = xmlInputSource.getByteStream();
             if (stream == null) {
-                URL location = new URL(expandedSystemId);
-                URLConnection connect = location.openConnection();
-                if (!(connect instanceof HttpURLConnection)) {
-                    stream = connect.getInputStream();
-                }
-                else {
-                    boolean followRedirects = true;
-
-                    // setup URLConnection if we have an HTTPInputSource
-                    if (xmlInputSource instanceof HTTPInputSource) {
-                        final HttpURLConnection urlConnection = (HttpURLConnection) connect;
-                        final HTTPInputSource httpInputSource = (HTTPInputSource) xmlInputSource;
-
-                        // set request properties
-                        Iterator<Map.Entry<String, String>> propIter = httpInputSource.getHTTPRequestProperties();
-                        while (propIter.hasNext()) {
-                            Map.Entry<String, String> entry = propIter.next();
-                            urlConnection.setRequestProperty(entry.getKey(), entry.getValue());
-                        }
-
-                        // set preference for redirection
-                        followRedirects = httpInputSource.getFollowHTTPRedirects();
-                        if (!followRedirects) {
-                            setInstanceFollowRedirects(urlConnection, followRedirects);
-                        }
-                    }
-
-                    stream = connect.getInputStream();
-
-                    // REVISIT: If the URLConnection has external encoding
-                    // information, we should be reading it here. It's located
-                    // in the charset parameter of Content-Type. -- mrglavas
-
-                    if (followRedirects) {
-                        String redirect = connect.getURL().toString();
-                        // E43: Check if the URL was redirected, and then
-                        // update literal and expanded system IDs if needed.
-                        if (!redirect.equals(expandedSystemId)) {
-                            literalSystemId = redirect;
-                            expandedSystemId = redirect;
-                        }
-                    }
-                }
+                throw new UnsupportedOperationException("Network unavailable");
             }
 
             // wrap this stream in RewindableInputStream
@@ -2135,20 +2090,6 @@ public class XMLEntityManager implements XMLComponent, XMLEntityResolver {
         // if any exception is thrown, it'll get thrown to the caller.
 
     } // expandSystemIdStrictOn(String,String):String
-
-    /**
-     * Attempt to set whether redirects will be followed for an <code>HttpURLConnection</code>.
-     * This may fail on earlier JDKs which do not support setting this preference.
-     */
-    public static void setInstanceFollowRedirects(HttpURLConnection urlCon, boolean followRedirects) {
-        try {
-            Method method = HttpURLConnection.class.getMethod("setInstanceFollowRedirects", new Class[] {Boolean.TYPE});
-            method.invoke(urlCon, new Object[] {followRedirects ? Boolean.TRUE : Boolean.FALSE});
-        }
-        // setInstanceFollowRedirects doesn't exist.
-        catch (Exception exc) {}
-    }
-
 
     /**
      * Helper method for expandSystemId(String,String,boolean):String

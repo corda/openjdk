@@ -29,7 +29,6 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -204,15 +203,6 @@ public class Base64Data implements CharSequence, Cloneable {
             return getDataSource().getInputStream();
         }
 
-        public void moveTo(File dst) throws IOException {
-            FileOutputStream fout = new FileOutputStream(dst);
-            try {
-                fout.write(data, 0, dataLen);
-            } finally {
-                fout.close();
-            }
-        }
-
         public void close() throws IOException {
             // nothing to do
         }
@@ -226,38 +216,6 @@ public class Base64Data implements CharSequence, Cloneable {
 
         public InputStream readOnce() throws IOException {
             return getDataSource().getInputStream();
-        }
-
-        public void moveTo(File dst) throws IOException {
-            byte[] buf = new byte[8192];
-            InputStream in = null;
-            OutputStream out = null;
-            try {
-                in = getDataSource().getInputStream();
-                out = new FileOutputStream(dst);
-                while (true) {
-                    int amountRead = in.read(buf);
-                    if (amountRead == -1) {
-                        break;
-                    }
-                    out.write(buf, 0, amountRead);
-                }
-            } finally {
-                if (in != null) {
-                    try {
-                        in.close();
-                    } catch(IOException ioe) {
-                        // nothing to do
-                    }
-                }
-                if (out != null) {
-                    try {
-                        out.close();
-                    } catch(IOException ioe) {
-                        // nothing to do
-                    }
-                }
-            }
         }
 
         public void close() throws IOException {
