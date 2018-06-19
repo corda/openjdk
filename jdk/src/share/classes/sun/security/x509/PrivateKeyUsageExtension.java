@@ -184,19 +184,6 @@ implements CertAttrSet<String> {
     }
 
     /**
-     * Verify that that the current time is within the validity period.
-     *
-     * @exception CertificateExpiredException if the certificate has expired.
-     * @exception CertificateNotYetValidException if the certificate is not
-     * yet valid.
-     */
-    public void valid()
-    throws CertificateNotYetValidException, CertificateExpiredException {
-        Date now = new Date();
-        valid(now);
-    }
-
-    /**
      * Verify that that the passed time is within the validity period.
      *
      * @exception CertificateExpiredException if the certificate has expired

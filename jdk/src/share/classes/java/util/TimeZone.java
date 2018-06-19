@@ -459,8 +459,7 @@ abstract public class TimeZone implements Serializable, Cloneable {
      * supports historical and future Daylight Saving Time schedule
      * changes, this method refers to the last known Daylight Saving Time
      * rule that can be a future prediction and may not be the same as
-     * the current rule. Consider calling {@link #observesDaylightTime()}
-     * if the current rule should also be taken into account.
+     * the current rule.
      *
      * @return {@code true} if this {@code TimeZone} uses Daylight Saving Time,
      *         {@code false}, otherwise.
@@ -468,28 +467,6 @@ abstract public class TimeZone implements Serializable, Cloneable {
      * @see Calendar#DST_OFFSET
      */
     public abstract boolean useDaylightTime();
-
-    /**
-     * Returns {@code true} if this {@code TimeZone} is currently in
-     * Daylight Saving Time, or if a transition from Standard Time to
-     * Daylight Saving Time occurs at any future time.
-     *
-     * <p>The default implementation returns {@code true} if
-     * {@code useDaylightTime()} or {@code inDaylightTime(new Date())}
-     * returns {@code true}.
-     *
-     * @return {@code true} if this {@code TimeZone} is currently in
-     * Daylight Saving Time, or if a transition from Standard Time to
-     * Daylight Saving Time occurs at any future time; {@code false}
-     * otherwise.
-     * @since 1.7
-     * @see #useDaylightTime()
-     * @see #inDaylightTime(Date)
-     * @see Calendar#DST_OFFSET
-     */
-    public boolean observesDaylightTime() {
-        return useDaylightTime() || inDaylightTime(new Date());
-    }
 
     /**
      * Queries if the given {@code date} is in Daylight Saving Time in

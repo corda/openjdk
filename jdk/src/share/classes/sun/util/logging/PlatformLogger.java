@@ -516,9 +516,8 @@ public class PlatformLogger {
             LoggingSupport.getSimpleFormat(false); // don't check logging.properties
 
         // minimize memory allocation
-        private Date date = new Date();
+        private Date date = new Date(0L);
         private synchronized String format(Level level, String msg, Throwable thrown) {
-            date.setTime(System.currentTimeMillis());
             String throwable = "";
             if (thrown != null) {
                 StringWriter sw = new StringWriter();

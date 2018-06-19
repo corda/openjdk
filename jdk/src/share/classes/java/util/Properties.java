@@ -826,8 +826,6 @@ class Properties extends Hashtable<Object,Object> {
         if (comments != null) {
             writeComments(bw, comments);
         }
-        bw.write("#" + new Date().toString());
-        bw.newLine();
         synchronized (this) {
             for (Enumeration<?> e = keys(); e.hasMoreElements();) {
                 String key = (String)e.nextElement();

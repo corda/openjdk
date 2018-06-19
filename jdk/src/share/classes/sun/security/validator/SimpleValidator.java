@@ -136,7 +136,7 @@ public final class SimpleValidator extends Validator {
         @SuppressWarnings("deprecation")
         Date date = validationDate;
         if (date == null) {
-            date = new Date();
+            throw new UnsupportedOperationException("System clock unavailable");
         }
 
         // create distrusted certificates checker

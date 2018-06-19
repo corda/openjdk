@@ -153,17 +153,6 @@ public class Date
     private static final long serialVersionUID = 7523967970034938905L;
 
     /**
-     * Allocates a <code>Date</code> object and initializes it so that
-     * it represents the time at which it was allocated, measured to the
-     * nearest millisecond.
-     *
-     * @see     java.lang.System#currentTimeMillis()
-     */
-    public Date() {
-        this(System.currentTimeMillis());
-    }
-
-    /**
      * Allocates a <code>Date</code> object and initializes it to
      * represent the specified number of milliseconds since the
      * standard base time known as "the epoch", namely January 1,
