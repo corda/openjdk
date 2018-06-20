@@ -143,9 +143,6 @@ public class Date
      */
     private transient BaseCalendar.Date cdate;
 
-    // Initialized just before the value is used. See parse().
-    private static int defaultCenturyStart;
-
     /* use serialVersionUID from modified java.util.Date for
      * interoperability with JDK1.1. The Date was modified to write
      * and read only the UTC time.
@@ -574,13 +571,7 @@ public class Date
                 break syntax;
             // Parse 2-digit years within the correct default century.
             if (year < 100) {
-                synchronized (Date.class) {
-                    if (defaultCenturyStart == 0) {
-                        defaultCenturyStart = gcal.getCalendarDate().getYear() - 80;
-                    }
-                }
-                year += (defaultCenturyStart / 100) * 100;
-                if (year < defaultCenturyStart) year += 100;
+                throw new UnsupportedOperationException("2-digit year not allowed");
             }
             if (sec < 0)
                 sec = 0;

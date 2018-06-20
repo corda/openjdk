@@ -222,8 +222,6 @@ public abstract class CalendarSystem {
      */
     public abstract String getName();
 
-    public abstract CalendarDate getCalendarDate();
-
     /**
      * Calculates calendar fields from the specified number of
      * milliseconds since the Epoch, January 1, 1970 00:00:00 UTC

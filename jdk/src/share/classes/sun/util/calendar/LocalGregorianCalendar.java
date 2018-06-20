@@ -184,11 +184,6 @@ public class LocalGregorianCalendar extends BaseCalendar {
     }
 
     @Override
-    public Date getCalendarDate() {
-        return getCalendarDate(System.currentTimeMillis(), newCalendarDate());
-    }
-
-    @Override
     public Date getCalendarDate(long millis) {
         return getCalendarDate(millis, newCalendarDate());
     }

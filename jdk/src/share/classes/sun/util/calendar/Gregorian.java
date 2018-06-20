@@ -61,10 +61,6 @@ public class Gregorian extends BaseCalendar {
         return "gregorian";
     }
 
-    public Date getCalendarDate() {
-        return getCalendarDate(System.currentTimeMillis(), newCalendarDate());
-    }
-
     public Date getCalendarDate(long millis) {
         return getCalendarDate(millis, newCalendarDate());
     }
