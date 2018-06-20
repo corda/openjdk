@@ -52,7 +52,7 @@ public final class CountStatisticImpl extends StatisticImpl
     }
 
     public CountStatisticImpl(String name, String unit, String desc) {
-        this(0L, name, unit, desc, -1L, System.currentTimeMillis());
+        this(0L, name, unit, desc, -1L, -1L);
     }
 
     public synchronized CountStatistic getStatistic() {
@@ -75,22 +75,18 @@ public final class CountStatisticImpl extends StatisticImpl
 
     public synchronized void setCount(long countVal) {
         count = countVal;
-        sampleTime = System.currentTimeMillis();
     }
 
     public synchronized void increment() {
         count++;
-        sampleTime = System.currentTimeMillis();
     }
 
     public synchronized void increment(long delta) {
         count = count + delta;
-        sampleTime = System.currentTimeMillis();
     }
 
     public synchronized void decrement() {
         count--;
-        sampleTime = System.currentTimeMillis();
     }
 
     @Override

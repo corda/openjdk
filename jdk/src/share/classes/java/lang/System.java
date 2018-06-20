@@ -319,11 +319,6 @@ public final class System {
     /**
      * @exclude This function is not supported.
      */
-    public static native long currentTimeMillis();
-
-    /**
-     * @exclude This function is not supported.
-     */
     public static native long nanoTime();
 
     /**

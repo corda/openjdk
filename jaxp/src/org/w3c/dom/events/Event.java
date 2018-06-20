@@ -107,16 +107,6 @@ public interface Event {
     public boolean getCancelable();
 
     /**
-     *  Used to specify the time (in milliseconds relative to the epoch) at
-     * which the event was created. Due to the fact that some systems may
-     * not provide this information the value of <code>timeStamp</code> may
-     * be not available for all events. When not available, a value of 0
-     * will be returned. Examples of epoch time are the time of the system
-     * start or 0:0:0 UTC 1st January 1970.
-     */
-    public long getTimeStamp();
-
-    /**
      * The <code>stopPropagation</code> method is used prevent further
      * propagation of an event during event flow. If this method is called
      * by any <code>EventListener</code> the event will cease propagating

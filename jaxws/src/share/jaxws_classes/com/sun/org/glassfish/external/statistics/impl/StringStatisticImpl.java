@@ -53,7 +53,7 @@ public final class StringStatisticImpl extends StatisticImpl
     }
 
     public StringStatisticImpl(String name, String unit, String desc) {
-        this("", name, unit, desc, System.currentTimeMillis(), System.currentTimeMillis());
+        this("", name, unit, desc, -1, -1);
     }
 
     public synchronized StringStatistic getStatistic() {
@@ -78,7 +78,6 @@ public final class StringStatisticImpl extends StatisticImpl
 
     public void setCurrent(String str) {
         this.str = str;
-        sampleTime = System.currentTimeMillis();
     }
 
     @Override

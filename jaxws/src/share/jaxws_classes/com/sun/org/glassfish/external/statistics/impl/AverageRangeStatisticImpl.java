@@ -125,7 +125,7 @@ public final class AverageRangeStatisticImpl extends StatisticImpl implements
         highWaterMark = (curVal >= highWaterMark ? curVal : highWaterMark);
         numberOfSamples++;
         runningTotal += curVal;
-        sampleTime = System.currentTimeMillis();
+        sampleTime = -1;
     }
 
     public synchronized long getHighWaterMark() {

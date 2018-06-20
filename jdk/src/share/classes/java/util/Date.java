@@ -156,7 +156,6 @@ public class Date
      * 1970, 00:00:00 GMT.
      *
      * @param   date   the milliseconds since January 1, 1970, 00:00:00 GMT.
-     * @see     java.lang.System#currentTimeMillis()
      */
     public Date(long date) {
         fastTime = date;

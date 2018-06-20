@@ -93,10 +93,6 @@
  * <h3>Dates and Times</h3>
  * <p>
  * {@link java.time.Instant} is essentially a numeric timestamp.
- * The current Instant can be retrieved from a {@link java.time.Clock}.
- * This is useful for logging and persistence of a point in time
- * and has in the past been associated with storing the result
- * from {@link java.lang.System#currentTimeMillis()}.
  * </p>
  * <p>
  * {@link java.time.LocalDate} stores a date without a time.

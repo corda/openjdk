@@ -317,25 +317,6 @@ class MemoryCache<K,V> extends Cache<K,V> {
      */
     private void expungeExpiredEntries() {
         emptyQueue();
-        if (lifetime == 0) {
-            return;
-        }
-        int cnt = 0;
-        long time = System.currentTimeMillis();
-        for (Iterator<CacheEntry<K,V>> t = cacheMap.values().iterator();
-                t.hasNext(); ) {
-            CacheEntry<K,V> entry = t.next();
-            if (entry.isValid(time) == false) {
-                t.remove();
-                cnt++;
-            }
-        }
-        if (DEBUG) {
-            if (cnt != 0) {
-                System.out.println("Removed " + cnt
-                        + " expired entries, remaining " + cacheMap.size());
-            }
-        }
     }
 
     public synchronized int size() {
@@ -359,9 +340,7 @@ class MemoryCache<K,V> extends Cache<K,V> {
 
     public synchronized void put(K key, V value) {
         emptyQueue();
-        long expirationTime = (lifetime == 0) ? 0 :
-                                        System.currentTimeMillis() + lifetime;
-        CacheEntry<K,V> newEntry = newEntry(key, value, expirationTime, queue);
+        CacheEntry<K,V> newEntry = newEntry(key, value, 0, queue);
         CacheEntry<K,V> oldEntry = cacheMap.put(key, newEntry);
         if (oldEntry != null) {
             oldEntry.invalidate();
@@ -386,14 +365,6 @@ class MemoryCache<K,V> extends Cache<K,V> {
         emptyQueue();
         CacheEntry<K,V> entry = cacheMap.get(key);
         if (entry == null) {
-            return null;
-        }
-        long time = (lifetime == 0) ? 0 : System.currentTimeMillis();
-        if (entry.isValid(time) == false) {
-            if (DEBUG) {
-                System.out.println("Ignoring expired entry");
-            }
-            cacheMap.remove(key);
             return null;
         }
         return entry.getValue();
@@ -498,11 +469,7 @@ class MemoryCache<K,V> extends Cache<K,V> {
         }
 
         public boolean isValid(long currentTime) {
-            boolean valid = (currentTime <= expirationTime);
-            if (valid == false) {
-                invalidate();
-            }
-            return valid;
+            return true;
         }
 
         public void invalidate() {
@@ -535,7 +502,7 @@ class MemoryCache<K,V> extends Cache<K,V> {
         }
 
         public boolean isValid(long currentTime) {
-            boolean valid = (currentTime <= expirationTime) && (get() != null);
+            boolean valid = (get() != null);
             if (valid == false) {
                 invalidate();
             }

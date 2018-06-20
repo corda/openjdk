@@ -73,8 +73,6 @@ import java.util.TimeZone;
  * <p>
  * Instances of this class are used to find the current instant, which can be
  * interpreted using the stored time-zone to find the current date and time.
- * As such, a clock can be used instead of {@link System#currentTimeMillis()}
- * and {@link TimeZone#getDefault()}.
  * <p>
  * Use of a {@code Clock} is optional. All key date-time classes also have a
  * {@code now()} factory method that uses the system clock in the default time zone.
@@ -100,8 +98,7 @@ import java.util.TimeZone;
  * or {@link #offset(Clock, Duration) offset} to be used during testing.
  * <p>
  * The {@code system} factory methods provide clocks based on the best available
- * system clock This may use {@link System#currentTimeMillis()}, or a higher
- * resolution clock if one is available.
+ * system clock.
  *
  * @implSpec
  * This abstract class must be implemented with care to ensure other classes operate correctly.
@@ -122,12 +119,6 @@ import java.util.TimeZone;
  * <p>
  * Implementations should implement {@code Serializable} wherever possible and must
  * document whether or not they do support serialization.
- *
- * @implNote
- * The clock implementation provided here is based on {@link System#currentTimeMillis()}.
- * That method provides little to no guarantee about the accuracy of the clock.
- * Applications requiring a more accurate clock must implement this abstract class
- * themselves using a different external clock, such as an NTP server.
  *
  * @since 1.8
  */
@@ -268,39 +259,6 @@ public abstract class Clock {
 
     //-------------------------------------------------------------------------
     /**
-     * Gets the current millisecond instant of the clock.
-     * <p>
-     * This returns the millisecond-based instant, measured from 1970-01-01T00:00Z (UTC).
-     * This is equivalent to the definition of {@link System#currentTimeMillis()}.
-     * <p>
-     * Most applications should avoid this method and use {@link Instant} to represent
-     * an instant on the time-line rather than a raw millisecond value.
-     * This method is provided to allow the use of the clock in high performance use cases
-     * where the creation of an object would be unacceptable.
-     * <p>
-     * The default implementation currently calls {@link #instant}.
-     *
-     * @return the current millisecond instant from this clock, measured from
-     *  the Java epoch of 1970-01-01T00:00Z (UTC), not null
-     * @throws DateTimeException if the instant cannot be obtained, not thrown by most implementations
-     */
-    public long millis() {
-        return instant().toEpochMilli();
-    }
-
-    //-----------------------------------------------------------------------
-    /**
-     * Gets the current instant of the clock.
-     * <p>
-     * This returns an instant representing the current instant as defined by the clock.
-     *
-     * @return the current instant from this clock, not null
-     * @throws DateTimeException if the instant cannot be obtained, not thrown by most implementations
-     */
-    public abstract Instant instant();
-
-    //-----------------------------------------------------------------------
-    /**
      * Checks if this clock is equal to another clock.
      * <p>
      * Clocks should override this method to compare equals based on
@@ -355,14 +313,6 @@ public abstract class Clock {
             return new FixedClock(instant, zone);
         }
         @Override
-        public long millis() {
-            return instant.toEpochMilli();
-        }
-        @Override
-        public Instant instant() {
-            return instant;
-        }
-        @Override
         public boolean equals(Object obj) {
             if (obj instanceof FixedClock) {
                 FixedClock other = (FixedClock) obj;
@@ -405,14 +355,6 @@ public abstract class Clock {
             return new OffsetClock(baseClock.withZone(zone), offset);
         }
         @Override
-        public long millis() {
-            return Math.addExact(baseClock.millis(), offset.toMillis());
-        }
-        @Override
-        public Instant instant() {
-            return baseClock.instant().plus(offset);
-        }
-        @Override
         public boolean equals(Object obj) {
             if (obj instanceof OffsetClock) {
                 OffsetClock other = (OffsetClock) obj;
@@ -453,22 +395,6 @@ public abstract class Clock {
                 return this;
             }
             return new TickClock(baseClock.withZone(zone), tickNanos);
-        }
-        @Override
-        public long millis() {
-            long millis = baseClock.millis();
-            return millis - Math.floorMod(millis, tickNanos / 1000_000L);
-        }
-        @Override
-        public Instant instant() {
-            if ((tickNanos % 1000_000) == 0) {
-                long millis = baseClock.millis();
-                return Instant.ofEpochMilli(millis - Math.floorMod(millis, tickNanos / 1000_000L));
-            }
-            Instant instant = baseClock.instant();
-            long nanos = instant.getNano();
-            long adjust = Math.floorMod(nanos, tickNanos);
-            return instant.minusNanos(adjust);
         }
         @Override
         public boolean equals(Object obj) {
