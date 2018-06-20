@@ -84,7 +84,7 @@ public class CalendarProviderImpl extends CalendarProvider implements AvailableL
         return new Calendar.Builder()
                      .setLocale(locale)
                      .setTimeZone(zone)
-                     .setInstant(System.currentTimeMillis())
+                     .setInstant(0)
                      .build();
     }
 

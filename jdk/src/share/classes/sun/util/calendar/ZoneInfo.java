@@ -426,13 +426,7 @@ public class ZoneInfo extends TimeZone {
      * to get local standard time
      */
     public int getRawOffset() {
-        if (!willGMTOffsetChange) {
-            return rawOffset + rawOffsetDiff;
-        }
-
-        int[] offsets = new int[2];
-        getOffsets(System.currentTimeMillis(), offsets, UTC_TIME);
-        return offsets[0];
+        return rawOffset + rawOffsetDiff;
     }
 
     public boolean isDirty() {
