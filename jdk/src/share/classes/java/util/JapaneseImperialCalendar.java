@@ -300,7 +300,7 @@ class JapaneseImperialCalendar extends Calendar {
     JapaneseImperialCalendar(TimeZone zone, Locale aLocale) {
         super(zone, aLocale);
         jdate = jcal.newCalendarDate(zone);
-        setTimeInMillis(System.currentTimeMillis());
+        setTimeInMillis(0);
     }
 
     /**

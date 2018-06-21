@@ -837,20 +837,6 @@ public class SimpleTimeZone extends TimeZone {
     }
 
     /**
-     * Returns {@code true} if this {@code SimpleTimeZone} observes
-     * Daylight Saving Time. This method is equivalent to {@link
-     * #useDaylightTime()}.
-     *
-     * @return {@code true} if this {@code SimpleTimeZone} observes
-     * Daylight Saving Time; {@code false} otherwise.
-     * @since 1.7
-     */
-    @Override
-    public boolean observesDaylightTime() {
-        return useDaylightTime();
-    }
-
-    /**
      * Queries if the given date is in daylight saving time.
      * @return true if daylight saving time is in effective at the
      * given date; false otherwise.

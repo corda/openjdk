@@ -426,13 +426,7 @@ public class ZoneInfo extends TimeZone {
      * to get local standard time
      */
     public int getRawOffset() {
-        if (!willGMTOffsetChange) {
-            return rawOffset + rawOffsetDiff;
-        }
-
-        int[] offsets = new int[2];
-        getOffsets(System.currentTimeMillis(), offsets, UTC_TIME);
-        return offsets[0];
+        return rawOffset + rawOffsetDiff;
     }
 
     public boolean isDirty() {
@@ -448,36 +442,6 @@ public class ZoneInfo extends TimeZone {
      */
     public boolean useDaylightTime() {
         return (simpleTimeZoneParams != null);
-    }
-
-    @Override
-    public boolean observesDaylightTime() {
-        if (simpleTimeZoneParams != null) {
-            return true;
-        }
-        if (transitions == null) {
-            return false;
-        }
-
-        // Look up the transition table to see if it's in DST right
-        // now or if there's any standard-to-daylight transition at
-        // any future.
-        long utc = System.currentTimeMillis() - rawOffsetDiff;
-        int index = getTransitionIndex(utc, UTC_TIME);
-
-        // before transitions in the transition table
-        if (index < 0) {
-            return false;
-        }
-
-        // the time is in the table range.
-        for (int i = index; i < transitions.length; i++) {
-            if ((transitions[i] & DST_MASK) != 0) {
-                return true;
-            }
-        }
-        // No further DST is observed.
-        return false;
     }
 
     /**

@@ -98,7 +98,7 @@ public final class TimeStatisticImpl extends StatisticImpl
             minTime = (current >= minTime ? minTime : current);
         }
         count++;
-        sampleTime = System.currentTimeMillis();
+        sampleTime = -1;
      }
 
     /**

@@ -81,7 +81,7 @@ public final class RangeStatisticImpl extends StatisticImpl
         currentVal = curVal;
         lowWaterMark = (curVal >= lowWaterMark ? lowWaterMark : curVal);
         highWaterMark = (curVal >= highWaterMark ? curVal : highWaterMark);
-        sampleTime = System.currentTimeMillis();
+        sampleTime = -1;
     }
 
     /**

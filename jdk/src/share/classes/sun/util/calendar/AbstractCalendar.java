@@ -99,10 +99,6 @@ public abstract class AbstractCalendar extends CalendarSystem {
         this.eras = eras;
     }
 
-    public CalendarDate getCalendarDate() {
-        return getCalendarDate(System.currentTimeMillis(), newCalendarDate());
-    }
-
     public CalendarDate getCalendarDate(long millis) {
         return getCalendarDate(millis, newCalendarDate());
     }

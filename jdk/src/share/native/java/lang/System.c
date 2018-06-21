@@ -36,7 +36,6 @@
 
 /* Only register the performance-critical methods */
 static JNINativeMethod methods[] = {
-    {"currentTimeMillis", "()J",              (void *)&JVM_CurrentTimeMillis},
     {"nanoTime",          "()J",              (void *)&JVM_NanoTime},
     {"arraycopy",     "(" OBJ "I" OBJ "II)V", (void *)&JVM_ArrayCopy},
 };

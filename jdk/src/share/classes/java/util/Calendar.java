@@ -300,7 +300,6 @@ import sun.util.spi.CalendarProvider;
  * fields should be affected, the user interface can behave as most users
  * will intuitively expect.</p>
  *
- * @see          java.lang.System#currentTimeMillis()
  * @see          Date
  * @see          GregorianCalendar
  * @see          TimeZone

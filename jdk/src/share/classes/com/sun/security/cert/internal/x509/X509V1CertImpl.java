@@ -162,7 +162,7 @@ public class X509V1CertImpl extends X509Certificate implements Serializable {
      */
     public void checkValidity() throws
       CertificateExpiredException, CertificateNotYetValidException {
-        checkValidity(new Date());
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     /**

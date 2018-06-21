@@ -77,9 +77,6 @@ final class P11SecureRandom extends SecureRandomSpi {
     // number of bytes remain in iBuffer
     private transient int ibuffered = 0;
 
-    // time that data was read into iBuffer
-    private transient long lastRead = 0L;
-
     P11SecureRandom(Token token) {
         this.token = token;
     }
@@ -126,11 +123,8 @@ final class P11SecureRandom extends SecureRandomSpi {
             int ofs = 0;
             synchronized (iBuffer) {
                 while (ofs < bytes.length) {
-                    long time = System.currentTimeMillis();
-                    // refill the internal buffer if empty or stale
-                    if ((ibuffered == 0) ||
-                            !(time - lastRead < MAX_IBUFFER_TIME)) {
-                        lastRead = time;
+                    // refill the internal buffer if empty
+                    if (ibuffered == 0) {
                         implNextBytes(iBuffer);
                         ibuffered = IBUFFER_SIZE;
                     }

@@ -598,8 +598,7 @@ public class X509CertImpl extends X509Certificate implements DerEncoder {
      */
     public void checkValidity()
     throws CertificateExpiredException, CertificateNotYetValidException {
-        Date date = new Date();
-        checkValidity(date);
+        throw new UnsupportedOperationException("System clock unavailable");
     }
 
     /**

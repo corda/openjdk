@@ -171,7 +171,7 @@ public class LoggingSupport {
         if (format != null) {
             try {
                 // validate the user-defined format string
-                String.format(format, new Date(), "", "", "", "", "");
+                String.format(format, new Date(0), "", "", "", "", "");
             } catch (IllegalArgumentException e) {
                 // illegal syntax; fall back to the default format
                 format = DEFAULT_FORMAT;

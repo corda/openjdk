@@ -1619,45 +1619,8 @@ public abstract class ResourceBundle {
         } else {
             CacheKey key = bundleRef.getCacheKey();
             long expirationTime = key.expirationTime;
-            if (!bundle.expired && expirationTime >= 0 &&
-                expirationTime <= System.currentTimeMillis()) {
-                // its TTL period has expired.
-                if (bundle != NONEXISTENT_BUNDLE) {
-                    // Synchronize here to call needsReload to avoid
-                    // redundant concurrent calls for the same bundle.
-                    synchronized (bundle) {
-                        expirationTime = key.expirationTime;
-                        if (!bundle.expired && expirationTime >= 0 &&
-                            expirationTime <= System.currentTimeMillis()) {
-                            try {
-                                bundle.expired = control.needsReload(key.getName(),
-                                                                     key.getLocale(),
-                                                                     key.getFormat(),
-                                                                     key.getLoader(),
-                                                                     bundle,
-                                                                     key.loadTime);
-                            } catch (Exception e) {
-                                cacheKey.setCause(e);
-                            }
-                            if (bundle.expired) {
-                                // If the bundle needs to be reloaded, then
-                                // remove the bundle from the cache, but
-                                // return the bundle with the expired flag
-                                // on.
-                                bundle.cacheKey = null;
-                                cacheList.remove(cacheKey, bundleRef);
-                            } else {
-                                // Update the expiration control info. and reuse
-                                // the same bundle instance
-                                setExpirationTime(key, control);
-                            }
-                        }
-                    }
-                } else {
-                    // We just remove NONEXISTENT_BUNDLE from the cache.
-                    cacheList.remove(cacheKey, bundleRef);
-                    bundle = null;
-                }
+            if (!bundle.expired && expirationTime >= 0) {
+                throw new UnsupportedOperationException("System clock unavailable");
             }
         }
         return bundle;
@@ -1709,11 +1672,7 @@ public abstract class ResourceBundle {
         long ttl = control.getTimeToLive(cacheKey.getName(),
                                          cacheKey.getLocale());
         if (ttl >= 0) {
-            // If any expiration time is specified, set the time to be
-            // expired in the cache.
-            long now = System.currentTimeMillis();
-            cacheKey.loadTime = now;
-            cacheKey.expirationTime = now + ttl;
+            throw new UnsupportedOperationException("System clock unavailable");
         } else if (ttl >= Control.TTL_NO_EXPIRATION_CONTROL) {
             cacheKey.expirationTime = ttl;
         } else {

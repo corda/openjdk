@@ -288,23 +288,6 @@ public class DisabledAlgorithmConstraints extends AbstractAlgorithmConstraints {
                         c = new jdkCAConstraint(algorithm);
                         jdkCALimit = true;
 
-                    } else if (entry.startsWith("denyAfter") &&
-                            (matcher = Holder.DENY_AFTER_PATTERN.matcher(entry))
-                                    .matches()) {
-                        if (debug != null) {
-                            debug.println("Constraints set to denyAfter");
-                        }
-                        if (denyAfterLimit) {
-                            throw new IllegalArgumentException("Only one " +
-                                    "denyAfter entry allowed in property. " +
-                                    "Constraint: " + constraintEntry);
-                        }
-                        int year = Integer.parseInt(matcher.group(1));
-                        int month = Integer.parseInt(matcher.group(2));
-                        int day = Integer.parseInt(matcher.group(3));
-                        c = new DenyAfterConstraint(algorithm, year, month,
-                                day);
-                        denyAfterLimit = true;
                     } else if (entry.startsWith("usage")) {
                         String s[] = (entry.substring(5)).trim().split(" ");
                         c = new UsageConstraint(algorithm, s);
@@ -546,105 +529,6 @@ public class DisabledAlgorithmConstraints extends AbstractAlgorithmConstraints {
             }
         }
     }
-
-    /*
-     * This class handles the denyAfter constraint.  The date is in the UTC/GMT
-     * timezone.
-     */
-     private static class DenyAfterConstraint extends Constraint {
-         private Date denyAfterDate;
-         private static final SimpleDateFormat dateFormat =
-                 new SimpleDateFormat("EEE, MMM d HH:mm:ss z yyyy");
-
-         DenyAfterConstraint(String algo, int year, int month, int day) {
-             Calendar c;
-
-             algorithm = algo;
-
-             if (debug != null) {
-                 debug.println("DenyAfterConstraint read in as:  year " +
-                         year + ", month = " + month + ", day = " + day);
-             }
-
-             c = new Calendar.Builder().setTimeZone(TimeZone.getTimeZone("GMT"))
-                     .setDate(year, month - 1, day).build();
-
-             if (year > c.getActualMaximum(Calendar.YEAR) ||
-                     year < c.getActualMinimum(Calendar.YEAR)) {
-                 throw new IllegalArgumentException(
-                         "Invalid year given in constraint: " + year);
-             }
-             if ((month - 1) > c.getActualMaximum(Calendar.MONTH) ||
-                     (month - 1) < c.getActualMinimum(Calendar.MONTH)) {
-                 throw new IllegalArgumentException(
-                         "Invalid month given in constraint: " + month);
-             }
-             if (day > c.getActualMaximum(Calendar.DAY_OF_MONTH) ||
-                     day < c.getActualMinimum(Calendar.DAY_OF_MONTH)) {
-                 throw new IllegalArgumentException(
-                         "Invalid Day of Month given in constraint: " + day);
-             }
-
-             denyAfterDate = c.getTime();
-             if (debug != null) {
-                 debug.println("DenyAfterConstraint date set to: " +
-                         dateFormat.format(denyAfterDate));
-             }
-         }
-
-         /*
-          * Checking that the provided date is not beyond the constraint date.
-          * The provided date can be the PKIXParameter date if given,
-          * otherwise it is the current date.
-          *
-          * If the constraint disallows, call next() for any following
-          * constraints. Throw an exception if this is the last constraint.
-          */
-         @Override
-         public void permits(ConstraintsParameters cp)
-                 throws CertPathValidatorException {
-             Date currentDate;
-             String errmsg;
-
-             if (cp.getJARTimestamp() != null) {
-                 currentDate = cp.getJARTimestamp().getTimestamp();
-                 errmsg = "JAR Timestamp date: ";
-             } else if (cp.getPKIXParamDate() != null) {
-                 currentDate = cp.getPKIXParamDate();
-                 errmsg = "PKIXParameter date: ";
-             } else {
-                 currentDate = new Date();
-                 errmsg = "Current date: ";
-             }
-
-             if (!denyAfterDate.after(currentDate)) {
-                 if (next(cp)) {
-                     return;
-                 }
-                 throw new CertPathValidatorException(
-                         "denyAfter constraint check failed: " + algorithm +
-                         " used with Constraint date: " +
-                         dateFormat.format(denyAfterDate) + "; " + errmsg +
-                         dateFormat.format(currentDate) + extendedMsg(cp),
-                         null, null, -1, BasicReason.ALGORITHM_CONSTRAINED);
-             }
-         }
-
-         /*
-          * Return result if the constraint's date is beyond the current date
-          * in UTC timezone.
-          */
-         public boolean permits(Key key) {
-             if (next(key)) {
-                 return true;
-             }
-             if (debug != null) {
-                 debug.println("DenyAfterConstraints.permits(): " + algorithm);
-             }
-
-             return denyAfterDate.after(new Date());
-         }
-     }
 
     /*
      * The usage constraint is for the "usage" keyword.  It checks against the

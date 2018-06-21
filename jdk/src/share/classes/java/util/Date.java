@@ -143,25 +143,11 @@ public class Date
      */
     private transient BaseCalendar.Date cdate;
 
-    // Initialized just before the value is used. See parse().
-    private static int defaultCenturyStart;
-
     /* use serialVersionUID from modified java.util.Date for
      * interoperability with JDK1.1. The Date was modified to write
      * and read only the UTC time.
      */
     private static final long serialVersionUID = 7523967970034938905L;
-
-    /**
-     * Allocates a <code>Date</code> object and initializes it so that
-     * it represents the time at which it was allocated, measured to the
-     * nearest millisecond.
-     *
-     * @see     java.lang.System#currentTimeMillis()
-     */
-    public Date() {
-        this(System.currentTimeMillis());
-    }
 
     /**
      * Allocates a <code>Date</code> object and initializes it to
@@ -170,7 +156,6 @@ public class Date
      * 1970, 00:00:00 GMT.
      *
      * @param   date   the milliseconds since January 1, 1970, 00:00:00 GMT.
-     * @see     java.lang.System#currentTimeMillis()
      */
     public Date(long date) {
         fastTime = date;
@@ -585,13 +570,7 @@ public class Date
                 break syntax;
             // Parse 2-digit years within the correct default century.
             if (year < 100) {
-                synchronized (Date.class) {
-                    if (defaultCenturyStart == 0) {
-                        defaultCenturyStart = gcal.getCalendarDate().getYear() - 80;
-                    }
-                }
-                year += (defaultCenturyStart / 100) * 100;
-                if (year < defaultCenturyStart) year += 100;
+                throw new UnsupportedOperationException("2-digit year not allowed");
             }
             if (sec < 0)
                 sec = 0;

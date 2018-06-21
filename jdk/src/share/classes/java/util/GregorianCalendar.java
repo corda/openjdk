@@ -623,7 +623,7 @@ public class GregorianCalendar extends Calendar {
     public GregorianCalendar(TimeZone zone, Locale aLocale) {
         super(zone, aLocale);
         gdate = (BaseCalendar.Date) gcal.newCalendarDate(zone);
-        setTimeInMillis(System.currentTimeMillis());
+        setTimeInMillis(0);
     }
 
     /**

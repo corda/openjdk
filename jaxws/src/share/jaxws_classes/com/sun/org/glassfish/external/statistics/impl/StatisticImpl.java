@@ -79,7 +79,7 @@ public abstract class StatisticImpl implements Statistic {
     }
 
     protected StatisticImpl(String name, String unit, String desc) {
-        this(name, unit, desc, System.currentTimeMillis(), System.currentTimeMillis());
+        this(name, unit, desc, -1, -1);
     }
 
     public synchronized Map getStaticAsMap() {
@@ -118,7 +118,7 @@ public abstract class StatisticImpl implements Statistic {
     }
 
     public synchronized void reset() {
-        startTime = System.currentTimeMillis();
+        startTime = -1;
     }
 
     public synchronized String toString() {

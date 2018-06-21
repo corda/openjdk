@@ -406,7 +406,7 @@ public final class Currency implements Serializable {
                 return null;
             } else {
                 int index = (tableEntry & SPECIAL_CASE_COUNTRY_INDEX_MASK) - SPECIAL_CASE_COUNTRY_INDEX_DELTA;
-                if (scCutOverTimes[index] == Long.MAX_VALUE || System.currentTimeMillis() < scCutOverTimes[index]) {
+                if (scCutOverTimes[index] == Long.MAX_VALUE) {
                     return getInstance(scOldCurrencies[index], scOldCurrenciesDFD[index],
                         scOldCurrenciesNumericCode[index]);
                 } else {
@@ -709,18 +709,6 @@ public final class Currency implements Serializable {
             return;
         }
 
-        try {
-            if (m.group(4) != null && !isPastCutoverDate(m.group(4))) {
-                info("currency.properties entry for " + ctry +
-                        " ignored since cutover date has not passed :" + curdata, null);
-                return;
-            }
-        } catch (ParseException ex) {
-            info("currency.properties entry for " + ctry +
-                        " ignored since exception encountered :" + ex.getMessage(), null);
-            return;
-        }
-
         String code = m.group(1);
         int numeric = Integer.parseInt(m.group(2));
         int entry = numeric << NUMERIC_CODE_SHIFT;
@@ -749,15 +737,6 @@ public final class Currency implements Serializable {
                      (index + SPECIAL_CASE_COUNTRY_INDEX_DELTA);
         }
         setMainTableEntry(ctry.charAt(0), ctry.charAt(1), entry);
-    }
-
-    private static boolean isPastCutoverDate(String s) throws ParseException {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ROOT);
-        format.setTimeZone(TimeZone.getTimeZone("UTC"));
-        format.setLenient(false);
-        long time = format.parse(s.trim()).getTime();
-        return System.currentTimeMillis() > time;
-
     }
 
     private static int countOccurrences(String value, char match) {
