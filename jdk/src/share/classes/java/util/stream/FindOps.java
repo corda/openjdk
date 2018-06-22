@@ -29,7 +29,6 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.Spliterator;
-import java.util.concurrent.CountedCompleter;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -152,12 +151,6 @@ final class FindOps {
             O result = helper.wrapAndCopyInto(sinkSupplier.get(), spliterator).get();
             return result != null ? result : emptyValue;
         }
-
-        @Override
-        public <P_IN> O evaluateParallel(PipelineHelper<T> helper,
-                                         Spliterator<P_IN> spliterator) {
-            return new FindTask<>(this, helper, spliterator).invoke();
-        }
     }
 
     /**
@@ -237,81 +230,6 @@ final class FindOps {
             public OptionalDouble get() {
                 return hasValue ? OptionalDouble.of(value) : null;
             }
-        }
-    }
-
-    /**
-     * {@code ForkJoinTask} implementing parallel short-circuiting search
-     * @param <P_IN> Input element type to the stream pipeline
-     * @param <P_OUT> Output element type from the stream pipeline
-     * @param <O> Result type from the find operation
-     */
-    @SuppressWarnings("serial")
-    private static final class FindTask<P_IN, P_OUT, O>
-            extends AbstractShortCircuitTask<P_IN, P_OUT, O, FindTask<P_IN, P_OUT, O>> {
-        private final FindOp<P_OUT, O> op;
-
-        FindTask(FindOp<P_OUT, O> op,
-                 PipelineHelper<P_OUT> helper,
-                 Spliterator<P_IN> spliterator) {
-            super(helper, spliterator);
-            this.op = op;
-        }
-
-        FindTask(FindTask<P_IN, P_OUT, O> parent, Spliterator<P_IN> spliterator) {
-            super(parent, spliterator);
-            this.op = parent.op;
-        }
-
-        @Override
-        protected FindTask<P_IN, P_OUT, O> makeChild(Spliterator<P_IN> spliterator) {
-            return new FindTask<>(this, spliterator);
-        }
-
-        @Override
-        protected O getEmptyResult() {
-            return op.emptyValue;
-        }
-
-        private void foundResult(O answer) {
-            if (isLeftmostNode())
-                shortCircuit(answer);
-            else
-                cancelLaterNodes();
-        }
-
-        @Override
-        protected O doLeaf() {
-            O result = helper.wrapAndCopyInto(op.sinkSupplier.get(), spliterator).get();
-            if (!op.mustFindFirst) {
-                if (result != null)
-                    shortCircuit(result);
-                return null;
-            }
-            else {
-                if (result != null) {
-                    foundResult(result);
-                    return result;
-                }
-                else
-                    return null;
-            }
-        }
-
-        @Override
-        public void onCompletion(CountedCompleter<?> caller) {
-            if (op.mustFindFirst) {
-                    for (FindTask<P_IN, P_OUT, O> child = leftChild, p = null; child != p;
-                         p = child, child = rightChild) {
-                    O result = child.getLocalResult();
-                    if (result != null && op.presentPredicate.test(result)) {
-                        setLocalResult(result);
-                        foundResult(result);
-                        break;
-                    }
-                }
-            }
-            super.onCompletion(caller);
         }
     }
 }

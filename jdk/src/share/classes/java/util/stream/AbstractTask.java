@@ -26,7 +26,6 @@ package java.util.stream;
 
 import java.util.Spliterator;
 import java.util.concurrent.CountedCompleter;
-import java.util.concurrent.ForkJoinPool;
 
 /**
  * Abstract base class for most fork-join tasks used to implement stream ops.
@@ -87,14 +86,6 @@ import java.util.concurrent.ForkJoinPool;
 abstract class AbstractTask<P_IN, P_OUT, R,
                             K extends AbstractTask<P_IN, P_OUT, R, K>>
         extends CountedCompleter<R> {
-
-    /**
-     * Default target factor of leaf tasks for parallel decomposition.
-     * To allow load balancing, we over-partition, currently to approximately
-     * four tasks per processor, which enables others to help out
-     * if leaf tasks are uneven or some processors are otherwise busy.
-     */
-    static final int LEAF_TARGET = ForkJoinPool.getCommonPoolParallelism() << 2;
 
     /** The pipeline helper, common to all tasks in a computation */
     protected final PipelineHelper<P_OUT> helper;
@@ -181,8 +172,7 @@ abstract class AbstractTask<P_IN, P_OUT, R,
      * @return suggested target leaf size
      */
     public static long suggestTargetSize(long sizeEstimate) {
-        long est = sizeEstimate / LEAF_TARGET;
-        return est > 0L ? est : 1L;
+        return 1L;
     }
 
     /**
