@@ -133,14 +133,6 @@ abstract class IntPipeline<E_IN>
     }
 
     @Override
-    final <P_IN> Node<Integer> evaluateToNode(PipelineHelper<Integer> helper,
-                                              Spliterator<P_IN> spliterator,
-                                              boolean flattenTree,
-                                              IntFunction<Integer[]> generator) {
-        return Nodes.collectInt(helper, spliterator, flattenTree);
-    }
-
-    @Override
     final <P_IN> Spliterator<Integer> wrap(PipelineHelper<Integer> ph,
                                            Supplier<Spliterator<P_IN>> supplier) {
         return new StreamSpliterators.IntWrappingSpliterator<>(ph, supplier);
@@ -496,7 +488,7 @@ abstract class IntPipeline<E_IN>
 
     @Override
     public final int[] toArray() {
-        return Nodes.flattenInt((Node.OfInt) evaluateToArrayNode(Integer[]::new))
+        return ((Node.OfInt) evaluateToArrayNode(Integer[]::new))
                         .asPrimitiveArray();
     }
 

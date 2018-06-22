@@ -493,21 +493,6 @@ abstract class AbstractPipeline<E_IN, E_OUT, S extends BaseStream<E_OUT, S>>
     abstract StreamShape getOutputShape();
 
     /**
-     * Collect elements output from a pipeline into a Node that holds elements
-     * of this shape.
-     *
-     * @param helper the pipeline helper describing the pipeline stages
-     * @param spliterator the source spliterator
-     * @param flattenTree true if the returned node should be flattened
-     * @param generator the array generator
-     * @return a Node holding the output of the pipeline
-     */
-    abstract <P_IN> Node<E_OUT> evaluateToNode(PipelineHelper<E_OUT> helper,
-                                               Spliterator<P_IN> spliterator,
-                                               boolean flattenTree,
-                                               IntFunction<E_OUT[]> generator);
-
-    /**
      * Create a spliterator that wraps a source spliterator, compatible with
      * this stream shape, and operations associated with a {@link
      * PipelineHelper}.

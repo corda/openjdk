@@ -100,14 +100,6 @@ abstract class ReferencePipeline<P_IN, P_OUT>
     }
 
     @Override
-    final <P_IN> Node<P_OUT> evaluateToNode(PipelineHelper<P_OUT> helper,
-                                        Spliterator<P_IN> spliterator,
-                                        boolean flattenTree,
-                                        IntFunction<P_OUT[]> generator) {
-        return Nodes.collect(helper, spliterator, flattenTree, generator);
-    }
-
-    @Override
     final <P_IN> Spliterator<P_OUT> wrap(PipelineHelper<P_OUT> ph,
                                      Supplier<Spliterator<P_IN>> supplier) {
         return new StreamSpliterators.WrappingSpliterator<>(ph, supplier);
@@ -432,7 +424,7 @@ abstract class ReferencePipeline<P_IN, P_OUT>
         // super type of U an ArrayStoreException will be thrown.
         @SuppressWarnings("rawtypes")
         IntFunction rawGenerator = (IntFunction) generator;
-        return (A[]) Nodes.flatten(evaluateToArrayNode(rawGenerator), rawGenerator)
+        return (A[]) evaluateToArrayNode(rawGenerator)
                               .asArray(rawGenerator);
     }
 

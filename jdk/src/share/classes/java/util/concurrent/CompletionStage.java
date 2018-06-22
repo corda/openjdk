@@ -761,20 +761,4 @@ public interface CompletionStage<T> {
         (BiFunction<? super T, Throwable, ? extends U> fn,
          Executor executor);
 
-    /**
-     * Returns a {@link CompletableFuture} maintaining the same
-     * completion properties as this stage. If this stage is already a
-     * CompletableFuture, this method may return this stage itself.
-     * Otherwise, invocation of this method may be equivalent in
-     * effect to {@code thenApply(x -> x)}, but returning an instance
-     * of type {@code CompletableFuture}. A CompletionStage
-     * implementation that does not choose to interoperate with others
-     * may throw {@code UnsupportedOperationException}.
-     *
-     * @return the CompletableFuture
-     * @throws UnsupportedOperationException if this implementation
-     * does not interoperate with CompletableFuture
-     */
-    public CompletableFuture<T> toCompletableFuture();
-
 }

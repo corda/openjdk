@@ -132,14 +132,6 @@ abstract class DoublePipeline<E_IN>
     }
 
     @Override
-    final <P_IN> Node<Double> evaluateToNode(PipelineHelper<Double> helper,
-                                             Spliterator<P_IN> spliterator,
-                                             boolean flattenTree,
-                                             IntFunction<Double[]> generator) {
-        return Nodes.collectDouble(helper, spliterator, flattenTree);
-    }
-
-    @Override
     final <P_IN> Spliterator<Double> wrap(PipelineHelper<Double> ph,
                                           Supplier<Spliterator<P_IN>> supplier) {
         return new StreamSpliterators.DoubleWrappingSpliterator<>(ph, supplier);
@@ -502,7 +494,7 @@ abstract class DoublePipeline<E_IN>
 
     @Override
     public final double[] toArray() {
-        return Nodes.flattenDouble((Node.OfDouble) evaluateToArrayNode(Double[]::new))
+        return ((Node.OfDouble) evaluateToArrayNode(Double[]::new))
                         .asPrimitiveArray();
     }
 
