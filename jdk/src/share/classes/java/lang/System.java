@@ -317,11 +317,6 @@ public final class System {
     }
 
     /**
-     * @exclude This function is not supported.
-     */
-    public static native long nanoTime();
-
-    /**
      * Copies an array from the specified source array, beginning at the
      * specified position, to the specified position of the destination array.
      * A subsequence of array components are copied from the source

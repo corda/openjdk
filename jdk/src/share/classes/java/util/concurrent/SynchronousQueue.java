@@ -433,31 +433,21 @@ public class SynchronousQueue<E> extends AbstractQueue<E>
              * and don't wait at all, so are trapped in transfer
              * method rather than calling awaitFulfill.
              */
-            final long deadline = timed ? System.nanoTime() + nanos : 0L;
+            final long deadline = 0L;
             Thread w = Thread.currentThread();
-            int spins = (shouldSpin(s) ?
-                         (timed ? maxTimedSpins : maxUntimedSpins) : 0);
+            int spins = (shouldSpin(s) ? maxUntimedSpins : 0);
             for (;;) {
                 if (w.isInterrupted())
                     s.tryCancel();
                 SNode m = s.match;
                 if (m != null)
                     return m;
-                if (timed) {
-                    nanos = deadline - System.nanoTime();
-                    if (nanos <= 0L) {
-                        s.tryCancel();
-                        continue;
-                    }
-                }
                 if (spins > 0)
                     spins = shouldSpin(s) ? (spins-1) : 0;
                 else if (s.waiter == null)
                     s.waiter = w; // establish waiter so can park next iter
-                else if (!timed)
+                else
                     LockSupport.park(this);
-                else if (nanos > spinForTimeoutThreshold)
-                    LockSupport.parkNanos(this, nanos);
             }
         }
 

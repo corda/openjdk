@@ -1297,16 +1297,6 @@ public class ForkJoinPool extends AbstractExecutorService {
     // static configuration constants
 
     /**
-     * Initial timeout value (in nanoseconds) for the thread
-     * triggering quiescence to park waiting for new work. On timeout,
-     * the thread will instead try to shrink the number of
-     * workers. The value should be large enough to avoid overly
-     * aggressive shrinkage during most transient stalls (long GCs
-     * etc).
-     */
-    private static final long IDLE_TIMEOUT = 2000L * 1000L * 1000L; // 2sec
-
-    /**
      * Tolerance for idle timeouts, to cope with timer undershoots
      */
     private static final long TIMEOUT_SLOP = 20L * 1000L * 1000L;  // 20ms
@@ -1802,7 +1792,7 @@ public class ForkJoinPool extends AbstractExecutorService {
             else if (w.qlock < 0)                     // recheck after spins
                 return false;
             else if (!Thread.interrupted()) {
-                long c, prevctl, parkTime, deadline;
+                long c, prevctl, parkTime;
                 int ac = (int)((c = ctl) >> AC_SHIFT) + (config & SMASK);
                 if ((ac <= 0 && tryTerminate(false, false)) ||
                     (runState & STOP) != 0)           // pool terminating
@@ -1812,11 +1802,10 @@ public class ForkJoinPool extends AbstractExecutorService {
                     int t = (short)(c >>> TC_SHIFT);  // shrink excess spares
                     if (t > 2 && U.compareAndSwapLong(this, CTL, c, prevctl))
                         return false;                 // else use timed wait
-                    parkTime = IDLE_TIMEOUT * ((t >= 0) ? 1 : 1 - t);
-                    deadline = System.nanoTime() + parkTime - TIMEOUT_SLOP;
+                    parkTime = Long.MAX_VALUE * ((t >= 0) ? 1 : 1 - t);
                 }
                 else
-                    prevctl = parkTime = deadline = 0L;
+                    prevctl = parkTime = 0L;
                 Thread wt = Thread.currentThread();
                 U.putObject(wt, PARKBLOCKER, this);   // emulate LockSupport
                 w.parker = wt;
@@ -1827,7 +1816,6 @@ public class ForkJoinPool extends AbstractExecutorService {
                 if (w.scanState >= 0)
                     break;
                 if (parkTime != 0L && ctl == c &&
-                    deadline - System.nanoTime() <= 0L &&
                     U.compareAndSwapLong(this, CTL, c, prevctl))
                     return false;                     // shrink pool
             }
@@ -2047,15 +2035,8 @@ public class ForkJoinPool extends AbstractExecutorService {
                     helpStealer(w, task);
                 if ((s = task.status) < 0)
                     break;
-                long ms, ns;
-                if (deadline == 0L)
-                    ms = 0L;
-                else if ((ns = deadline - System.nanoTime()) <= 0L)
-                    break;
-                else if ((ms = TimeUnit.NANOSECONDS.toMillis(ns)) <= 0L)
-                    ms = 1L;
                 if (tryCompensate(w)) {
-                    task.internalWait(ms);
+                    task.internalWait();
                     U.getAndAddLong(this, CTL, AC_UNIT);
                 }
             }
@@ -3104,47 +3085,6 @@ public class ForkJoinPool extends AbstractExecutorService {
     }
 
     /**
-     * Blocks until all tasks have completed execution after a
-     * shutdown request, or the timeout occurs, or the current thread
-     * is interrupted, whichever happens first. Because the {@link
-     * #commonPool()} never terminates until program shutdown, when
-     * applied to the common pool, this method is equivalent to {@link
-     * #awaitQuiescence(long, TimeUnit)} but always returns {@code false}.
-     *
-     * @param timeout the maximum time to wait
-     * @param unit the time unit of the timeout argument
-     * @return {@code true} if this executor terminated and
-     *         {@code false} if the timeout elapsed before termination
-     * @throws InterruptedException if interrupted while waiting
-     */
-    public boolean awaitTermination(long timeout, TimeUnit unit)
-        throws InterruptedException {
-        if (Thread.interrupted())
-            throw new InterruptedException();
-        if (this == common) {
-            awaitQuiescence(timeout, unit);
-            return false;
-        }
-        long nanos = unit.toNanos(timeout);
-        if (isTerminated())
-            return true;
-        if (nanos <= 0L)
-            return false;
-        long deadline = System.nanoTime() + nanos;
-        synchronized (this) {
-            for (;;) {
-                if (isTerminated())
-                    return true;
-                if (nanos <= 0L)
-                    return false;
-                long millis = TimeUnit.NANOSECONDS.toMillis(nanos);
-                wait(millis > 0L ? millis : 1L);
-                nanos = deadline - System.nanoTime();
-            }
-        }
-    }
-
-    /**
      * If called by a ForkJoinTask operating in this pool, equivalent
      * in effect to {@link ForkJoinTask#helpQuiesce}. Otherwise,
      * waits and/or attempts to assist performing tasks until this
@@ -3155,8 +3095,7 @@ public class ForkJoinPool extends AbstractExecutorService {
      * @return {@code true} if quiescent; {@code false} if the
      * timeout elapsed.
      */
-    public boolean awaitQuiescence(long timeout, TimeUnit unit) {
-        long nanos = unit.toNanos(timeout);
+    boolean awaitQuiescence(long timeout, TimeUnit unit) {
         ForkJoinWorkerThread wt;
         Thread thread = Thread.currentThread();
         if ((thread instanceof ForkJoinWorkerThread) &&
@@ -3164,15 +3103,12 @@ public class ForkJoinPool extends AbstractExecutorService {
             helpQuiescePool(wt.workQueue);
             return true;
         }
-        long startTime = System.nanoTime();
         WorkQueue[] ws;
         int r = 0, m;
         boolean found = true;
         while (!isQuiescent() && (ws = workQueues) != null &&
                (m = ws.length - 1) >= 0) {
             if (!found) {
-                if ((System.nanoTime() - startTime) > nanos)
-                    return false;
                 Thread.yield(); // cannot block
             }
             found = false;

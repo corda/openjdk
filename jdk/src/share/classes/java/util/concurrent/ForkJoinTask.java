@@ -296,18 +296,18 @@ public abstract class ForkJoinTask<V> implements Future<V>, Serializable {
     }
 
     /**
-     * If not done, sets SIGNAL status and performs Object.wait(timeout).
+     * If not done, sets SIGNAL status and performs Object.wait().
      * This task may or may not be done on exit. Ignores interrupts.
      *
      * @param timeout using Object.wait conventions.
      */
-    final void internalWait(long timeout) {
+    final void internalWait() {
         int s;
         if ((s = status) >= 0 && // force completer to issue notify
             U.compareAndSwapInt(this, STATUS, s, s | SIGNAL)) {
             synchronized (this) {
                 if (status >= 0)
-                    try { wait(timeout); } catch (InterruptedException ie) { }
+                    try { wait(); } catch (InterruptedException ie) { }
                 else
                     notifyAll();
             }
