@@ -229,18 +229,6 @@ final class MatchOps {
                                               Spliterator<S> spliterator) {
             return helper.wrapAndCopyInto(sinkSupplier.get(), spliterator).getAndClearState();
         }
-
-        @Override
-        public <S> Boolean evaluateParallel(PipelineHelper<T> helper,
-                                            Spliterator<S> spliterator) {
-            // Approach for parallel implementation:
-            // - Decompose as per usual
-            // - run match on leaf chunks, call result "b"
-            // - if b == matchKind.shortCircuitOn, complete early and return b
-            // - else if we complete normally, return !shortCircuitOn
-
-            return new MatchTask<>(this, helper, spliterator).invoke();
-        }
     }
 
     /**
@@ -264,54 +252,6 @@ final class MatchOps {
         @Override
         public boolean cancellationRequested() {
             return stop;
-        }
-    }
-
-    /**
-     * ForkJoinTask implementation to implement a parallel short-circuiting
-     * quantified match
-     *
-     * @param <P_IN> the type of source elements for the pipeline
-     * @param <P_OUT> the type of output elements for the pipeline
-     */
-    @SuppressWarnings("serial")
-    private static final class MatchTask<P_IN, P_OUT>
-            extends AbstractShortCircuitTask<P_IN, P_OUT, Boolean, MatchTask<P_IN, P_OUT>> {
-        private final MatchOp<P_OUT> op;
-
-        /**
-         * Constructor for root node
-         */
-        MatchTask(MatchOp<P_OUT> op, PipelineHelper<P_OUT> helper,
-                  Spliterator<P_IN> spliterator) {
-            super(helper, spliterator);
-            this.op = op;
-        }
-
-        /**
-         * Constructor for non-root node
-         */
-        MatchTask(MatchTask<P_IN, P_OUT> parent, Spliterator<P_IN> spliterator) {
-            super(parent, spliterator);
-            this.op = parent.op;
-        }
-
-        @Override
-        protected MatchTask<P_IN, P_OUT> makeChild(Spliterator<P_IN> spliterator) {
-            return new MatchTask<>(this, spliterator);
-        }
-
-        @Override
-        protected Boolean doLeaf() {
-            boolean b = helper.wrapAndCopyInto(op.sinkSupplier.get(), spliterator).getAndClearState();
-            if (b == op.matchKind.shortCircuitResult)
-                shortCircuit(b);
-            return null;
-        }
-
-        @Override
-        protected Boolean getEmptyResult() {
-            return !op.matchKind.shortCircuitResult;
         }
     }
 }

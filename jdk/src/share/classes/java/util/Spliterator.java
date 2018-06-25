@@ -241,48 +241,6 @@ import java.util.function.LongConsumer;
  *   }
  * }}</pre>
  *
- * <p>As an example how a parallel computation framework, such as the
- * {@code java.util.stream} package, would use Spliterator in a parallel
- * computation, here is one way to implement an associated parallel forEach,
- * that illustrates the primary usage idiom of splitting off subtasks until
- * the estimated amount of work is small enough to perform
- * sequentially. Here we assume that the order of processing across
- * subtasks doesn't matter; different (forked) tasks may further split
- * and process elements concurrently in undetermined order.  This
- * example uses a {@link java.util.concurrent.CountedCompleter};
- * similar usages apply to other parallel task constructions.
- *
- * <pre>{@code
- * static <T> void parEach(TaggedArray<T> a, Consumer<T> action) {
- *   Spliterator<T> s = a.spliterator();
- *   long targetBatchSize = s.estimateSize() / (ForkJoinPool.getCommonPoolParallelism() * 8);
- *   new ParEach(null, s, action, targetBatchSize).invoke();
- * }
- *
- * static class ParEach<T> extends CountedCompleter<Void> {
- *   final Spliterator<T> spliterator;
- *   final Consumer<T> action;
- *   final long targetBatchSize;
- *
- *   ParEach(ParEach<T> parent, Spliterator<T> spliterator,
- *           Consumer<T> action, long targetBatchSize) {
- *     super(parent);
- *     this.spliterator = spliterator; this.action = action;
- *     this.targetBatchSize = targetBatchSize;
- *   }
- *
- *   public void compute() {
- *     Spliterator<T> sub;
- *     while (spliterator.estimateSize() > targetBatchSize &&
- *            (sub = spliterator.trySplit()) != null) {
- *       addToPendingCount(1);
- *       new ParEach<>(this, sub, action, targetBatchSize).fork();
- *     }
- *     spliterator.forEachRemaining(action);
- *     propagateCompletion();
- *   }
- * }}</pre>
- *
  * @implNote
  * If the boolean system property {@code org.openjdk.java.util.stream.tripwire}
  * is set to {@code true} then diagnostic warnings are reported if boxing of

@@ -131,14 +131,6 @@ abstract class LongPipeline<E_IN>
     }
 
     @Override
-    final <P_IN> Node<Long> evaluateToNode(PipelineHelper<Long> helper,
-                                           Spliterator<P_IN> spliterator,
-                                           boolean flattenTree,
-                                           IntFunction<Long[]> generator) {
-        return Nodes.collectLong(helper, spliterator, flattenTree);
-    }
-
-    @Override
     final <P_IN> Spliterator<Long> wrap(PipelineHelper<Long> ph,
                                         Supplier<Spliterator<P_IN>> supplier) {
         return new StreamSpliterators.LongWrappingSpliterator<>(ph, supplier);
@@ -478,7 +470,7 @@ abstract class LongPipeline<E_IN>
 
     @Override
     public final long[] toArray() {
-        return Nodes.flattenLong((Node.OfLong) evaluateToArrayNode(Long[]::new))
+        return ((Node.OfLong) evaluateToArrayNode(Long[]::new))
                 .asPrimitiveArray();
     }
 

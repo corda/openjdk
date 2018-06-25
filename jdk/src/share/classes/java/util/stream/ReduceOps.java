@@ -30,7 +30,6 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.Spliterator;
-import java.util.concurrent.CountedCompleter;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
@@ -706,56 +705,6 @@ final class ReduceOps {
         public <P_IN> R evaluateSequential(PipelineHelper<T> helper,
                                            Spliterator<P_IN> spliterator) {
             return helper.wrapAndCopyInto(makeSink(), spliterator).get();
-        }
-
-        @Override
-        public <P_IN> R evaluateParallel(PipelineHelper<T> helper,
-                                         Spliterator<P_IN> spliterator) {
-            return new ReduceTask<>(this, helper, spliterator).invoke().get();
-        }
-    }
-
-    /**
-     * A {@code ForkJoinTask} for performing a parallel reduce operation.
-     */
-    @SuppressWarnings("serial")
-    private static final class ReduceTask<P_IN, P_OUT, R,
-                                          S extends AccumulatingSink<P_OUT, R, S>>
-            extends AbstractTask<P_IN, P_OUT, S, ReduceTask<P_IN, P_OUT, R, S>> {
-        private final ReduceOp<P_OUT, R, S> op;
-
-        ReduceTask(ReduceOp<P_OUT, R, S> op,
-                   PipelineHelper<P_OUT> helper,
-                   Spliterator<P_IN> spliterator) {
-            super(helper, spliterator);
-            this.op = op;
-        }
-
-        ReduceTask(ReduceTask<P_IN, P_OUT, R, S> parent,
-                   Spliterator<P_IN> spliterator) {
-            super(parent, spliterator);
-            this.op = parent.op;
-        }
-
-        @Override
-        protected ReduceTask<P_IN, P_OUT, R, S> makeChild(Spliterator<P_IN> spliterator) {
-            return new ReduceTask<>(this, spliterator);
-        }
-
-        @Override
-        protected S doLeaf() {
-            return helper.wrapAndCopyInto(op.makeSink(), spliterator);
-        }
-
-        @Override
-        public void onCompletion(CountedCompleter<?> caller) {
-            if (!isLeaf()) {
-                S leftResult = leftChild.getLocalResult();
-                leftResult.combine(rightChild.getLocalResult());
-                setLocalResult(leftResult);
-            }
-            // GC spliterator, left and right child
-            super.onCompletion(caller);
         }
     }
 }
