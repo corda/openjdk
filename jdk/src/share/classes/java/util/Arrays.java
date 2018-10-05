@@ -125,7 +125,7 @@ public class Arrays {
      * same form: Performing argument checks if necessary, and then
      * expanding arguments into those required for the internal
      * implementation methods residing in other package-private
-     * classes (except for legacyMergeSort, included in this class).
+     * classes.
      */
 
     /**
@@ -445,19 +445,6 @@ public class Arrays {
      */
 
     /**
-     * Old merge sort implementation can be selected (for
-     * compatibility with broken comparators) using a system property.
-     * Cannot be a static boolean in the enclosing class due to
-     * circular dependencies. To be removed in a future release.
-     */
-    static final class LegacyMergeSort {
-        private static final boolean userRequested =
-            java.security.AccessController.doPrivileged(
-                new sun.security.action.GetBooleanAction(
-                    "java.util.Arrays.useLegacyMergeSort")).booleanValue();
-    }
-
-    /**
      * Sorts the specified array of objects into ascending order, according
      * to the {@linkplain Comparable natural ordering} of its elements.
      * All elements in the array must implement the {@link Comparable}
@@ -500,16 +487,7 @@ public class Arrays {
      *         {@link Comparable} contract
      */
     public static void sort(Object[] a) {
-        if (LegacyMergeSort.userRequested)
-            legacyMergeSort(a);
-        else
-            ComparableTimSort.sort(a, 0, a.length, null, 0, 0);
-    }
-
-    /** To be removed in a future release. */
-    private static void legacyMergeSort(Object[] a) {
-        Object[] aux = a.clone();
-        mergeSort(aux, a, 0, a.length, 0);
+        ComparableTimSort.sort(a, 0, a.length, null, 0, 0);
     }
 
     /**
@@ -566,83 +544,7 @@ public class Arrays {
      */
     public static void sort(Object[] a, int fromIndex, int toIndex) {
         rangeCheck(a.length, fromIndex, toIndex);
-        if (LegacyMergeSort.userRequested)
-            legacyMergeSort(a, fromIndex, toIndex);
-        else
-            ComparableTimSort.sort(a, fromIndex, toIndex, null, 0, 0);
-    }
-
-    /** To be removed in a future release. */
-    private static void legacyMergeSort(Object[] a,
-                                        int fromIndex, int toIndex) {
-        Object[] aux = copyOfRange(a, fromIndex, toIndex);
-        mergeSort(aux, a, fromIndex, toIndex, -fromIndex);
-    }
-
-    /**
-     * Tuning parameter: list size at or below which insertion sort will be
-     * used in preference to mergesort.
-     * To be removed in a future release.
-     */
-    private static final int INSERTIONSORT_THRESHOLD = 7;
-
-    /**
-     * Src is the source array that starts at index 0
-     * Dest is the (possibly larger) array destination with a possible offset
-     * low is the index in dest to start sorting
-     * high is the end index in dest to end sorting
-     * off is the offset to generate corresponding low, high in src
-     * To be removed in a future release.
-     */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private static void mergeSort(Object[] src,
-                                  Object[] dest,
-                                  int low,
-                                  int high,
-                                  int off) {
-        int length = high - low;
-
-        // Insertion sort on smallest arrays
-        if (length < INSERTIONSORT_THRESHOLD) {
-            for (int i=low; i<high; i++)
-                for (int j=i; j>low &&
-                         ((Comparable) dest[j-1]).compareTo(dest[j])>0; j--)
-                    swap(dest, j, j-1);
-            return;
-        }
-
-        // Recursively sort halves of dest into src
-        int destLow  = low;
-        int destHigh = high;
-        low  += off;
-        high += off;
-        int mid = (low + high) >>> 1;
-        mergeSort(dest, src, low, mid, -off);
-        mergeSort(dest, src, mid, high, -off);
-
-        // If list is already sorted, just copy from src to dest.  This is an
-        // optimization that results in faster sorts for nearly ordered lists.
-        if (((Comparable)src[mid-1]).compareTo(src[mid]) <= 0) {
-            System.arraycopy(src, low, dest, destLow, length);
-            return;
-        }
-
-        // Merge sorted halves (now in src) into dest
-        for(int i = destLow, p = low, q = mid; i < destHigh; i++) {
-            if (q >= high || p < mid && ((Comparable)src[p]).compareTo(src[q])<=0)
-                dest[i] = src[p++];
-            else
-                dest[i] = src[q++];
-        }
-    }
-
-    /**
-     * Swaps x[a] with x[b].
-     */
-    private static void swap(Object[] x, int a, int b) {
-        Object t = x[a];
-        x[a] = x[b];
-        x[b] = t;
+        ComparableTimSort.sort(a, fromIndex, toIndex, null, 0, 0);
     }
 
     /**
@@ -692,20 +594,8 @@ public class Arrays {
         if (c == null) {
             sort(a);
         } else {
-            if (LegacyMergeSort.userRequested)
-                legacyMergeSort(a, c);
-            else
-                TimSort.sort(a, 0, a.length, c, null, 0, 0);
+            TimSort.sort(a, 0, a.length, c, null, 0, 0);
         }
-    }
-
-    /** To be removed in a future release. */
-    private static <T> void legacyMergeSort(T[] a, Comparator<? super T> c) {
-        T[] aux = a.clone();
-        if (c==null)
-            mergeSort(aux, a, 0, a.length, 0);
-        else
-            mergeSort(aux, a, 0, a.length, 0, c);
     }
 
     /**
@@ -766,68 +656,7 @@ public class Arrays {
             sort(a, fromIndex, toIndex);
         } else {
             rangeCheck(a.length, fromIndex, toIndex);
-            if (LegacyMergeSort.userRequested)
-                legacyMergeSort(a, fromIndex, toIndex, c);
-            else
-                TimSort.sort(a, fromIndex, toIndex, c, null, 0, 0);
-        }
-    }
-
-    /** To be removed in a future release. */
-    private static <T> void legacyMergeSort(T[] a, int fromIndex, int toIndex,
-                                            Comparator<? super T> c) {
-        T[] aux = copyOfRange(a, fromIndex, toIndex);
-        if (c==null)
-            mergeSort(aux, a, fromIndex, toIndex, -fromIndex);
-        else
-            mergeSort(aux, a, fromIndex, toIndex, -fromIndex, c);
-    }
-
-    /**
-     * Src is the source array that starts at index 0
-     * Dest is the (possibly larger) array destination with a possible offset
-     * low is the index in dest to start sorting
-     * high is the end index in dest to end sorting
-     * off is the offset into src corresponding to low in dest
-     * To be removed in a future release.
-     */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private static void mergeSort(Object[] src,
-                                  Object[] dest,
-                                  int low, int high, int off,
-                                  Comparator c) {
-        int length = high - low;
-
-        // Insertion sort on smallest arrays
-        if (length < INSERTIONSORT_THRESHOLD) {
-            for (int i=low; i<high; i++)
-                for (int j=i; j>low && c.compare(dest[j-1], dest[j])>0; j--)
-                    swap(dest, j, j-1);
-            return;
-        }
-
-        // Recursively sort halves of dest into src
-        int destLow  = low;
-        int destHigh = high;
-        low  += off;
-        high += off;
-        int mid = (low + high) >>> 1;
-        mergeSort(dest, src, low, mid, -off, c);
-        mergeSort(dest, src, mid, high, -off, c);
-
-        // If list is already sorted, just copy from src to dest.  This is an
-        // optimization that results in faster sorts for nearly ordered lists.
-        if (c.compare(src[mid-1], src[mid]) <= 0) {
-           System.arraycopy(src, low, dest, destLow, length);
-           return;
-        }
-
-        // Merge sorted halves (now in src) into dest
-        for(int i = destLow, p = low, q = mid; i < destHigh; i++) {
-            if (q >= high || p < mid && c.compare(src[p], src[q]) <= 0)
-                dest[i] = src[p++];
-            else
-                dest[i] = src[q++];
+            TimSort.sort(a, fromIndex, toIndex, c, null, 0, 0);
         }
     }
 
