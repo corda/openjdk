@@ -25,6 +25,8 @@
 
 package java.io;
 
+import java.nio.channels.FileChannel;
+
 /**
  * A file output stream is an output stream for writing data to a
  * <code>File</code> or to a <code>FileDescriptor</code>. Whether or not
@@ -58,6 +60,11 @@ class FileOutputStream extends OutputStream
      * True if the file is opened for append.
      */
     private final boolean append;
+
+    /**
+     * The associated channel, initialized lazily.
+     */
+    private FileChannel channel;
 
     /**
      * The path of the referenced file
@@ -359,6 +366,19 @@ class FileOutputStream extends OutputStream
         }
         throw new IOException();
      }
+
+    /**
+     * Returns the unique {@link java.nio.channels.FileChannel FileChannel}
+     * object associated with this file output stream.
+     *
+     * @return  the file channel associated with this file output stream
+     *
+     * @since 1.4
+     * @spec JSR-51
+     */
+    public FileChannel getChannel() {
+        return channel;
+    }
 
     /**
      * Cleans up the connection to the file, and ensures that the
