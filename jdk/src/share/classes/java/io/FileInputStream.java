@@ -25,6 +25,8 @@
 
 package java.io;
 
+import java.nio.channels.FileChannel;
+
 /**
  * A <code>FileInputStream</code> obtains input bytes
  * from a file in a file system. What files
@@ -53,6 +55,8 @@ class FileInputStream extends InputStream
      * (null if the stream is created with a file descriptor)
      */
     private final String path;
+
+    private FileChannel channel = null;
 
     private final Object closeLock = new Object();
     private volatile boolean closed = false;
@@ -342,6 +346,19 @@ class FileInputStream extends InputStream
             return fd;
         }
         throw new IOException();
+    }
+
+    /**
+     * Returns the unique {@link java.nio.channels.FileChannel FileChannel}
+     * object associated with this file input stream.
+     *
+     * @return  the file channel associated with this file input stream
+     *
+     * @since 1.4
+     * @spec JSR-51
+     */
+    public FileChannel getChannel() {
+        return channel;
     }
 
     private static native void initIDs();
