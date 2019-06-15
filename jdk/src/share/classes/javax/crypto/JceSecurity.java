@@ -191,7 +191,7 @@ final class JceSecurity {
 
     static {
         try {
-            NULL_URL = new URL("http://null.oracle.com/");
+            NULL_URL = new URL("file://null.oracle.com/");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
